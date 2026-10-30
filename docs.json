@@ -836,5 +836,10 @@
         ]
       }
     ]
+  },
+  "seo": {
+    "metatags": {
+      "canonical": "https://docs.cedarcopilot.com"
+    }
   }
 }
