@@ -3,28 +3,58 @@ title: "config-write"
 description: "Parameters, scopes, and response schema for config-write."
 ---
 
-Generated from Cedar's external registration and Zod schemas. Your connection's `tools/list` is authoritative for availability. See [calling tools](/getting-started/calling-tools) and [permissions](/getting-started/permissions).
+Generated from Cedar's actual registration and Zod schemas. Your connection's `tools/list` is authoritative for availability. See [calling tools](/getting-started/calling-tools) and [permissions](/getting-started/permissions).
 
-## Capability
+## Capabilities
+
+[Configuration overview](/modules/configuration) · [Complete capabilities](/capabilities/configuration).
+
+<Accordion title="Full tool behavior and constraints">
 
 For "why didn't X happen"/system-behavior questions, load-skill('cedar-configuration') first — these actions write/mutate raw config, they don't explain behavior. ACTIONS: (1) reassign-aop — re-evaluate/reassign a conversation's AOP. (2) create-field — add a custom field. A field backed by a CRM picklist/multi-select (select OR list) is created with sourceFromCrm — never hand-typed options — then read back (config-read list-fields) to confirm it has options. (3) update-field — edit a custom or built-in field's label/description/governance flags. (4) delete-field — remove a custom field. (5) link-mapping — associate/reconcile a field with an external CRM field; the only agent tool path that changes a mapped field's options. (6) unlink-mapping — remove that association. (7-9) add/update/remove-field-option — manage a select/list field's options by value. (10) set-stage-criteria — set a stage's entry or exit criteria text in its PLAYBOOK.md. This changes the shared stage process for the whole team (org-level); it is not for one rep's personal rule. MUST load-skill('cedar-configuration', 'fields-and-values') before using the field actions — it has the full rules (built-in field keys, the mapped-field options restriction, delete/reconciliation safety) this omits. Each action takes its params in a same-named object (e.g. action: "create-field" pairs with a createField: &#123;...&#125; object) — omit every params object except the one matching your chosen action. For a CONNECTED INTEGRATION's own config (CRM field mappings, Slack sync, sync toggles, connection instructions, playbook webhooks) use connection-write. For inbox layout, inbox tabs, and task groups use workspace-write. For credentials and MCP servers use systems-write.
 
+</Accordion>
+
 ## Operations and scopes
 
-| Action | Baseline scope |
-| --- | --- |
-| `reassign-aop` | `playbook:write` |
-| `create-field` | `playbook:write` |
-| `update-field` | `playbook:write` |
-| `delete-field` | `playbook:write` |
-| `link-mapping` | `playbook:write` |
-| `unlink-mapping` | `playbook:write` |
-| `add-field-option` | `playbook:write` |
-| `update-field-option` | `playbook:write` |
-| `remove-field-option` | `playbook:write` |
-| `set-stage-criteria` | `playbook:write` |
+| Action | Capability | Baseline scope |
+| --- | --- | --- |
+| `reassign-aop` | Re-evaluate a conversation's AOP, with options to clear old working memory and initialize new fields. | `playbook:write` |
+| `create-field` | Create a custom field with its type, definition and supported settings. | `playbook:write` |
+| `update-field` | Edit an existing field; its type is immutable and mapped picklist options require reconciliation. | `playbook:write` |
+| `delete-field` | Remove a field through the supported configuration lifecycle. | `playbook:write` |
+| `link-mapping` | Link a CRM field and reconcile real provider options, reporting removed options for review. | `playbook:write` |
+| `unlink-mapping` | Remove the selected field's external CRM mapping. | `playbook:write` |
+| `add-field-option` | Add an allowed option where field governance and mapping rules permit it. | `playbook:write` |
+| `update-field-option` | Update a field option while respecting mapped-option constraints. | `playbook:write` |
+| `remove-field-option` | Remove a field option through the supported option operation. | `playbook:write` |
+| `set-stage-criteria` | Set a shared sales stage's entry and exit criteria. | `playbook:write` |
 
 Path, account role, feature gates, target ownership, and billing permissions can impose additional requirements.
+
+## Supported options and filters
+
+Every finite input choice is listed here, including array values and nested variants. Free-text filters, dates, numeric ranges and runtime validation are covered in the [parameter tables](/reference/config-write#parameters). Options apply to their named operation or branch.
+
+| Input | Choices | Variant / meaning |
+| --- | --- | --- |
+| `createField.internalSignals.definitions[].eligibility` | `any`, `lost_or_lapsed`, `customer` |  |
+| `createField.signal.enabled` | `true` |  |
+| `createField.scope` | `user`, `org` | Field owner: user AOP or linked org AOP. list-fields returns both; CRM mappings stay user-scoped. |
+| `createField.type` | `text`, `number`, `date`, `boolean`, `select`, `currency`, `url`, `email`, `phone`, `list`, `fraction`, `json`, `people`, `summarized_history`, `deal_brief` | Field type. Fixed forever once created — there is no update-field path to change it. |
+| `updateField.internalSignals.definitions[].eligibility` | `any`, `lost_or_lapsed`, `customer` |  |
+| `updateField.signal.enabled` | `true` |  |
+| `updateField.scope` | `user`, `org` | Field owner: user AOP or linked org AOP. list-fields returns both; CRM mappings stay user-scoped. |
+| `deleteField.scope` | `user`, `org` | Field owner: user AOP or linked org AOP. list-fields returns both; CRM mappings stay user-scoped. |
+| `linkMapping.scope` | `user`, `org` | Field owner: user AOP or linked org AOP. list-fields returns both; CRM mappings stay user-scoped. |
+| `linkMapping.resolutions[].action` | `remap-to` | action=remap-to — Bulk-migrates every existing stored value from oldValue to newValue, then drops the old option. |
+| `linkMapping.resolutions[].action` | `keep-legacy` | action=keep-legacy — Leaves existing stored values as-is (no longer selectable going forward) and drops the old option. |
+| `addFieldOption.scope` | `user`, `org` | Field owner: user AOP or linked org AOP. list-fields returns both; CRM mappings stay user-scoped. |
+| `updateFieldOption.scope` | `user`, `org` | Field owner: user AOP or linked org AOP. list-fields returns both; CRM mappings stay user-scoped. |
+| `removeFieldOption.scope` | `user`, `org` | Field owner: user AOP or linked org AOP. list-fields returns both; CRM mappings stay user-scoped. |
+| `removeFieldOption.resolution.action` | `remap-to` | action=remap-to — Bulk-migrates every existing stored value from this option to newValue, then removes it. |
+| `removeFieldOption.resolution.action` | `keep-legacy` | action=keep-legacy — Leaves existing stored values as-is (no longer selectable going forward) and removes the option. |
+| `setStageCriteria.field` | `entry`, `exit` | Which criteria block to set. |
 
 ## Parameters
 
@@ -76,7 +106,134 @@ Path, account role, feature gates, target ownership, and billing permissions can
 | `sourceFromCrm` | object | No | Select/list only: create and link+reconcile the live CRM picklist in one call. Options use current CRM values/labels, never hand-typed. Mutually exclusive with options.  |
 | `targetUserId` | string | No | Org owner/admin only: target a same-org member user AOP (scope=user). Omit for self; non-admins and cross-org targets are rejected.  |
 
+### createField.internalSignals
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `definitions` | object&#91;&#93; | Yes |   |
+| `lifecycle` | object | Yes |   |
+
+### createField.internalSignals.definitions item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `id` | string | Yes |  minLength: 1 |
+| `type` | string | Yes |  minLength: 1 |
+| `enabled` | boolean | Yes |   |
+| `instructions` | string | Yes |  minLength: 1 |
+| `description` | string | No |   |
+| `eligibility` | "any" · "lost_or_lapsed" · "customer" | No |  default: "any" |
+
+### createField.internalSignals.lifecycle
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `lostStatuses` | string&#91;&#93; | No |  default: &#91;&#93; |
+| `customerStatuses` | string&#91;&#93; | No |  default: &#91;&#93; |
+| `activeStatuses` | string&#91;&#93; | No |  default: &#91;&#93; |
+| `excludedLossReasons` | string&#91;&#93; | No |  default: &#91;&#93; |
+| `contactRestrictionFieldId` | string | No |   |
+| `lossReasonFieldId` | string | No |   |
+| `lapsedFieldId` | string | No |   |
+
+### createField.signal
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `enabled` | true | Yes |   |
+| `description` | string | No |   |
+
+### createField.dealBriefStages
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `discovery` | object | No |   |
+| `demo` | object | No |   |
+| `commercial` | object | No |   |
+| `negotiation` | object | No |   |
+
+### createField.dealBriefStages.discovery
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `visible` | boolean | Yes |   |
+| `rows` | object&#91;&#93; | Yes |  maxItems: 3 |
+
+### createField.dealBriefStages.discovery.rows item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `label` | string | Yes |  minLength: 1 |
+| `instruction` | string | Yes |   |
+| `graded` | boolean | Yes |   |
+
+### createField.dealBriefStages.demo
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `visible` | boolean | Yes |   |
+| `rows` | object&#91;&#93; | Yes |  maxItems: 3 |
+
+### createField.dealBriefStages.demo.rows item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `label` | string | Yes |  minLength: 1 |
+| `instruction` | string | Yes |   |
+| `graded` | boolean | Yes |   |
+
+### createField.dealBriefStages.commercial
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `visible` | boolean | Yes |   |
+| `rows` | object&#91;&#93; | Yes |  maxItems: 3 |
+
+### createField.dealBriefStages.commercial.rows item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `label` | string | Yes |  minLength: 1 |
+| `instruction` | string | Yes |   |
+| `graded` | boolean | Yes |   |
+
+### createField.dealBriefStages.negotiation
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `visible` | boolean | Yes |   |
+| `rows` | object&#91;&#93; | Yes |  maxItems: 3 |
+
+### createField.dealBriefStages.negotiation.rows item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `label` | string | Yes |  minLength: 1 |
+| `instruction` | string | Yes |   |
+| `graded` | boolean | Yes |   |
+
+### createField.options item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `value` | string | Yes | Stable option value — never changes once set; use label for the display text.  |
+| `label` | string | No |   |
+| `color` | string | Yes |   |
+| `icon` | string | No |   |
+| `enumOrder` | integer | No | Position in the list. Omit to append in array order.  |
+
+### createField.sourceFromCrm
+
+Select/list only: create and link+reconcile the live CRM picklist in one call. Options use current CRM values/labels, never hand-typed. Mutually exclusive with options.
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `connectionId` | string | Yes | From read-settings sections:&#91;"connections"&#93;.  |
+| `crmFieldName` | string | Yes | The external CRM's own field name/API key whose live picklist becomes this field's options (e.g. HubSpot's "dealstage").  |
+
 ### updateField
+
+Deliberately has no `type` field — type is immutable once a field is created. For a field with a live external CRM mapping, this action also rejects editing `options` — that must go through link-mapping instead.
 
 | Parameter | Type | Required | Details |
 | --- | --- | --- | --- |
@@ -95,6 +252,114 @@ Path, account role, feature gates, target ownership, and billing permissions can
 | `ownerAgentId` | string or null | No | Owning subagent's agent_id — only that agent may write this field. Omit to leave the current owner unchanged; pass null (not omit) to explicitly clear an existing owner.  |
 | `targetUserId` | string | No | Org owner/admin only: target a same-org member user AOP (scope=user). Omit for self; non-admins and cross-org targets are rejected.  |
 
+### updateField.internalSignals
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `definitions` | object&#91;&#93; | Yes |   |
+| `lifecycle` | object | Yes |   |
+
+### updateField.internalSignals.definitions item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `id` | string | Yes |  minLength: 1 |
+| `type` | string | Yes |  minLength: 1 |
+| `enabled` | boolean | Yes |   |
+| `instructions` | string | Yes |  minLength: 1 |
+| `description` | string | No |   |
+| `eligibility` | "any" · "lost_or_lapsed" · "customer" | No |  default: "any" |
+
+### updateField.internalSignals.lifecycle
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `lostStatuses` | string&#91;&#93; | No |  default: &#91;&#93; |
+| `customerStatuses` | string&#91;&#93; | No |  default: &#91;&#93; |
+| `activeStatuses` | string&#91;&#93; | No |  default: &#91;&#93; |
+| `excludedLossReasons` | string&#91;&#93; | No |  default: &#91;&#93; |
+| `contactRestrictionFieldId` | string | No |   |
+| `lossReasonFieldId` | string | No |   |
+| `lapsedFieldId` | string | No |   |
+
+### updateField.signal
+
+Buyer Journey is a default card below Tasks, separate from People. It uses journey_problem, journey_solution, journey_buying, journey_alternatives and journey_commercial. Buyer Journey replaces the standard MEDDIC/MEDDPICC seed. Untouched legacy qualification fields are hidden in conversation views without deleting saved values or configuration; customized rubrics and CRM-mapped qualification fields remain visible. Configure stage versions with dealBriefStages: discovery, demo, commercial, negotiation, each with visible and up to three rows (&#123;label, instruction, graded&#125;). Commercial is hidden until the Commercial stage by default. Later rubrics may remove obsolete items. Keep Power and Competition. Use the same CRM Updater; buyer-journey selection is independent of CRM status. Row values are concise facts with strength 0–100 scored against fixed rubric anchors; unknown is null. Early Power uses Power known and Path to power agreed; later Power uses Power reached and Power engaged. Problem always uses Stated problem, Priority, Quantify impact. Stated problem may list up to three distinct established buyer problems on numbered lines (1., 2., 3.), normally 3–8 words each, using actual newlines. Never invent or pad problems; none established means Unknown and strength:null. Keep one assessment for the entire Stated problem row. Stated problem scores 75 for a concrete buyer-stated problem; 100 requires a buyer-validated shared definition, affected workflow and scope without material ambiguity. Solution fit uses Stated criteria, Sentiment, Solution solves stated problems; include product gaps within criteria. Current state belongs in Competition. description is base guidance; stage rows take precedence.
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `enabled` | true | Yes |   |
+| `description` | string | No |   |
+
+### updateField.dealBriefStages
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `discovery` | object | No |   |
+| `demo` | object | No |   |
+| `commercial` | object | No |   |
+| `negotiation` | object | No |   |
+
+### updateField.dealBriefStages.discovery
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `visible` | boolean | Yes |   |
+| `rows` | object&#91;&#93; | Yes |  maxItems: 3 |
+
+### updateField.dealBriefStages.discovery.rows item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `label` | string | Yes |  minLength: 1 |
+| `instruction` | string | Yes |   |
+| `graded` | boolean | Yes |   |
+
+### updateField.dealBriefStages.demo
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `visible` | boolean | Yes |   |
+| `rows` | object&#91;&#93; | Yes |  maxItems: 3 |
+
+### updateField.dealBriefStages.demo.rows item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `label` | string | Yes |  minLength: 1 |
+| `instruction` | string | Yes |   |
+| `graded` | boolean | Yes |   |
+
+### updateField.dealBriefStages.commercial
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `visible` | boolean | Yes |   |
+| `rows` | object&#91;&#93; | Yes |  maxItems: 3 |
+
+### updateField.dealBriefStages.commercial.rows item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `label` | string | Yes |  minLength: 1 |
+| `instruction` | string | Yes |   |
+| `graded` | boolean | Yes |   |
+
+### updateField.dealBriefStages.negotiation
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `visible` | boolean | Yes |   |
+| `rows` | object&#91;&#93; | Yes |  maxItems: 3 |
+
+### updateField.dealBriefStages.negotiation.rows item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `label` | string | Yes |  minLength: 1 |
+| `instruction` | string | Yes |   |
+| `graded` | boolean | Yes |   |
+
 ### deleteField
 
 | Parameter | Type | Required | Details |
@@ -106,6 +371,8 @@ Path, account role, feature gates, target ownership, and billing permissions can
 
 ### linkMapping
 
+For select/list-type fields, this is the only agent tool path that changes options once a field is mapped — never hand-type allowedValues. Live-inspects the CRM field's real picklist (or falls back to a cached snapshot, flagged as such), then safely applies renames/additions and reports (never auto-resolves) any removed option.
+
 | Parameter | Type | Required | Details |
 | --- | --- | --- | --- |
 | `scope` | "user" · "org" | Yes | Field owner: user AOP or linked org AOP. list-fields returns both; CRM mappings stay user-scoped.  |
@@ -115,6 +382,21 @@ Path, account role, feature gates, target ownership, and billing permissions can
 | `crmFieldName` | string | Yes | The external CRM's own field name/API key (e.g. HubSpot's "dealstage").  |
 | `resolutions` | object or object&#91;&#93; | No | Closes out previously-surfaced removed options from an earlier link-mapping call's `reconciliation.removed`. Omit on a first call for a field — there is nothing to resolve yet.  |
 | `targetUserId` | string | No | Org owner/admin only: target a same-org member user AOP (scope=user). Omit for self; non-admins and cross-org targets are rejected.  |
+
+### linkMapping.resolutions item — action: remap-to
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `oldValue` | string | Yes | The removed CRM option's stable value, as previously surfaced in a link-mapping response's `reconciliation.removed`.  |
+| `action` | "remap-to" | Yes | Bulk-migrates every existing stored value from oldValue to newValue, then drops the old option.  |
+| `newValue` | string | Yes | The option value (from the current picklist) to migrate existing stored values to.  |
+
+### linkMapping.resolutions item — action: keep-legacy
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `oldValue` | string | Yes | The removed CRM option's stable value, as previously surfaced in a link-mapping response's `reconciliation.removed`.  |
+| `action` | "keep-legacy" | Yes | Leaves existing stored values as-is (no longer selectable going forward) and drops the old option.  |
 
 ### unlinkMapping
 
@@ -162,6 +444,19 @@ Path, account role, feature gates, target ownership, and billing permissions can
 | `value` | string | Yes |   |
 | `resolution` | object or object | No | For a CUSTOM field only (built-in fields' options are never value-reconciled): required when the option has existing stored values. Omit on a first call — if values exist, the call refuses and reports affectedValueCount instead of deleting silently; call again with a resolution once you know what to do with them.  |
 | `targetUserId` | string | No | Org owner/admin only: target a same-org member user AOP (scope=user). Omit for self; non-admins and cross-org targets are rejected.  |
+
+### removeFieldOption.resolution — action: remap-to
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `action` | "remap-to" | Yes | Bulk-migrates every existing stored value from this option to newValue, then removes it.  |
+| `newValue` | string | Yes | The option value (from the field's remaining options) to migrate existing stored values to.  |
+
+### removeFieldOption.resolution — action: keep-legacy
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `action` | "keep-legacy" | Yes | Leaves existing stored values as-is (no longer selectable going forward) and removes the option.  |
 
 ### setStageCriteria
 

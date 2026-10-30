@@ -1,80 +1,184 @@
 ---
 title: "Tool catalog"
-description: "The complete external MCP surface, grouped by module."
+description: "Every registered tool, grouped by module and availability."
 ---
 
-Cedar exposes 40 family tools in this source snapshot, plus `load-skill` and the gated `load-brain-skills`. Each family groups related operations under an `action` or `channel`. Available tools vary by scopes, organization role, and feature flags.
+This inventory covers **44 external registrations** (including staff and feature-gated tools), **8 Cedar-app-only tools**, and **20 registered skills**. Customer connections receive only the tools their scopes, role, and features permit.
 
-The reference records advertised schemas, including explicitly labeled restricted actions. It does not promise that every advertised operation is authorized. [Download the complete family catalog](/reference/catalog.json).
+Every action and nested configuration variant is indexed in the [capability coverage index](/reference/coverage). Every skill and resource is listed in the [skill catalog](/skills/index). [Download the complete catalog](/reference/catalog.json).
 
-## LinkedIn
+## Overview
+
+### Saved views
+
+- [`ui-config`](/reference/ui-config)
+
+### Workspace preferences
+
+- [`workspace-write`](/reference/workspace-write)
+
+### Billing
+
+- [`billing-read`](/reference/billing-read)
+- [`billing-write`](/reference/billing-write)
+
+### Usage and delivery recovery
+
+- [`usage-observations-read`](/reference/usage-observations-read)
+- [`usage-observations-retry`](/reference/usage-observations-retry)
+
+### Customer support
+
+- [`send-user-feedback`](/reference/send-user-feedback)
+
+### Staff administration
+
+- [`analytics`](/reference/analytics)
+- [`billing-admin`](/reference/billing-admin)
+- [`cedar-staff-debug`](/reference/cedar-staff-debug)
+
+## Agent platform
+
+### User tasks
+
+- [`task`](/reference/task)
+
+### Playbooks and triggers
+
+- [`aop-write`](/reference/aop-write)
+
+### Connected systems
+
+- [`systems-write`](/reference/systems-write)
+- [`external-mcp`](/reference/external-mcp)
+
+### Workflow buttons
+
+- [`workflow`](/reference/workflow)
+
+### Delegation and code execution
+
+- [`delegate`](/reference/delegate)
+
+### Chat context and history
+
+- [`chat-context`](/reference/chat-context)
+- [`search-chat-history`](/reference/search-chat-history)
+- [`load-chat-history`](/reference/load-chat-history)
+- [`switch-chat-thread`](/reference/switch-chat-thread)
+
+### Configuration
+
+- [`config-read`](/reference/config-read)
+- [`config-write`](/reference/config-write)
+
+### Organization administration
+
+- [`config-propagate`](/reference/config-propagate)
+
+### Skill loading
+
+- [`load-skill`](/reference/load-skill)
+- [`load-brain-skills`](/reference/load-brain-skills)
+
+### Diagnostics
+
+- [`debug`](/reference/debug)
+
+## Channels
+
+### LinkedIn
 
 - [`linkedin-read`](/reference/linkedin-read)
 - [`linkedin-write`](/reference/linkedin-write)
 
-## Signals
+### Email
+
+- [`mail`](/reference/mail)
+- [`send-email`](/reference/send-email)
+
+### Email tracking
+
+- [`email-tracking`](/reference/email-tracking)
+
+### Slack
+
+- [`slack-read`](/reference/slack-read)
+- [`slack-write`](/reference/slack-write)
+
+### Meetings
+
+- [`meetings`](/reference/meetings)
+
+### Calendar
+
+- [`calendar`](/reference/calendar)
+
+### Drafting
+
+- [`draft-comms`](/reference/draft-comms)
+
+### Message scheduling
+
+- [`schedule-send`](/reference/schedule-send)
+
+### Notifications
+
+- [`notify`](/reference/notify)
+
+## Enrichment
+
+### Enrichment and research tools
+
+- [`research`](/reference/research)
+
+### Data services
+
+- [`data-settings`](/reference/data-settings)
+
+## Pipeline intelligence
+
+### CRM analytics
+
+- [`conversation-analytics`](/reference/conversation-analytics)
+
+### Signals
 
 - [`signals-read`](/reference/signals-read)
 - [`signals-write`](/reference/signals-write)
 
-## Slack and notifications
+## Brain
 
-- [`slack-read`](/reference/slack-read)
-- [`slack-write`](/reference/slack-write)
-- [`notify`](/reference/notify)
-
-## Email and scheduling
-
-- [`mail`](/reference/mail)
-- [`email-tracking`](/reference/email-tracking)
-- [`draft-comms`](/reference/draft-comms)
-- [`send-email`](/reference/send-email)
-- [`schedule-send`](/reference/schedule-send)
-
-## CRM, meetings and tasks
+### CRM conversations
 
 - [`conversation-read`](/reference/conversation-read)
 - [`conversation-write`](/reference/conversation-write)
-- [`conversation-analytics`](/reference/conversation-analytics)
-- [`run-sql`](/reference/run-sql)
-- [`taxonomy-fields`](/reference/taxonomy-fields)
-- [`meetings`](/reference/meetings)
-- [`calendar`](/reference/calendar)
-- [`task`](/reference/task)
 
-## Documents and research
+### Field intelligence
+
+- [`taxonomy-fields`](/reference/taxonomy-fields)
+
+### SQL reporting
+
+- [`run-sql`](/reference/run-sql)
+
+### Documents
 
 - [`document-read`](/reference/document-read)
 - [`document-write`](/reference/document-write)
+
+### Tables
+
 - [`table`](/reference/table)
-- [`research`](/reference/research)
-- [`ui-config`](/reference/ui-config)
 
-## Configuration
+### Boards
 
-- [`config-read`](/reference/config-read)
-- [`config-write`](/reference/config-write)
+- [`board`](/reference/board)
+
+### Connections
+
 - [`connection-write`](/reference/connection-write)
-- [`aop-write`](/reference/aop-write)
-- [`workspace-write`](/reference/workspace-write)
-- [`systems-write`](/reference/systems-write)
-- [`data-settings`](/reference/data-settings)
-- [`config-propagate`](/reference/config-propagate)
-
-## Billing and diagnostics
-
-- [`billing-read`](/reference/billing-read)
-- [`billing-write`](/reference/billing-write)
-- [`usage-observations-read`](/reference/usage-observations-read)
-- [`usage-observations-retry`](/reference/usage-observations-retry)
-- [`billing-admin`](/reference/billing-admin)
-- [`debug`](/reference/debug)
-- [`send-user-feedback`](/reference/send-user-feedback)
-
-## Skills
-
-- [`load-skill` and `load-brain-skills`](/reference/skills)
 
 ## Surface boundaries
 
-Boards, graphs, general code execution, Cedar subagent spawning, outbound flow creation, and HeyReach campaign management are not registered external MCP families. Some have Cedar app or separate API surfaces; see [capability boundaries](/getting-started/capability-boundaries).
+App-only operations are labeled inside their parent area with explicit availability warnings. Graphs, outbound flow creation and third-party campaign management do not become external MCP operations merely because related Cedar features exist. See [capability boundaries](/getting-started/capability-boundaries).

@@ -3,36 +3,58 @@ title: "billing-admin"
 description: "Parameters, scopes, and response schema for billing-admin."
 ---
 
-Generated from Cedar's external registration and Zod schemas. Your connection's `tools/list` is authoritative for availability. See [calling tools](/getting-started/calling-tools) and [permissions](/getting-started/permissions).
+Generated from Cedar's actual registration and Zod schemas. Your connection's `tools/list` is authoritative for availability. See [calling tools](/getting-started/calling-tools) and [permissions](/getting-started/permissions).
+
+<Warning>This tool requires Cedar staff access. It is not available to ordinary customer connections.</Warning>
 
 <Note>Cedar staff only. A billing scope alone does not authorize administration.</Note>
 
-## Capability
+## Capabilities
+
+[Staff administration overview](/operations/support-and-staff) · [Complete capabilities](/capabilities/staff).
+
+<Accordion title="Full tool behavior and constraints">
 
 Cedar staff only. organization-accounts paginates member organizations; provision-organization-accounts requires organizationIds/reviewReference and creates no funds or grants. organization-monthly-limits previews or applies (apply:true) $50/$80/$100 then each $100 notifications, preserving customer limits. Preview canonical Stripe subscriptions before verify-import with reviewed snapshotHash/ownershipReference. Immutable offers, catalog and prospective allowances require approved terms; never invent prices or modify existing Stripe plans/quantities. payment-events reads outcomes; retry-payment requires reviewReference/idempotencyKey and revalidates evidence. postpaid reads organization configuration. configure-postpaid requires postpaid:&#123;accountId,enabled,expectedVersion,subscriptionId?,rolloutReference&#125;; only the real staff operator may perform this rollout. It records staff authority and customerConsentAsserted:false, never customer opt-in or impersonation. Existing payer/eligibility checks remain. process-postpaid processes frozen usage or a known batchId; no caller-supplied amounts. correct-usage requires a reviewed correction.
 
+</Accordion>
+
 ## Operations and scopes
 
-| Action | Baseline scope |
-| --- | --- |
-| `inventory` | `billing:read` |
-| `preview-import` | `billing:read` |
-| `verify-import` | `billing:write` |
-| `reconcile-subscription` | `billing:write` |
-| `save-offer` | `billing:write` |
-| `save-catalog` | `billing:write` |
-| `save-allowance` | `billing:write` |
-| `payment-events` | `billing:read` |
-| `retry-payment` | `billing:write` |
-| `process-postpaid` | `billing:write` |
-| `postpaid` | `billing:read` |
-| `configure-postpaid` | `billing:write` |
-| `correct-usage` | `billing:write` |
-| `organization-monthly-limits` | `billing:write` |
-| `organization-accounts` | `billing:read` |
-| `provision-organization-accounts` | `billing:write` |
+| Action | Capability | Baseline scope |
+| --- | --- | --- |
+| `inventory` | Inspect staff-only billing inventory. | `billing:read` |
+| `preview-import` | Preview canonical subscription evidence before a reviewed historical import. | `billing:read` |
+| `verify-import` | Verify an import using the reviewed snapshot and ownership reference. | `billing:write` |
+| `reconcile-subscription` | Reconcile supported subscription accounting state from verified evidence. | `billing:write` |
+| `save-offer` | Save an approved immutable commercial offer without inventing or changing existing plan terms. | `billing:write` |
+| `save-catalog` | Save approved billing catalog configuration. | `billing:write` |
+| `save-allowance` | Save an approved prospective allowance. | `billing:write` |
+| `payment-events` | Inspect payment-processing outcomes. | `billing:read` |
+| `retry-payment` | Retry an eligible payment-processing operation with reviewed evidence and an idempotency key. | `billing:write` |
+| `process-postpaid` | Process frozen usage or an existing batch; callers cannot supply arbitrary amounts. | `billing:write` |
+| `postpaid` | Inspect organization postpaid configuration with staff authority. | `billing:read` |
+| `configure-postpaid` | Apply a reviewed staff postpaid rollout without representing it as customer opt-in. | `billing:write` |
+| `correct-usage` | Apply a reviewed usage correction through the controlled correction path. | `billing:write` |
+| `organization-monthly-limits` | Preview or apply supported notification thresholds while preserving customer limits. | `billing:write` |
+| `organization-accounts` | Page through member organizations and their billing-account state. | `billing:read` |
+| `provision-organization-accounts` | Provision reviewed organization accounts without creating funds or spending grants. | `billing:write` |
 
 Path, account role, feature gates, target ownership, and billing permissions can impose additional requirements.
+
+## Supported options and filters
+
+Every finite input choice is listed here, including array values and nested variants. Free-text filters, dates, numeric ranges and runtime validation are covered in the [parameter tables](/reference/billing-admin#parameters). Options apply to their named operation or branch.
+
+| Input | Choices | Variant / meaning |
+| --- | --- | --- |
+| `offer.type` | `topup`, `subscription` |  |
+| `offer.grantExpiry` | `never`, `paid_period_end` |  |
+| `catalog.meters[].chargingMode` | `disabled`, `shadow`, `billable` |  |
+| `catalog.rates[].billableOutcome` | `success_only`, `consumed_units` |  |
+| `catalog.rates[].cachePolicy` | `free` |  |
+| `allowance.quantityBasis` | `subscription`, `paid_seat` |  |
+| `allowance.expiresAtPeriodEnd` | `true` |  |
 
 ## Parameters
 
@@ -79,12 +101,49 @@ Path, account role, feature gates, target ownership, and billing permissions can
 | `terms` | string | Yes |  minLength: 1; maxLength: 4000 |
 | `approvalReference` | string or null | No |  default: null |
 
+### offer.money
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `minorUnits` | string | Yes |  pattern: "^&#91;1-9&#93;&#91;0-9&#93;&#123;0,11&#125;$" |
+| `currency` | string | Yes |  pattern: "^&#91;a-z&#93;&#123;3&#125;$" |
+
 ### catalog
 
 | Parameter | Type | Required | Details |
 | --- | --- | --- | --- |
 | `meters` | object&#91;&#93; | Yes |  maxItems: 100 |
 | `rates` | object&#91;&#93; | Yes |  maxItems: 100 |
+
+### catalog.meters item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `key` | string | Yes |  minLength: 1; maxLength: 256 |
+| `version` | integer | Yes |  exclusiveMinimum: 0 |
+| `featureKey` | string | Yes |  minLength: 1; maxLength: 256 |
+| `producerKey` | string | Yes |  minLength: 1; maxLength: 256 |
+| `unit` | string | Yes |  minLength: 1; maxLength: 256 |
+| `dimensionKeys` | string&#91;&#93; | Yes |   |
+| `quantityScale` | integer | Yes |  minimum: 0; maximum: 12 |
+| `chargingMode` | "disabled" · "shadow" · "billable" | Yes |   |
+| `displayName` | string | Yes |  minLength: 1; maxLength: 256 |
+
+### catalog.rates item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `id` | string | Yes |  minLength: 1; maxLength: 256 |
+| `version` | integer | Yes |  exclusiveMinimum: 0 |
+| `meterKey` | string | Yes |  minLength: 1; maxLength: 256 |
+| `meterVersion` | integer | Yes |  exclusiveMinimum: 0 |
+| `matchDimensions` | object | Yes |   |
+| `microcreditsPerUnit` | string | Yes |  pattern: "^\\d+(\\.\\d&#123;1,12&#125;)?$" |
+| `effectiveFrom` | string | Yes |  format: "date-time" |
+| `effectiveUntil` | string or null | Yes |   |
+| `billableOutcome` | "success_only" · "consumed_units" | Yes |   |
+| `cachePolicy` | "free" | Yes |   |
+| `customerDescription` | string | Yes |  minLength: 1; maxLength: 256 |
 
 ### allowance
 

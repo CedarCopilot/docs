@@ -3,13 +3,41 @@ title: "workspace-write"
 description: "Parameters, scopes, and response schema for workspace-write."
 ---
 
-Generated from Cedar's external registration and Zod schemas. Your connection's `tools/list` is authoritative for availability. See [calling tools](/getting-started/calling-tools) and [permissions](/getting-started/permissions).
+Generated from Cedar's actual registration and Zod schemas. Your connection's `tools/list` is authoritative for availability. See [calling tools](/getting-started/calling-tools) and [permissions](/getting-started/permissions).
 
-## Capability
+## Capabilities
+
+[Workspace preferences overview](/workspace/preferences) · [Complete capabilities](/capabilities/workspace).
+
+<Accordion title="Full tool behavior and constraints">
 
 Change the user's own settings and workspace layout. Call config-read read-settings first to get the current ids — every update/delete/reorder needs them. CHANGES: (1) update_user_settings — Slack notification preferences and mail settings (signatureEnabled, signatureContent, defaultEmailAlias, undoSendEnabled); read-settings sections:&#91;"user_settings"&#93; first. (2) update_inbox_settings — inbox layout (inboxLayout, importantSignal, inboxOrder) and shared Gmail/LinkedIn/Slack inboxSortingInstructions. Read sections:&#91;"inboxes"&#93; first; empty instructions clear. Sorting works before CRM admission and does not authorize sending. (3) manage_inbox — create/update/delete/reorder a custom inbox tab (split); read-settings sections:&#91;"inboxes"&#93; for inbox ids, accountId is resolved server-side. (4) manage_task_group — create/update/delete/reorder a task group (the lanes tasks are filed into); read-settings sections:&#91;"task_groups"&#93; for group ids. (5) update_webhook_export_config — set/clear the HTTPS endpoint Cedar POSTs conversation-field updates to on every change (url:null clears it). For CRM/connection config (field mappings, Slack sync, CRM sync toggles, connection instructions, playbook webhooks) use connection-write instead. For AOP custom fields and their CRM mappings use config-write. For playbook, subagent, and resource file edits use write-document.
 
+</Accordion>
+
 Required baseline scope: `playbook:write`. Additional role and target checks apply.
+
+## Supported options and filters
+
+Every finite input choice is listed here, including array values and nested variants. Free-text filters, dates, numeric ranges and runtime validation are covered in the [parameter tables](/reference/workspace-write#parameters). Options apply to their named operation or branch.
+
+| Input | Choices | Variant / meaning |
+| --- | --- | --- |
+| `change.type` | `update_user_settings` | type=update_user_settings |
+| `change.slackNotifications.deliveryMethod` | `dm`, `channel` | type=update_user_settings |
+| `change.type` | `update_inbox_settings` | type=update_inbox_settings |
+| `change.linkedinNavigation.filters[].view` | `all`, `focused`, `archive`, `reminders`, `drafts`, `unread`, `starred`, `inmail`, `salesnav`, `spam`, `sponsored`, `other` | type=update_inbox_settings |
+| `change.linkedinNavigation.filters[].filter` | `all`, `waiting-them`, `waiting-me`, `unread` | type=update_inbox_settings |
+| `change.inboxLayout` | `inbox`, `important_other`, `stacked` | type=update_inbox_settings — Global inbox layout mode. |
+| `change.importantSignal` | `category_personal`, `gmail_important` | type=update_inbox_settings — Which signal marks a thread "important". |
+| `change.type` | `manage_inbox` | type=manage_inbox |
+| `change.op` | `create`, `update`, `delete`, `reorder` | type=manage_inbox — create/update/delete/reorder a custom inbox tab (split). accountId is resolved server-side. |
+| `change.lookbackDays` | `all` | type=manage_inbox |
+| `change.channels[]` | `email`, `linkedin`, `whatsapp`, `slack` | type=manage_inbox |
+| `change.type` | `manage_task_group` | type=manage_task_group |
+| `change.op` | `create`, `update`, `delete`, `reorder` | type=manage_task_group — create/update/delete/reorder a task group (the lanes tasks are filed into). |
+| `change.overduePolicy.mode` | `nag`, `auto-complete`, `ignore` | type=manage_task_group |
+| `change.type` | `update_webhook_export_config` | type=update_webhook_export_config |
 
 ## Parameters
 
@@ -21,9 +49,112 @@ Required baseline scope: `playbook:write`. Additional role and target checks app
 | `user_request_summary` | string | Yes | One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does.  |
 | `is_new_request` | boolean | Yes | true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread.  |
 
-### change
+### change — type: update_user_settings
 
-See the JSON schema below for this union or value.
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `type` | "update_user_settings" | Yes |   |
+| `slackNotifications` | object | No | Slack notification preferences. Merged with existing values — omit fields to leave unchanged.  |
+| `emailNotifications` | object | No | Email notification preferences (e.g. &#123;enabled, agendaEmail&#125;). Sub-keys merge individually — omit a sub-key to leave it unchanged.  |
+| `imessageNotifications` | object | No | iMessage notification preferences. Sub-keys merge individually — omit a sub-key to leave it unchanged.  |
+| `whatsappNotifications` | object | No | WhatsApp notification preferences. Sub-keys merge individually — omit a sub-key to leave it unchanged.  |
+| `signatureEnabled` | boolean | No | Whether the email signature is active.  |
+| `signatureContent` | string | No | HTML or plain-text signature block.  |
+| `defaultEmailAlias` | string | No | Default from-address alias for composed emails.  |
+| `undoSendEnabled` | boolean | No | Whether undo-send is enabled.  |
+
+### change — type: update_user_settings.slackNotifications
+
+Slack notification preferences. Merged with existing values — omit fields to leave unchanged.
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `enabled` | boolean | No |   |
+| `digestTimezone` | string | No | IANA timezone, e.g. "America/New_York"  |
+| `deliveryMethod` | "dm" · "channel" | No |   |
+
+### change — type: update_inbox_settings
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `type` | "update_inbox_settings" | Yes |   |
+| `linkedinNavigation` | object | No | LinkedIn sections, order, visibility and saved filters. Read inboxes settings first. Label IDs use label:&lt;uuid&gt;; saved views use filter:&lt;id&gt;.  |
+| `inboxSortingInstructions` | string | No | Shared Gmail/LinkedIn/Slack attention-label preferences. Replaces the current text; read-settings sections:&#91;"inboxes"&#93; first. Empty text clears. Maximum 20,000 characters. Does not enable sending or CRM admission. maxLength: 20000 |
+| `inboxLayout` | "inbox" · "important_other" · "stacked" | No | Global inbox layout mode.  |
+| `importantSignal` | "category_personal" · "gmail_important" | No | Which signal marks a thread "important".  |
+| `inboxOrder` | string&#91;&#93; | No | Ordered inbox/tab ids, left to right. Get current ids from read-settings sections:&#91;"inboxes"&#93;.  |
+
+### change — type: update_inbox_settings.linkedinNavigation
+
+LinkedIn sections, order, visibility and saved filters. Read inboxes settings first. Label IDs use label:&lt;uuid&gt;; saved views use filter:&lt;id&gt;.
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `order` | string&#91;&#93; | Yes |  maxItems: 200 |
+| `hidden` | string&#91;&#93; | Yes |  maxItems: 200 |
+| `filters` | object&#91;&#93; | No |  maxItems: 100 |
+
+### change — type: update_inbox_settings.linkedinNavigation.filters item
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `id` | string | Yes |  minLength: 1; maxLength: 80 |
+| `name` | string | Yes |  minLength: 1; maxLength: 100 |
+| `view` | "all" · "focused" · "archive" · "reminders" · "drafts" · "unread" · "starred" · "inmail" · "salesnav" · "spam" · "sponsored" · "other" | Yes |   |
+| `filter` | "all" · "waiting-them" · "waiting-me" · "unread" | Yes |   |
+| `search` | string | No |  maxLength: 500 |
+
+### change — type: manage_inbox
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `type` | "manage_inbox" | Yes |   |
+| `op` | "create" · "update" · "delete" · "reorder" | Yes | create/update/delete/reorder a custom inbox tab (split). accountId is resolved server-side.  |
+| `inboxId` | string | No | Required for update/delete. From read-settings sections:&#91;"inboxes"&#93;.  |
+| `name` | string | No | Required for create; the tab label.  |
+| `rule` | any | No | Structured inbox rule: &#123;kind:"all"&#125; &#124; &#123;kind:"all_of"&#124;"any_of", clauses:&#91;...&#93;&#125;. Validated server-side against inboxRuleSchema; read-settings sections:&#91;"inboxes"&#93; shows real examples.  |
+| `query` | string | No | Gmail query string for this tab.  |
+| `excludeQuery` | string | No | Gmail query whose matches are subtracted; empty string clears it.  |
+| `lookbackDays` | number or "all" | No | How far back to scan.  |
+| `alsoShowInImportant` | boolean | No |   |
+| `hideWhenEmpty` | boolean | No |   |
+| `position` | integer | No | Tab position; omit to append.  |
+| `conversationFilter` | any | No | CRM rule restricting this tab to matching linked conversations, shaped &#123;filters:&#123;...&#125;, uiConfig?:&#123;...&#125;&#125;; null clears it. Copy the shape from an existing inbox via read-settings sections:&#91;"inboxes"&#93; — validated server-side against inboxConversationFilterSchema.  |
+| `channels` | "email" · "linkedin" · "whatsapp" · "slack"&#91;&#93; | No | Channels this tab evaluates; defaults to email only.  |
+| `orderedInboxIds` | string&#91;&#93; | No | Required for reorder: every inbox id in the new order.  |
+
+### change — type: manage_task_group
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `type` | "manage_task_group" | Yes |   |
+| `op` | "create" · "update" · "delete" · "reorder" | Yes | create/update/delete/reorder a task group (the lanes tasks are filed into).  |
+| `groupId` | string | No | Required for update/delete. From read-settings sections:&#91;"task_groups"&#93;.  |
+| `name` | string | No | Required for create; the group name. minLength: 1; maxLength: 120 |
+| `color` | string or null | No | UI accent (hex or token).  |
+| `icon` | string or null | No | Lucide icon name (e.g. "Trophy").  |
+| `routingCriteria` | string or null | No | Natural-language description the AI router reads to file tasks here; null = never auto-file.  |
+| `agentVisible` | boolean | No | Whether the agent sees this group in its default task list.  |
+| `overduePolicy` | object or null | No | How overdue tasks in this group are handled; null = default nag behavior.  |
+| `position` | integer | No | Display order; omit to append.  |
+| `orderedGroupIds` | string&#91;&#93; | No | Required for reorder: every group id in the new order.  |
+
+### change — type: manage_task_group.overduePolicy — variant 1
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `mode` | "nag" · "auto-complete" · "ignore" | Yes |   |
+| `afterDays` | integer | Yes |  minimum: 0 |
+| `agentMayReschedule` | boolean | Yes |   |
+
+### change — type: update_webhook_export_config
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `type` | "update_webhook_export_config" | Yes |   |
+| `url` | string or null | Yes | HTTPS endpoint Cedar POSTs conversation-field updates to on every change. Pass null to clear.  |
+| `secret` | any or string or null | No | Shared secret so the endpoint can verify a request genuinely came from Cedar. Omit to keep the existing one.  |
+| `secretHeader` | any or string or null | No | Header name carrying the secret. Defaults "X-Cedar-Secret".  |
 
 ## Full input schema
 
