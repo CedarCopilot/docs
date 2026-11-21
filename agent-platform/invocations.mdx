@@ -15,6 +15,10 @@ Cedar can inspect the sources configured to invoke an agent. The list is derived
 
 Past chats and **Run now** are activity, not persistent invocation configuration. Outward API calls are not inbound trigger sources.
 
+## Limit which events start a producer
+
+A producer reference can include checks on facts such as the event type, whether a calendar meeting is in the future, or whether an existing plan already blocks preparation. For example, an agent can prepare a first-meeting plan only for future meetings with external attendees. Optional judgment uses the bounded context selected in the rule. When required facts or a configured judgment are unavailable, automatic work is held. These checks apply to supported event triggers and leave explicit human requests and outbound approvals separate.
+
 ## Add, change or remove a source
 
 The agent workspace supports adding one or multiple playbook sources, creating webhook sources and removing configured sources. Edits use the current playbook version to detect concurrent changes. Re-read the version after each saved edit rather than overwriting another edit with stale content.

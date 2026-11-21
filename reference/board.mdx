@@ -42,486 +42,119 @@ Path, account role, feature gates, target ownership, and billing permissions can
 
 ## Supported options and filters
 
-Every finite input choice is listed here, including array values and nested variants. Free-text filters, dates, numeric ranges and runtime validation are covered in the [parameter tables](/reference/board#parameters). Options apply to their named operation or branch.
-
-| Input | Choices | Variant / meaning |
+| Input | Choices | Variant |
 | --- | --- | --- |
 | `add_card.visibility` | `private`, `team` |  |
 | `set.visibility` | `private`, `team` |  |
 
 ## Parameters
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `action` | "list_boards" · "list_templates" · "read" · "create_board" · "get_schema" · "set_schema" · "add_fields" · "set_view" · "set_board_meta" · "add_card" · "set" · "move" · "comment" · "cards" · "archive" · "list_triggers" | Yes | Which verb to run.  |
-| `board` | string | No | Board name, path, or id. Required for every verb except list_boards, set, move, comment.  |
-| `card` | string | No | Card path or id. Required for set, move, comment.  |
-| `create_board` | object | No |   |
-| `set_schema` | object | No |   |
-| `add_fields` | object | No |   |
-| `set_view` | object | No |   |
-| `set_board_meta` | object | No |   |
-| `add_card` | object | No |   |
-| `set` | object | No |   |
-| `move` | object | No |   |
-| `comment` | object | No |   |
-| `read` | object | No |   |
-| `cards` | object | No |   |
+| `action` | `list_boards` · `list_templates` · `read` · `create_board` · `get_schema` · `set_schema` · `add_fields` · `set_view` · `set_board_meta` · `add_card` · `set` · `move` · `comment` · `cards` · `archive` · `list_triggers` | Yes | Which verb to run. |
+| `board` | string | No | Board name, path, or id. Required for every verb except list_boards, set, move, comment. |
+| `card` | string | No | Card path or id. Required for set, move, comment. |
+| `create_board` | object | No |  |
+| `set_schema` | object | No |  |
+| `add_fields` | object | No |  |
+| `set_view` | object | No |  |
+| `set_board_meta` | object | No |  |
+| `add_card` | object | No |  |
+| `set` | object | No |  |
+| `move` | object | No |  |
+| `comment` | object | No |  |
+| `read` | object | No |  |
+| `cards` | object | No |  |
 
 ### create_board
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `name` | string | Yes |   |
-| `description` | string | No |   |
-| `template` | string | No | A list_templates id. The starting schema; `schema` merges over it.  |
-| `schema` | object | No |   |
-
-### create_board.schema
-
-| Parameter | Type | Required | Details |
-| --- | --- | --- | --- |
-| `visibility` | string | No |   |
-| `cardTitleHint` | string | No |   |
-| `fields` | object&#91;&#93; | No |   |
-| `view` | object | No |   |
-| `meta` | object | No |   |
-
-### create_board.schema.fields item
-
-| Parameter | Type | Required | Details |
-| --- | --- | --- | --- |
-| `key` | string | No |   |
-| `label` | string | No |   |
-| `type` | string | No |   |
-| `default` | string | No | Value a card gets for this field when `add_card` omits the key — e.g. "backlog" on `status`, so a card filed with no status IS a Backlog card on disk rather than landing ungrouped. Most useful on the field `view.groupByField` points at.  |
-
-### create_board.schema.view
-
-| Parameter | Type | Required | Details |
-| --- | --- | --- | --- |
-| `groupByField` | string | No | The field whose VALUES are the columns. Repointing it regroups the same cards.  |
-| `cardFields` | string&#91;&#93; | No | Fields to show on the card face.  |
-| `columnOrder` | string&#91;&#93; | No |   |
-| `hiddenColumns` | string&#91;&#93; | No |   |
+| `name` | string | Yes |  |
+| `description` | string | No |  |
+| `template` | string | No | A list_templates id. The starting schema; &#96;schema&#96; merges over it. |
+| `schema` | object | No |  |
 
 ### set_schema
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `schema` | object | Yes |   |
-| `replace` | boolean | No | Destructive whole-schema overwrite. Default merges.  |
-
-### set_schema.schema
-
-| Parameter | Type | Required | Details |
-| --- | --- | --- | --- |
-| `visibility` | string | No |   |
-| `cardTitleHint` | string | No |   |
-| `fields` | object&#91;&#93; | No |   |
-| `view` | object | No |   |
-| `meta` | object | No |   |
-
-### set_schema.schema.fields item
-
-| Parameter | Type | Required | Details |
-| --- | --- | --- | --- |
-| `key` | string | No |   |
-| `label` | string | No |   |
-| `type` | string | No |   |
-| `default` | string | No | Value a card gets for this field when `add_card` omits the key — e.g. "backlog" on `status`, so a card filed with no status IS a Backlog card on disk rather than landing ungrouped. Most useful on the field `view.groupByField` points at.  |
-
-### set_schema.schema.view
-
-| Parameter | Type | Required | Details |
-| --- | --- | --- | --- |
-| `groupByField` | string | No | The field whose VALUES are the columns. Repointing it regroups the same cards.  |
-| `cardFields` | string&#91;&#93; | No | Fields to show on the card face.  |
-| `columnOrder` | string&#91;&#93; | No |   |
-| `hiddenColumns` | string&#91;&#93; | No |   |
+| `schema` | object | Yes |  |
+| `replace` | boolean | No | Destructive whole-schema overwrite. Default merges. |
 
 ### add_fields
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `fields` | object&#91;&#93; | Yes |  minItems: 1 |
-
-### add_fields.fields item
-
-| Parameter | Type | Required | Details |
-| --- | --- | --- | --- |
-| `key` | string | No |   |
-| `label` | string | No |   |
-| `type` | string | No |   |
-| `default` | string | No | Value a card gets for this field when `add_card` omits the key — e.g. "backlog" on `status`, so a card filed with no status IS a Backlog card on disk rather than landing ungrouped. Most useful on the field `view.groupByField` points at.  |
+| `fields` | array of object | Yes | minItems: 1 |
 
 ### set_view
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `groupByField` | string | No | The field whose VALUES are the columns. Repointing it regroups the same cards.  |
-| `cardFields` | string&#91;&#93; | No | Fields to show on the card face.  |
-| `columnOrder` | string&#91;&#93; | No |   |
-| `hiddenColumns` | string&#91;&#93; | No |   |
+| `groupByField` | string | No | The field whose VALUES are the columns. Repointing it regroups the same cards. |
+| `cardFields` | array of string | No | Fields to show on the card face. |
+| `columnOrder` | array of string | No |  |
+| `hiddenColumns` | array of string | No |  |
 
 ### set_board_meta
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `meta` | object | Yes |   |
-| `replace` | boolean | No |   |
+| `meta` | object | Yes |  |
+| `replace` | boolean | No |  |
 
 ### add_card
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `title` | string | Yes |   |
-| `description` | string | No |   |
-| `fields` | object | No | The card's whole data bag, including the field the view groups by.  |
-| `visibility` | "private" · "team" | No |   |
+| `title` | string | Yes |  |
+| `description` | string | No |  |
+| `fields` | object | No | The card's whole data bag, including the field the view groups by. |
+| `visibility` | `private` · `team` | No |  |
 
 ### set
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `title` | string | No |   |
-| `description` | string | No |   |
-| `fields` | object | No |   |
-| `replaceFields` | boolean | No |   |
-| `visibility` | "private" · "team" | No |   |
+| `title` | string | No |  |
+| `description` | string | No |  |
+| `fields` | object | No |  |
+| `replaceFields` | boolean | No |  |
+| `visibility` | `private` · `team` | No |  |
 
 ### move
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `column` | string | No | A VALUE of view.groupByField. Landing here writes it.  |
-| `before` | string | No | Card to land immediately above.  |
-| `after` | string | No | Card to land immediately below.  |
+| `column` | string | No | A VALUE of view.groupByField. Landing here writes it. |
+| `before` | string | No | Card to land immediately above. |
+| `after` | string | No | Card to land immediately below. |
 
 ### comment
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `body` | string | Yes |   |
-| `author` | string | No |   |
+| `body` | string | Yes |  |
+| `author` | string | No |  |
 
 ### read
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `column` | string | No |   |
+| `column` | string | No |  |
 
 ### cards
 
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `column` | string | No | One value of this board's groupByField.  |
-| `fields` | object | No | Exact match on any field value.  |
-| `query` | string | No | Case-insensitive substring over title and description.  |
+| `column` | string | No | One value of this board's groupByField. |
+| `fields` | object | No | Exact match on any field value. |
+| `query` | string | No | Case-insensitive substring over title and description. |
 
 ## Full input schema
 
-[Download the input schema](/reference/schemas/board.input.json). Nested objects, variants, and constraints are preserved in full. Runtime refinements and ownership checks still apply.
-
-<Accordion title="Input JSON Schema">
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "action": {
-      "type": "string",
-      "enum": [
-        "list_boards",
-        "list_templates",
-        "read",
-        "create_board",
-        "get_schema",
-        "set_schema",
-        "add_fields",
-        "set_view",
-        "set_board_meta",
-        "add_card",
-        "set",
-        "move",
-        "comment",
-        "cards",
-        "archive",
-        "list_triggers"
-      ],
-      "description": "Which verb to run."
-    },
-    "board": {
-      "type": "string",
-      "description": "Board name, path, or id. Required for every verb except list_boards, set, move, comment."
-    },
-    "card": {
-      "type": "string",
-      "description": "Card path or id. Required for set, move, comment."
-    },
-    "create_board": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "template": {
-          "type": "string",
-          "description": "A list_templates id. The starting schema; `schema` merges over it."
-        },
-        "schema": {
-          "type": "object",
-          "properties": {
-            "visibility": {
-              "type": "string"
-            },
-            "cardTitleHint": {
-              "type": "string"
-            },
-            "fields": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "key": {
-                    "type": "string"
-                  },
-                  "label": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "default": {
-                    "type": "string",
-                    "description": "Value a card gets for this field when `add_card` omits the key — e.g. \"backlog\" on `status`, so a card filed with no status IS a Backlog card on disk rather than landing ungrouped. Most useful on the field `view.groupByField` points at."
-                  }
-                },
-                "additionalProperties": true
-              }
-            },
-            "view": {
-              "type": "object",
-              "properties": {
-                "groupByField": {
-                  "type": "string",
-                  "description": "The field whose VALUES are the columns. Repointing it regroups the same cards."
-                },
-                "cardFields": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "description": "Fields to show on the card face."
-                },
-                "columnOrder": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "hiddenColumns": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": true
-            },
-            "meta": {
-              "type": "object",
-              "additionalProperties": {}
-            }
-          },
-          "additionalProperties": true
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "additionalProperties": false
-    },
-    "set_schema": {
-      "type": "object",
-      "properties": {
-        "schema": {
-          "$ref": "#/properties/create_board/properties/schema"
-        },
-        "replace": {
-          "type": "boolean",
-          "description": "Destructive whole-schema overwrite. Default merges."
-        }
-      },
-      "required": [
-        "schema"
-      ],
-      "additionalProperties": false
-    },
-    "add_fields": {
-      "type": "object",
-      "properties": {
-        "fields": {
-          "type": "array",
-          "items": {
-            "$ref": "#/properties/create_board/properties/schema/properties/fields/items"
-          },
-          "minItems": 1
-        }
-      },
-      "required": [
-        "fields"
-      ],
-      "additionalProperties": false
-    },
-    "set_view": {
-      "$ref": "#/properties/create_board/properties/schema/properties/view"
-    },
-    "set_board_meta": {
-      "type": "object",
-      "properties": {
-        "meta": {
-          "type": "object",
-          "additionalProperties": {}
-        },
-        "replace": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "meta"
-      ],
-      "additionalProperties": false
-    },
-    "add_card": {
-      "type": "object",
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "fields": {
-          "type": "object",
-          "additionalProperties": {},
-          "description": "The card's whole data bag, including the field the view groups by."
-        },
-        "visibility": {
-          "type": "string",
-          "enum": [
-            "private",
-            "team"
-          ]
-        }
-      },
-      "required": [
-        "title"
-      ],
-      "additionalProperties": false
-    },
-    "set": {
-      "type": "object",
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "fields": {
-          "type": "object",
-          "additionalProperties": {}
-        },
-        "replaceFields": {
-          "type": "boolean"
-        },
-        "visibility": {
-          "type": "string",
-          "enum": [
-            "private",
-            "team"
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "move": {
-      "type": "object",
-      "properties": {
-        "column": {
-          "type": "string",
-          "description": "A VALUE of view.groupByField. Landing here writes it."
-        },
-        "before": {
-          "type": "string",
-          "description": "Card to land immediately above."
-        },
-        "after": {
-          "type": "string",
-          "description": "Card to land immediately below."
-        }
-      },
-      "additionalProperties": false
-    },
-    "comment": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "type": "string"
-        },
-        "author": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "body"
-      ],
-      "additionalProperties": false
-    },
-    "read": {
-      "type": "object",
-      "properties": {
-        "column": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
-    },
-    "cards": {
-      "type": "object",
-      "properties": {
-        "column": {
-          "type": "string",
-          "description": "One value of this board's groupByField."
-        },
-        "fields": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Exact match on any field value."
-        },
-        "query": {
-          "type": "string",
-          "description": "Case-insensitive substring over title and description."
-        }
-      },
-      "additionalProperties": false
-    }
-  },
-  "required": [
-    "action"
-  ],
-  "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#"
-}
-```
-
-</Accordion>
+[Download the input schema](/reference/schemas/board.input.json). The schema includes nested properties and constraints. Cedar also validates permissions and action-specific requirements when you call the tool.
 
 ## Response
 

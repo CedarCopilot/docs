@@ -1,0 +1,14 @@
+---
+title: "agent-setup"
+description: "Personalize a library agent and verify its configuration before activating it."
+---
+
+Load `load-skill` with `{"name":"agent-setup"}` when setting up an agent from the library. Identify the template, read existing account settings, agree on what the agent should produce and check the saved definition and workspace. Initialization alone does not activate an event source.
+
+| Resource | When to load it |
+| --- | --- |
+| `internal-revivals` | Define the evidence and audience for a pipeline revival. |
+| `internal-growth` | Personalize the upsell and expansion workflow. |
+| `task-view-producers` | On an enabled account, map an existing producer to a Task View and verify where its work appears. |
+
+Pass the resource name in the same call, for example `{"name":"agent-setup","resource":"internal-revivals"}`. [Agent library](/agent-platform/library) · [Task Views](/tasks/task-views)

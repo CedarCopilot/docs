@@ -45,7 +45,7 @@ Every finite input choice is listed here, including array values and nested vari
 | `type` | "manage_mcp_connection" | Yes |   |
 | `op` | "create" · "delete" | Yes | create/delete an MCP server connection.  |
 | `connectionId` | string | No | Required for delete. From read-settings sections:&#91;"connections"&#93;.  |
-| `name` | string | No | Required for create; the label the agent addresses this server by, e.g. "Mintlify Docs". minLength: 1; maxLength: 128 |
+| `name` | string | No | Required for create; the label the agent addresses this server by, e.g. "Example documentation". minLength: 1; maxLength: 128 |
 | `serverUrl` | string | No | Required for create; the MCP server URL. Public hosts only - loopback and private ranges are refused. format: "uri" |
 | `instructions` | string | No | Hint for the agent on when to use this source. maxLength: 4000 |
 | `scope` | "user" · "org" | No | Defaults "user". "org" shares the server with every member of the organization (org admins only); a member's own connection of the same name still wins.  |
@@ -98,7 +98,7 @@ Every finite input choice is listed here, including array values and nested vari
               "type": "string",
               "minLength": 1,
               "maxLength": 128,
-              "description": "Required for create; the label the agent addresses this server by, e.g. \"Mintlify Docs\"."
+              "description": "Required for create; the label the agent addresses this server by, e.g. \"Example documentation\"."
             },
             "serverUrl": {
               "type": "string",

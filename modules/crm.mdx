@@ -1,8 +1,9 @@
 ---
-title: "CRM conversations overview"
-sidebarTitle: "Overview"
+title: "Extract fields & maintain CRM"
 description: "Search customer context, maintain deal records, and compute pipeline metrics."
 ---
+
+Use the [field query skill](/skills/field-query) to locate the right field, inspect its [history](/crm/field-history), and compare the proposed value with the source event. Follow the configured CRM approval policy before changing a record.
 
 ## Find the right conversation
 
@@ -16,9 +17,11 @@ A semantic hit is a slice of evidence. For a question about one specific call or
 
 `conversation-write` can create a conversation, update fields, log an event, transfer ownership, link an existing external CRM deal, or perform supported structural mutations. Read the effective CRM updater instructions before making changes.
 
-Creating a Cedar conversation does not create an opportunity in Salesforce, HubSpot, Attio, or Copper. `link-external-crm-deal` writes the association; use the supported field update path for values. Gmail thread ingestion is a live-mail operation and requires `email:read`.
+Creating a Cedar conversation saves the local deal record. To propose a new record in a connected CRM, use the separate `create-opportunity` workflow and inspect the saved approval and provider result. `link-external-crm-deal` writes the association; use the supported field update path for values. Gmail thread ingestion is a live-mail operation and requires `email:read`.
 
 Structural mutations include moving an event, assigning an AOP, refreshing a conversation, clearing working memory, merging records, fixing assignments, and renaming. Those operations have different consequences; use the exact operation and verify the result.
+
+For a suggested new deal, open **Review deal** to inspect the proposed record. **Open in chat** lets you discuss the proposal with its task context. After approval, inspect the returned CRM link or verification result before treating the record as created. See [reviewing your pipeline](/recipes/pipeline-review).
 
 ## Historical and evidence-based analysis
 

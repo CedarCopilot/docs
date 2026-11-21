@@ -98,6 +98,9 @@
         "chatId": {
           "type": "string"
         },
+        "recipientProviderId": {
+          "type": "string"
+        },
         "unipileAccountId": {
           "type": "string"
         },
@@ -111,6 +114,9 @@
           "type": "string"
         },
         "draftUpdatedAt": {
+          "type": "string"
+        },
+        "taskId": {
           "type": "string"
         },
         "currentDraft": {

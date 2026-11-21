@@ -281,8 +281,18 @@
         "subject": {
           "type": "string"
         },
+        "connectionId": {
+          "type": "string"
+        },
+        "conversationId": {
+          "type": "string"
+        },
         "messageCount": {
           "type": "number"
+        },
+        "nextOffset": {
+          "type": "number",
+          "description": "Pass as offset to read the next older page."
         },
         "messages": {
           "type": "array",
@@ -294,6 +304,12 @@
                 "description": "Gmail message id — pass to fetch-email-attachments."
               },
               "from": {
+                "type": "string"
+              },
+              "eventId": {
+                "type": "string"
+              },
+              "conversationId": {
                 "type": "string"
               },
               "to": {
@@ -316,6 +332,13 @@
                 "type": "string"
               },
               "unread": {
+                "type": "boolean"
+              },
+              "body": {
+                "type": "string",
+                "description": "Actual email body as plain text/Markdown, not the snippet."
+              },
+              "bodyTruncated": {
                 "type": "boolean"
               },
               "tracking": {
@@ -624,8 +647,7 @@
                       "clickCount",
                       "firstOpenedAt",
                       "lastOpenedAt",
-                      "firstClickedAt",
-                      "events"
+                      "firstClickedAt"
                     ],
                     "additionalProperties": false,
                     "description": "Observed tracking activity, not verified human read receipts. Disabled tracking is distinct from zero activity."

@@ -30,10 +30,14 @@ Cedar's enrichment module turns known identities and input records into structur
 
 ## Identity, providers and freshness
 
-Use a verified person email or LinkedIn URL, and a company website domain or resolvable saved identity. Reading a candidate match does not itself enrich it. For manual person/company enrichment, explicitly select **Fiber**. Product defaults or account policy can differ; a missing result does not authorize silently switching providers.
+Use a verified person email or LinkedIn URL, and a company website domain or resolvable saved identity. Reading a candidate match does not itself enrich it. When a person or company lookup needs Fiber, select **Fiber** explicitly. Otherwise rich research follows the effective provider policy, with Crustdata as the built-in default. A missing result does not authorize switching providers.
 
 Field coverage depends on the operation, provider record and freshness policy. A field in the web picker is part of the vocabulary; it is not proof that a configured provider can fill it. The [field catalog](/enrichment/fields) makes that distinction explicit.
 
 ## Enrichment feeds the rest of Cedar
 
 Enrichment adds profile attributes to the [Brain data layer](/brain/overview). [Pipeline intelligence](/intelligence/overview) combines those attributes with original buyer evidence. [Signals](/signals/overview) monitor subsequent changes, while [agents](/agent-platform/overview) can use enrichment as an authorized step in a larger workflow.
+
+## Research a public account before outreach
+
+Start with the known company domain or person identity and the specific question the rep needs answered. Use the profile and existing CRM evidence first. In Cedar, [website](/reference/website) can read or refresh known public pages and return citations. Check each page's status and freshness. For a scoped, durable research assignment, the [research-job](/reference/research-job) flow requires the relevant access and explicit authorization for paid work. Preserve citations alongside any proposed outreach copy. [Research an account before outreach](/recipes/account-research)

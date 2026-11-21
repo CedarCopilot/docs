@@ -23,17 +23,17 @@
         "conversationId": {
           "type": "string",
           "format": "uuid",
-          "description": "The conversation ID to re-evaluate."
+          "description": "Conversation to re-evaluate."
         },
         "deleteOldWorkingMemory": {
           "type": "boolean",
           "default": true,
-          "description": "Whether to delete old working memory fields before initializing new ones."
+          "description": "Delete old working memory before initializing new fields."
         },
         "initializeNewFields": {
           "type": "boolean",
           "default": true,
-          "description": "Whether to initialize new working memory fields from the new AOP schema."
+          "description": "Initialize working memory from the new AOP schema."
         },
         "targetUserId": {
           "type": "string",
@@ -169,7 +169,7 @@
         },
         "aopId": {
           "type": "string",
-          "description": "The user AOP id (scope=\"user\") or org AOP id (scope=\"org\") to add the field to."
+          "description": "User AOP ID for scope=user; org AOP ID for scope=org."
         },
         "fieldKey": {
           "type": "string",
@@ -184,6 +184,8 @@
           "enum": [
             "text",
             "number",
+            "score",
+            "percent",
             "date",
             "boolean",
             "select",
@@ -198,11 +200,11 @@
             "summarized_history",
             "deal_brief"
           ],
-          "description": "Field type. Fixed forever once created — there is no update-field path to change it."
+          "description": "Field type. score and percent are finite numbers from 0 to 100; percent stores percentage points (30 means 30%, not 0.3). Leave unknown assessments empty rather than inventing a value. Fixed forever once created — there is no update-field path to change it."
         },
         "displayOrder": {
           "type": "integer",
-          "description": "Order this field appears in the UI, relative to other fields."
+          "description": "UI field order."
         },
         "description": {
           "type": "string"
@@ -240,6 +242,30 @@
                     "additionalProperties": false
                   },
                   "maxItems": 3
+                },
+                "checklist": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "label": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "instruction": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "label"
+                    ],
+                    "additionalProperties": false
+                  }
                 }
               },
               "required": [
@@ -269,14 +295,14 @@
         },
         "agentRequiresApproval": {
           "type": "boolean",
-          "description": "When true, agent writes to this field create an approval task instead of applying directly."
+          "description": "When true, agent writes create approval tasks instead of applying directly."
         },
         "approvalRequiredOptions": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "For select-type fields: option values that require approval when the agent tries to set them."
+          "description": "Select values requiring approval for agent writes."
         },
         "ownerAgentId": {
           "type": "string",
@@ -289,7 +315,7 @@
             "properties": {
               "value": {
                 "type": "string",
-                "description": "Stable option value — never changes once set; use label for the display text."
+                "description": "Immutable option value; label is display text."
               },
               "label": {
                 "type": "string"
@@ -302,7 +328,7 @@
               },
               "enumOrder": {
                 "type": "integer",
-                "description": "Position in the list. Omit to append in array order."
+                "description": "Position; omit to append in array order."
               }
             },
             "required": [
@@ -353,6 +379,29 @@
         "internalSignals": {
           "$ref": "#/properties/createField/properties/internalSignals"
         },
+        "internalSignalDefinitionUpdates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "instructions": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "instructions"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "description": "Update only instructions of existing internal Signals definition IDs (enabled state is preserved); preserves all other definitions and lifecycle. Mutually exclusive with internalSignals."
+        },
         "signal": {
           "type": "object",
           "properties": {
@@ -368,7 +417,7 @@
             "enabled"
           ],
           "additionalProperties": false,
-          "description": "Buyer Journey is a default card below Tasks, separate from People. It uses journey_problem, journey_solution, journey_buying, journey_alternatives and journey_commercial. Buyer Journey replaces the standard MEDDIC/MEDDPICC seed. Untouched legacy qualification fields are hidden in conversation views without deleting saved values or configuration; customized rubrics and CRM-mapped qualification fields remain visible. Configure stage versions with dealBriefStages: discovery, demo, commercial, negotiation, each with visible and up to three rows ({label, instruction, graded}). Commercial is hidden until the Commercial stage by default. Later rubrics may remove obsolete items. Keep Power and Competition. Use the same CRM Updater; buyer-journey selection is independent of CRM status. Row values are concise facts with strength 0–100 scored against fixed rubric anchors; unknown is null. Early Power uses Power known and Path to power agreed; later Power uses Power reached and Power engaged. Problem always uses Stated problem, Priority, Quantify impact. Stated problem may list up to three distinct established buyer problems on numbered lines (1., 2., 3.), normally 3–8 words each, using actual newlines. Never invent or pad problems; none established means Unknown and strength:null. Keep one assessment for the entire Stated problem row. Stated problem scores 75 for a concrete buyer-stated problem; 100 requires a buyer-validated shared definition, affected workflow and scope without material ambiguity. Solution fit uses Stated criteria, Sentiment, Solution solves stated problems; include product gaps within criteria. Current state belongs in Competition. description is base guidance; stage rows take precedence."
+          "description": "Buyer Journey is separate from People. It uses journey_problem, journey_solution, journey_buying, journey_alternatives and journey_commercial. Replaces the MEDDIC/MEDDPICC seed; untouched legacy fields are hidden, not deleted. Custom rubrics and CRM-mapped qualification fields stay visible. dealBriefStages: discovery/demo/commercial/negotiation, each with visible, <=3 rows ({label,instruction,graded}) and optional checklist ({id,label,instruction?}, unique stable IDs). Stage-specific checklist completion is per-conversation, initially unchecked; never changes scores or advances stage. Commercial defaults hidden until Commercial stage. Later rubrics may drop obsolete items. Keep Power and Competition. Use CRM Updater; journey stage is independent of CRM status. Concise facts; strength 0–100 uses fixed rubric anchors, unknown=null. Power: early=Power known/Path to power agreed; later=Power reached/Power engaged. Problem: Stated problem, Priority, Quantify impact. Stated problem: <=3 established buyer problems, numbered actual newline-separated lines, typically 3–8 words each. Never invent/pad; none=Unknown, strength:null. One assessment for the whole row. Stated problem: 75=concrete buyer-stated problem; 100=buyer-validated shared definition, workflow and scope without material ambiguity. Solution fit: Stated criteria (include product gaps), Sentiment, Solution solves stated problems. Current state belongs in Competition. description is base guidance; stage rows take precedence."
         },
         "dealBriefStages": {
           "$ref": "#/properties/createField/properties/dealBriefStages"
@@ -412,8 +461,7 @@
           "description": "Owning subagent's agent_id — only that agent may write this field. Omit to leave the current owner unchanged; pass null (not omit) to explicitly clear an existing owner."
         },
         "targetUserId": {
-          "type": "string",
-          "description": "Org owner/admin only: target a same-org member user AOP (scope=user). Omit for self; non-admins and cross-org targets are rejected."
+          "$ref": "#/properties/createField/properties/targetUserId"
         }
       },
       "required": [
@@ -437,8 +485,7 @@
           "type": "string"
         },
         "targetUserId": {
-          "type": "string",
-          "description": "Org owner/admin only: target a same-org member user AOP (scope=user). Omit for self; non-admins and cross-org targets are rejected."
+          "$ref": "#/properties/createField/properties/targetUserId"
         }
       },
       "required": [
@@ -520,8 +567,7 @@
           "description": "Closes out previously-surfaced removed options from an earlier link-mapping call's `reconciliation.removed`. Omit on a first call for a field — there is nothing to resolve yet."
         },
         "targetUserId": {
-          "type": "string",
-          "description": "Org owner/admin only: target a same-org member user AOP (scope=user). Omit for self; non-admins and cross-org targets are rejected."
+          "$ref": "#/properties/createField/properties/targetUserId"
         }
       },
       "required": [
@@ -569,7 +615,7 @@
         },
         "value": {
           "type": "string",
-          "description": "Stable option value — never changes once set; use label for the display text."
+          "description": "Immutable option value; label is display text."
         },
         "label": {
           "type": "string"
@@ -582,11 +628,10 @@
         },
         "enumOrder": {
           "type": "integer",
-          "description": "Position to insert at. Omit to append at the end."
+          "description": "Insert position; omit to append."
         },
         "targetUserId": {
-          "type": "string",
-          "description": "Org owner/admin only: target a same-org member user AOP (scope=user). Omit for self; non-admins and cross-org targets are rejected."
+          "$ref": "#/properties/createField/properties/targetUserId"
         }
       },
       "required": [
@@ -613,7 +658,7 @@
         },
         "value": {
           "type": "string",
-          "description": "The existing option's stable value to patch."
+          "description": "Existing option value to patch."
         },
         "label": {
           "type": "string"
@@ -629,8 +674,7 @@
           "description": "Move the option to this position."
         },
         "targetUserId": {
-          "type": "string",
-          "description": "Org owner/admin only: target a same-org member user AOP (scope=user). Omit for self; non-admins and cross-org targets are rejected."
+          "$ref": "#/properties/createField/properties/targetUserId"
         }
       },
       "required": [
@@ -696,8 +740,7 @@
           "description": "For a CUSTOM field only (built-in fields' options are never value-reconciled): required when the option has existing stored values. Omit on a first call — if values exist, the call refuses and reports affectedValueCount instead of deleting silently; call again with a resolution once you know what to do with them."
         },
         "targetUserId": {
-          "type": "string",
-          "description": "Org owner/admin only: target a same-org member user AOP (scope=user). Omit for self; non-admins and cross-org targets are rejected."
+          "$ref": "#/properties/createField/properties/targetUserId"
         }
       },
       "required": [

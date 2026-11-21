@@ -1,50 +1,171 @@
 ---
-title: "Cedar MCP"
-description: "Connect your AI agent to the context and actions behind your GTM work."
+title: "Cedar architecture"
+sidebarTitle: "Architecture overview"
+description: "Explore the architecture guides from deal evidence and execution to outputs and rep review."
 ---
 
-Cedar's Model Context Protocol server connects your AI client to GTM evidence and actions: LinkedIn, Slack, email, CRM records, signals, meetings, calendars, tasks, knowledge, documents, tables, pipeline analytics, and configuration. Its skills also guide collateral creation, sales coaching, deal analysis, and persistent agent workflows.
+Follow the arrows upward. Cedar’s harness or your team’s own runtime can prepare work. Reps can review the resulting tasks and drafts in Cedar, in Slack, or through their own MCP-connected agents. Select a card to open its guide. Each agent can use the tools and skill resources allowed by its [runtime and grants](/agent-platform/permissions).
 
-## Explore Cedar
+<div className="cedar-architecture-map">
 
-<CardGroup cols={2}>
-<Card title="Connect and discover" icon="plug" href="/getting-started/quickstart">Authenticate your MCP client, discover available tools and make a first read.</Card>
-<Card title="Agent platform" icon="robot" href="/agent-platform/overview">The agent library, user tasks, specialized documents, triggers, memory, permissions and execution.</Card>
-<Card title="Channels" icon="comments" href="/channels/overview">LinkedIn, email, Slack, messaging, meetings and calendars—with their channel tools, sending and limits.</Card>
-<Card title="Enrichment" icon="magnifying-glass" href="/enrichment/overview">Person and company profiles, the web enrichment builder, field catalogs and provider tools.</Card>
-<Card title="Pipeline intelligence" icon="chart-line" href="/intelligence/overview">Pipeline metrics, deal analysis, signals, coaching and evidence-backed outputs.</Card>
-<Card title="Brain · Data layer" icon="database" href="/brain/overview">Records, source evidence, fields, knowledge, documents, tables, boards and graphs.</Card>
+<div className="cedar-map-band cedar-map-orange">
+
+### Where reps work
+
+<CardGroup cols={3}>
+  <Card horizontal title="Review deals in Cedar" icon="desktop" href="/getting-started/first-deal" />
+  <Card horizontal title="Review tasks in Slack" icon="hashtag" href="/slack/task-views" />
+  <Card horizontal title="Review work with your agent via MCP" icon="plug" href="/workspace/review-with-mcp" />
 </CardGroup>
 
-Each product area contains its own modules, workflows and tool references. LinkedIn includes [sending and limits](/linkedin/limits); the agent platform includes the [agent library](/agent-platform/library). Browse the [full hierarchy](/getting-started/modules) for every family, or the [tool catalog](/reference/index) for exact registered names.
+</div>
 
-## Work, outputs and evidence
+<div className="cedar-edge cedar-edge-straight" aria-hidden="true"><span>reviewed in</span></div>
+
+<div className="cedar-map-band cedar-map-blue">
+
+### Where outputs go
 
 <CardGroup cols={2}>
-<Card title="User tasks" icon="list-check" href="/tasks/overview">14 MCP actions to inspect, create, assign, prepare, approve, reschedule and complete work.</Card>
-<Card title="Specialized documents" icon="file-lines" href="/agent-platform/specialized-documents">Lists, task-aware agendas, structured tables, flowcharts, reports and actionable documents.</Card>
-<Card title="Visibility and access" icon="eye" href="/brain/visibility">Understand accessible records, task inventories, resource grants and the coverage of a result.</Card>
-<Card title="Statistical backing" icon="chart-column" href="/intelligence/statistical-backing">Inspect sample counts, source IDs, calculations and verified CRM inventories behind findings.</Card>
+  <Card horizontal title="Task Views" icon="list-check" href="/tasks/task-views" />
+  <Card horizontal title="Conversation Overview" icon="table-columns" href="/workspace/conversation-overview" />
 </CardGroup>
 
-## What you can build
+</div>
 
-| Workflow | Cedar capabilities |
+<div className="cedar-edge cedar-edge-straight" aria-hidden="true"><span>organized in</span></div>
+
+<div className="cedar-map-band cedar-map-gray">
+
+### Agent outputs
+
+<CardGroup cols={3}>
+  <Card horizontal title="Message drafts" icon="envelope" href="/channels/drafting" />
+  <Card horizontal title="Workflow documents" icon="bolt" href="/agent-platform/workflows" />
+  <Card horizontal title="Reports and coaching" icon="chart-line" href="/documents/reports" />
+  <Card horizontal title="Deal rooms" icon="folder-open" href="/documents/deal-rooms" />
+  <Card horizontal title="Tables" icon="table" href="/documents/tables" />
+  <Card horizontal title="Org charts and maps" icon="sitemap" href="/agent-platform/graphs" />
+  <Card horizontal title="Documents and briefs" icon="file-lines" href="/modules/documents-tables" />
+  <Card horizontal title="Boards" icon="table-columns" href="/agent-platform/boards" />
+</CardGroup>
+
+</div>
+
+<div className="cedar-edge cedar-edge-join" aria-hidden="true"><span>produce outputs</span></div>
+
+<div className="cedar-map-runners" role="group" aria-label="Agent execution paths">
+
+<div className="cedar-map-band cedar-map-green">
+
+### Cedar runtime
+
+<CardGroup cols={1}>
+  <Card title="Cedar’s agent harness" icon="play" href="/agent-platform/execution">Runs your configured agents with their instructions, context and allowed tools.</Card>
+  <Card horizontal title="Triggers: events, schedules and webhooks" icon="bolt" href="/agent-platform/triggers" />
+</CardGroup>
+
+</div>
+
+<div className="cedar-map-band cedar-map-external">
+
+### Your team’s runtime
+
+<CardGroup cols={1}>
+  <Card title="Run your own agent with Cedar" icon="server" href="/agent-platform/your-runtime">Your team hosts and triggers the agent. It uses authorized Cedar tools via MCP to prepare work.</Card>
+</CardGroup>
+
+</div>
+
+</div>
+
+<div className="cedar-edge cedar-edge-fork" aria-hidden="true"><span>use context and tools</span></div>
+
+<div className="cedar-map-inputs">
+
+<div className="cedar-map-band cedar-map-gray">
+
+### Foundation
+
+<CardGroup cols={1}>
+  <Card horizontal title="Sales strategy and playbooks" icon="compass" href="/automation/playbooks" />
+  <Card horizontal title="Deal context and evidence" icon="database" href="/brain/evidence-and-records" />
+  <Card horizontal title="Connected data sources" icon="network-wired" href="/integrations/external-systems" />
+</CardGroup>
+
+</div>
+
+<div className="cedar-map-band cedar-map-purple">
+
+### Agent superpowers
+
+#### Work across channels
+
+<CardGroup cols={2}>
+  <Card horizontal title="LinkedIn" icon="linkedin" href="/linkedin/overview" />
+  <Card horizontal title="Slack" icon="hashtag" href="/slack/overview" />
+  <Card horizontal title="Email" icon="envelope" href="/modules/email" />
+  <Card horizontal title="Meetings & calendar" icon="calendar" href="/channels/meetings" />
+</CardGroup>
+
+[All channels](/channels/overview)
+
+#### Understand accounts & buyers
+
+<CardGroup cols={2}>
+  <Card horizontal title="Research & enrich accounts" icon="magnifying-glass" href="/modules/research" />
+  <Card horizontal title="Qualify & score leads" icon="list-check" href="/intelligence/lead-qualification" />
+  <Card horizontal title="Map the buying committee" icon="sitemap" href="/intelligence/buying-committee" />
+  <Card horizontal title="Monitor buying signals" icon="tower-broadcast" href="/signals/overview" />
+  <Card horizontal title="Search the knowledge base" icon="book-open" href="/knowledge/overview" />
+</CardGroup>
+
+#### Maintain CRM & analyze revenue
+
+<CardGroup cols={2}>
+  <Card horizontal title="Extract fields & maintain CRM" icon="database" href="/modules/crm" />
+  <Card horizontal title="Review & forecast pipeline" icon="chart-line" href="/intelligence/overview" />
+  <Card horizontal title="Coach reps" icon="comments" href="/intelligence/coaching" />
+  <Card horizontal title="Analyze customer & competitive themes" icon="layer-group" href="/intelligence/customer-themes" />
+</CardGroup>
+
+#### Prepare & coordinate work
+
+<CardGroup cols={2}>
+  <Card horizontal title="Manage next steps & tasks" icon="list-check" href="/workspace/tasks" />
+  <Card horizontal title="Build outreach sequences" icon="paper-plane" href="/automation/outreach-sequences" />
+  <Card horizontal title="Create briefs & collateral" icon="file-lines" href="/knowledge/collateral" />
+  <Card horizontal title="Build tables & boards" icon="table" href="/documents/build-tables-and-boards" />
+  <Card horizontal title="Use connected tools" icon="plug" href="/agent-platform/connected-tools" />
+</CardGroup>
+
+</div>
+
+</div>
+
+</div>
+
+For steps that span layers, start with [an account research workflow](/recipes/account-research) or [a pipeline review](/recipes/pipeline-review). To operate a workflow, check [agent permissions](/agent-platform/permissions), [run history](/agent-platform/observability), and [spending limits](/operations/billing-and-budgets). The [documentation directory](/getting-started/modules) lists guides by diagram layer and links to the [MCP tool catalog](/reference/tool-catalog).
+
+## Follow a discovery-call task through the layers
+
+When a workflow crosses systems, decide which work the agent can finish and where the rep’s judgment changes the next step. See [Design a human-in-the-loop workflow](/getting-started/human-in-the-loop) to see how a rep chooses whom to approach from a deal org chart and then approves the outreach sequences.
+
+| Layer | What happens |
 | --- | --- |
-| Find relevant people and prepare outreach | LinkedIn search and engagement → prospect screening → CRM context → drafts or authorized scheduled sends |
-| Watch a customer Slack channel | Channel source → filtered playbook trigger → evidence check → notification |
-| Act on a website visit | Visitor provider or form → Cedar HTTP input/playbook → qualification → reviewable follow-up |
-| Monitor buyers and accounts | Person/company watchers → signal history → evidence-backed review → tasks or drafts |
-| Keep a pipeline current | Email, Slack, meetings and LinkedIn context → CRM fields → analytics |
-| Give agents a persistent workspace | Lists, row-addressed tables, flowcharts, reports, tasks and configured playbooks |
-| Turn recommendations into owned work | Task inventory → eligible assignee → preparation or approval → completion and verified result |
-| Build buyer-facing materials | Deal evidence + knowledge base + templates → deck, one-pager, business case or action plan |
-| Coach reps and explain pipeline outcomes | Qualification frameworks + field history + taxonomy evidence + server-computed metrics |
-| Roll out team configuration | Effective playbooks + field rollups + authorized field/mapping propagation |
-| Manage operating workflows | Assigned tasks + saved views + inboxes + notifications + spending controls |
+| Foundation | The meeting transcript records a commitment. The sales playbook says which commitments need follow-up. |
+| Agent superpowers | The agent reads the deal, checks the transcript and prepares a source-backed follow-up. |
+| Agent execution | [Cedar’s harness](/agent-platform/execution) starts on a configured trigger, or [your runtime](/agent-platform/your-runtime) starts on your schedule. |
+| Agent outputs | The run saves a brief with the proposed next step and a link to its evidence. |
+| Where outputs go | A follow-up task carries the owner and due date. Its [Task View](/tasks/task-views) gives the rep a queue of work. |
+| Where reps work | The rep opens the task in Cedar, reviews a configured Slack card, or [asks their assistant](/workspace/review-with-mcp) to retrieve the brief. |
 
-## How to use these docs
+## Examples
 
-Start with **Overview**, then choose **Agent platform**, **Channels**, **Enrichment**, **Pipeline intelligence** or **Brain**. Every family opens with an overview before its detailed capabilities, guides and tool contracts. Shared channel tools live under Channels; data-layer tools live under Brain; user tasks, specialized outputs, agent templates and skills live inside Agent platform. **Overview** contains connection guides, the full reference, workspace preferences and administration. The tool reference preserves the complete schema for each family; consult it for exact field names, enums, limits, and response branches. JSON snippets in guides are **tool arguments** unless explicitly labeled JSON-RPC or HTTP. Replace example identifiers with values returned by your account.
+| Workflow | Context and strategy | Agent work | Rep experience |
+| --- | --- | --- | --- |
+| Account prioritization | Usage, engagement, conversations and your account-scoring rules | Maintain evidence-backed account research and priorities | Account table or brief plus owned follow-up tasks in a Task View |
+| Slack signal monitoring | Authorized channel activity and your buying-signal/friction definitions | Inspect relevant messages and prepare a supported next step | A task with linked evidence, reviewed from Cedar or Slack |
+| Pipeline revival | Deal history, relevant case studies and product updates | Draft a specific, useful reason to reconnect | Review the draft, send deliberately and track the resulting task state |
 
-This documentation was audited against repository source on **October 29, 2026**. A deployed server may differ; its `tools/list` response, `load-skill` instructions, and runtime capability discovery take precedence. [Capability boundaries](/getting-started/capability-boundaries) identify app-only, gated, and separate-API features.
+These are workflow designs, not a promise that a template connects every source or activates every trigger automatically. Start by configuring and testing one workflow and its rep-facing destination.

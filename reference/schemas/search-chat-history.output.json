@@ -25,7 +25,8 @@
             "type": "string",
             "enum": [
               "title",
-              "message"
+              "message",
+              "conversation"
             ]
           },
           "snippet": {

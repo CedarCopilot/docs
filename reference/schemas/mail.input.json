@@ -39,7 +39,7 @@
       "properties": {
         "targetUserId": {
           "type": "string",
-          "description": "Read ANOTHER user instead of yourself. Omit for your own sent email, which is almost always what you want. This returns verbatim drafted and sent message bodies, so a cross-user read is refused even for an admin of the target's own organization."
+          "description": "Read the original and sent text of Cedar-drafted emails for this user. Same-org owners and admins may read a teammate’s draft analytics. Omit for your own emails."
         },
         "userId": {
           "type": "string",
@@ -112,7 +112,7 @@
         "query": {
           "type": "string",
           "minLength": 1,
-          "description": "Gmail search query — full Gmail search syntax (e.g. \"from:jane@acme.com newer_than:30d has:attachment subject:intro\"). Searches the user's LIVE mailbox, not Cedar's synced store. Returns thread ids + subject/from/snippet previews."
+          "description": "Gmail search query — full Gmail search syntax (e.g. \"from:person@example.com newer_than:30d has:attachment subject:intro\"). Searches the user's LIVE mailbox, not Cedar's synced store. Returns thread ids + subject/from/snippet previews."
         },
         "maxResults": {
           "type": "integer",
@@ -136,7 +136,30 @@
         "threadId": {
           "type": "string",
           "minLength": 1,
-          "description": "Gmail thread id (from search-live). Reads the full thread LIVE from the mailbox."
+          "description": "Gmail thread id (from search-live-emails). Read LIVE from the mailbox."
+        },
+        "connectionId": {
+          "type": "string",
+          "description": "Explicit mailbox connection ID; must belong to the executing user."
+        },
+        "includeTrackingHistory": {
+          "type": "boolean",
+          "description": "Include detailed open/click event history only when asked about tracking. Default false."
+        },
+        "messageId": {
+          "type": "string",
+          "description": "Read only this message, including an older message outside the newest page."
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of newest messages already read. Default 0."
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "description": "Messages per page, newest page first and chronological within each page. Default 20."
         }
       },
       "required": [

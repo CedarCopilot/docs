@@ -1,5 +1,5 @@
 ---
-title: "Task lifecycle, assignment and follow-up"
+title: "Manage next steps & tasks"
 description: "Create owned work, handle recommendations and approvals, and track completion."
 ---
 
@@ -16,9 +16,21 @@ Load `tasks` for the account's task rules. The `task` family covers personal wor
 | `start` | Start preparation for eligible caller-owned work |
 | `complete`, `cancel`, `delete` | Finish, cancel or remove a task with distinct semantics |
 
+## Review a multi-step follow-up
+
+A task can carry a personalized cadence with a contact and one to twelve steps. Preparation uses an existing sequence or a reusable template. Open the saved plan to review its steps, timing and current progress. A saved or newly edited plan needs its applicable human approval before delivery. When a reply or calendar change invalidates the plan, recheck its status before approving or retrying.
+
+## Work from a deal task
+
+Open the task on the deal and follow its primary action. **Start task** opens a normal Cedar chat with the task as context. A task with prepared output can offer **View Draft**, **Open invite**, **Review sequence**, or **Review document**, depending on the saved output.
+
+For a suggested deal or CRM change, open **Review deal** or **Review proposal** and inspect the saved fields and supporting notes. Choose **Accept** only when the values match the change you want. Opening the review chat leaves the proposal pending. If a saved proposal changed, review its current values before trying again.
+
+An email draft can remain open after preparation. If automatic completion is blocked, inspect the reason and the linked sent evidence before resolving the task. Completing a task manually records its lifecycle outcome. It does not deliver the draft.
+
 ## Create the right kind of work
 
-A recommendation is not yet an assigned persisted task. Discover the valid options, create the task, and keep its ID for updates. Preserve the source deal and useful source permalinks in the task's notes.
+A recommended task can already have a saved ID. Check its status and ownership before creating or assigning work. Discover the valid options, create the task, and keep its ID for updates. Preserve the source deal and useful source permalinks in the task's notes.
 
 A due date is when work is due. Agent execution time determines when an agent-enabled task runs. A personal reminder does not become automatic agent execution just because it has a future date.
 
@@ -32,4 +44,4 @@ Use the explicit completion/cancellation/deletion operation intended by the user
 
 `workspace-write manage_task_group` controls groups, ordering, visual metadata, routing criteria, agent visibility and supported overdue policies. Those workspace settings are separate from changing individual tasks. Read existing group IDs using `config-read read-settings` first.
 
-[Task overview](/tasks/overview) · [Visibility and inventory receipts](/tasks/visibility) · [Task contract](/reference/task) · [Workspace preferences](/workspace/preferences)
+[Task View reminder timing](/tasks/task-views#when-a-due-reminder-repeats) · [Task overview](/tasks/overview) · [Visibility and inventory receipts](/tasks/visibility) · [Task contract](/reference/task) · [Workspace preferences](/workspace/preferences)

@@ -31,7 +31,11 @@ After the client completes the MCP initialization handshake, a call looks like:
   "method": "tools/call",
   "params": {
     "name": "linkedin-read",
-    "arguments": { "action": "list-seats" }
+    "arguments": {
+      "action": "list-seats",
+      "user_request_summary": "Check which LinkedIn seats I can use.",
+      "is_new_request": true
+    }
   }
 }
 ```
@@ -59,4 +63,4 @@ Do not automatically retry an externally visible send after a timeout. It may ha
 
 ## Intent metadata
 
-Family schemas include optional `user_request_summary` and `is_new_request` fields used for request observability. They do not grant permissions or authorize a send. Use them only to describe the real user request.
+Every public tool call includes `user_request_summary` (a short string describing the request) and `is_new_request` (a boolean). Set the boolean to `true` for the first call of a new request and `false` for subsequent calls serving it. These fields group activity. They grant no permission to change data or send a message. Examples elsewhere in this guide show the operation-specific arguments. When constructing a raw call, add the two fields as in the JSON-RPC example above.

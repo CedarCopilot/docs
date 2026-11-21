@@ -203,6 +203,8 @@
               "enum": [
                 "text",
                 "number",
+                "score",
+                "percent",
                 "date",
                 "boolean",
                 "select",
@@ -260,6 +262,30 @@
                         "additionalProperties": false
                       },
                       "maxItems": 3
+                    },
+                    "checklist": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "instruction": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "label"
+                        ],
+                        "additionalProperties": false
+                      }
                     }
                   },
                   "required": [

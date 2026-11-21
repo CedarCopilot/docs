@@ -19,7 +19,7 @@ Billing tools use authorized accounts, exact microcredit strings and versioned p
 | Spending grants | `write-grant`, `revoke-grant` |
 | Imports and monthly billing | `request-import`, `configure-postpaid`, `reconcile-postpaid` |
 
-An unfunded account does not contain purchased credits. A checkout link does not prove payment. Credits follow verified payment processing. A grant does not override account/member/feature/meter limits.
+An unfunded account does not contain purchased credits. A checkout link does not prove payment. Credits follow verified payment processing. A grant does not override account/member/feature/meter limits. When a grant changes, already accepted operations retain their recorded grant version. Check the grant on the operation before interpreting a historical charge using today’s settings.
 
 ## Observations and retry boundaries
 
@@ -27,8 +27,4 @@ An unfunded account does not contain purchased credits. A checkout link does not
 
 Inspect an operation's exact recovery contract before retrying. Reconciliation, payment processing, ledger delivery and enrichment are different operations with different duplicate risks.
 
-## Staff administration
-
-`billing-admin` adds catalog/offers/allowances, payment events/retries, subscription reconciliation, import verification, usage corrections and organization account/monthly-limit administration. These are explicitly staff-only capabilities; customer integrations should use their authorized read/write surface.
-
-[Read reference](/reference/billing-read) · [Write reference](/reference/billing-write) · [Staff administration](/reference/billing-admin)
+[Read reference](/reference/billing-read) · [Write reference](/reference/billing-write)

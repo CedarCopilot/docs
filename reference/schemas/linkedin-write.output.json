@@ -7,6 +7,24 @@
     "errorMessage": {
       "type": "string"
     },
+    "viewProfile": {
+      "type": "object",
+      "properties": {
+        "providerId": {
+          "type": "string"
+        },
+        "publicIdentifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "headline": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
     "sendMessage": {
       "type": "object",
       "properties": {

@@ -264,6 +264,43 @@
               "type": "string",
               "const": "update_crm_settings"
             },
+            "objectApiName": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Native CRM object; omit for Deals/Opportunity, use leads for HubSpot Leads."
+            },
+            "playbookBindings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value": {
+                    "$ref": "#/properties/change/anyOf/3/properties/playbookBindings/items/properties/field"
+                  },
+                  "aopId": {
+                    "$ref": "#/properties/change/anyOf/3/properties/playbookBindings/items/properties/field"
+                  },
+                  "identityMode": {
+                    "type": "string",
+                    "enum": [
+                      "record",
+                      "legacy"
+                    ]
+                  }
+                },
+                "required": [
+                  "field",
+                  "value",
+                  "aopId"
+                ],
+                "additionalProperties": false
+              },
+              "description": "Replace native field/value → this user’s existing AOP ID routes for this object. Use one field (HubSpot pipeline), unique values, and an entry for every routed pipeline. [] explicitly clears. identityMode defaults to record; legacy preserves company identity only for the current Deal/Opportunity-default AOP. This does not enable sync or writes."
+            },
             "connectionId": {
               "type": "string",
               "description": "The CRM connection row ID — get from read-connection-settings sections:[\"connections\"]"

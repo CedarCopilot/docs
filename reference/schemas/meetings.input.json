@@ -19,7 +19,7 @@
         },
         "participant": {
           "type": "string",
-          "description": "Match meetings with this person among the attendees — an email, an email domain (\"acme.com\"), or a name. Matches the organizer too."
+          "description": "Match meetings with this person among the attendees — an email, an email domain (\"example.com\"), or a name. Matches the organizer too."
         },
         "url": {
           "type": "string",
@@ -66,11 +66,11 @@
         },
         "titleContains": {
           "type": "string",
-          "description": "Narrow the provider window to meetings whose title contains this."
+          "description": "Narrow to matching titles. Circleback searches this at the source; prefer it or an attendee domain over an exact attendee email."
         },
         "participant": {
           "type": "string",
-          "description": "Narrow to meetings with this attendee — email, email domain, or name."
+          "description": "Attendee email, email domain, or name. For Circleback, use a domain such as example.com for server-side search. Exact emails and names are filtered locally after fetching the date window."
         },
         "url": {
           "type": "string",

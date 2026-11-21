@@ -5,12 +5,12 @@ description: "Separate preparation from externally visible LinkedIn actions."
 
 ## Read the relationship first
 
-Call `find-chat` with a verified person URL, provider ID, Cedar person ID, or name. A name can return multiple candidates; resolve ambiguity before selecting a person. `refresh: true` requests fresh provider context. The lookup may ingest an unsynced chat into Cedar.
+Call `find-chat` with a verified person URL, provider ID, Cedar person ID, or name. This lookup identifies the conversation without importing its history. If a name returns several matches, use the verified profile URL or provider ID to select the intended person.
 
 ```json
 {
   "action": "find-chat",
-  "findChat": { "url": "https://www.linkedin.com/in/example-person", "refresh": true }
+  "findChat": { "url": "https://www.linkedin.com/in/example-person" }
 }
 ```
 
@@ -18,7 +18,7 @@ Use `read-chat` for messages and the saved draft. `list-chats` supports a limit,
 
 ## Draft first
 
-Use `draft-comms` with `action: "draft-linkedin-message"` and the matching `draftLinkedinMessage` object. It prepares a draft; it does not authorize delivery. Read the exact target and body fields in the [draft tool reference](/reference/draft-comms).
+Use `draft-comms` with `action: "draft-linkedin-message"` and the matching `draftLinkedinMessage` object. For a reply, read the existing chat and pass its ID. For first contact, identify the recipient from a verified connection or profile lookup. Supply the owned seat, recipient provider ID, recipient name and existing task ID. The rep can review the message in that task before a provider thread exists. Saving the draft never creates a LinkedIn chat or sends a message. Read the exact target and body fields in the [draft tool reference](/reference/draft-comms).
 
 ## Send an authorized message
 
@@ -56,7 +56,7 @@ After the user authorizes the recipient, content, and time, call `schedule-send`
 ```json
 {
   "channel": "linkedin",
-  "sendAt": "2026-11-02T09:15:00-08:00",
+  "sendAt": "2027-01-12T09:15:00-08:00",
   "body": "Following up with the technical summary you requested.",
   "linkedin": {
     "unipileAccountId": "seat_from_list_seats",
@@ -71,4 +71,8 @@ For a new chat, pass `attendeeProviderId` instead of `chatId`, never both. Cedar
 
 ## Attach a chat to a deal
 
-`linkedin-write sync-chat` ingests a chat into an authorized existing Cedar conversation. It requires `linkedin:read`, not the sending scope. It does not contact the prospect.
+`linkedin-write sync-chat` ingests a chat into an authorized existing Cedar conversation. For a chat discovered through `find-chat` that Cedar has yet to index, pass the returned chat ID, counterpart provider ID and owned seat. Cedar rechecks the match before importing history. The operation requires `linkedin:read` and permission to update the destination conversation. It does not contact the prospect.
+
+## Check whether a buyer replied
+
+For a tracked LinkedIn funnel, Cedar looks for a nonempty inbound message from the identified buyer after a verified send in the same chat. A preview, an outbound echo or an earlier inbound message does not establish a reply to that outreach. The sequence of events supports inferred attribution; inspect the buyer’s actual message before describing it as a positive response.

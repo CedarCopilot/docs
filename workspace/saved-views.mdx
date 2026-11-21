@@ -16,6 +16,10 @@ description: "Create reusable pipeline, table, report, task and calendar views."
 
 Supported canvas types include `conversationCanvas`, `kanbanConversation`, `cardList`, `table`, `report`, `statistics`, `tasks`, `agenda` and `calendar`. Use the matching configuration shape from the reference; a valid type name alone does not define the data/filter settings.
 
+## Keep or discard pipeline filters
+
+In an editable pipeline view, change the filters and inspect the matching deals. Choose **Save filters** to keep that combination on the view. Choose **Restore saved filters** to return to the last saved combination. The controls appear when the current filters differ from the saved values. Saving a filter changes which deals the view shows. The underlying deals retain their existing fields.
+
 ## Read before replacing
 
 List current canvases, inspect their IDs/configuration and preserve settings that should remain. An update can replace a configuration object, so an additive request should not accidentally remove existing filters or layout.
@@ -32,3 +36,7 @@ Use the intended AOP and supported field IDs for an overview. Field visibility a
 Read the saved view back after editing. Use the [analytics tool](/crm/metrics) to compute a metric when the task requires a number; changing a view is not evidence that a calculation ran.
 
 [Complete UI configuration contract](/reference/ui-config)
+
+## Conversation Overview
+
+To choose the fields and documents that appear on a single deal, see [Conversation Overview](/workspace/conversation-overview).

@@ -8,7 +8,7 @@
         "send",
         "status"
       ],
-      "description": "Omit action for legacy send; explicit send requires approvalHash. prepare only reads a review snapshot/hash; status only reads the existing draft-send journal."
+      "description": "Omit action for legacy send; explicit send requires reviewToken or approvalHash. prepare only reads a review snapshot/hash; status only reads the existing draft-send journal."
     },
     "draftId": {
       "type": "string",
@@ -18,7 +18,12 @@
     "approvalHash": {
       "type": "string",
       "pattern": "^[a-f0-9]{64}$",
-      "description": "On send, compare live draft/sender/thread with this explicitly reviewed prepare hash before sending. Required for the DeepLine conditional-send workflow."
+      "description": "On send, compare live draft/sender/thread with this explicitly reviewed prepare hash before sending."
+    },
+    "reviewToken": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Signed proof from prepare. Pass unchanged when sending the reviewed draft, including compose drafts and signature images."
     },
     "targetUserId": {
       "type": "string",
