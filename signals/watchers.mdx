@@ -41,7 +41,7 @@ Fiber tracker availability is feature-gated; check `capabilities.fiber.available
 
 Supported rules include promotions/demotions, person/company posts, added technology, new office locations, layoffs, department size thresholds, hires by title, job postings by function or keyword, and headcount percentage change. Rule entity types must match the subject. Thresholds and keyword filters must reflect the requested monitoring criteria. Fiber does not expose follower/connection-count tracker rules here.
 
-Fiber refreshes are metered per completed profile refresh, including runs finding zero signals. Avoid overlapping post coverage across providers. Manual identity enrichment in this guide explicitly uses Fiber.
+Fiber refreshes are metered per completed profile refresh, including runs finding zero signals. Avoid overlapping post coverage across providers. Choosing a Fiber tracker does not change the account's provider for manual lookups.
 
 ## Identity continuation
 
@@ -67,7 +67,7 @@ If `continuation.required` is true, the watch is not fully set up. Use saved dea
 
 Watch activation is separate from reading. Provider dispatch requires an approved rate and spending permission; Cedar credits are distinct from native provider credits and dollar cost. Never raise caps or purchase credits automatically. The API contains a `confirmedPeopleCount` mechanism for tasks exceeding 50 people; count the complete job rather than hiding size in smaller batches.
 
-The current entity/discovery implementation includes Crustdata and Fiber paths. Do not interpret a generic activation request as a provider choice when the user's policy specifies one. The manual-enrichment examples explicitly use Fiber. Reading these docs does not execute or enable any provider.
+The current entity/discovery implementation includes Crustdata and Fiber paths. Do not interpret a generic activation request as a provider choice when the user's policy specifies one. Reading these docs does not execute or enable any provider.
 
 {/* BEGIN GENERATED CAPABILITY CATALOG */}
 

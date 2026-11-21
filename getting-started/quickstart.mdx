@@ -15,7 +15,7 @@ Add this remote MCP server URL:
 https://api.mail.cedarcopilot.com/mcp
 ```
 
-This endpoint's OAuth discovery and unauthenticated challenge were verified on October 29, 2026. For a workspace using a separate published proxy URL, use the exact URL supplied for that environment.
+Use the endpoint supplied for your environment when connecting to a separate Cedar workspace or proxy.
 
 A client that accepts a remote HTTP configuration can use this shape, as a starting point:
 
@@ -43,7 +43,7 @@ Client configuration formats vary. Choose the client's remote HTTP connector opt
 ## Verify the connection
 
 1. Let the MCP client initialize and list the server's tools.
-2. Call `load-skill` with `{}` to discover the instruction catalog.
+2. Ask your client to list Cedar skills. The `load-skill` call without a skill name returns the catalog available to your account. A raw client must also supply the [request metadata](/getting-started/calling-tools#intent-metadata) on each call.
 3. Load the skill relevant to your task. For integrations, configuration, playbooks, or the data model:
 
 ```json

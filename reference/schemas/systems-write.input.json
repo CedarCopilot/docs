@@ -30,7 +30,7 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 128,
-              "description": "Required for create; the label the agent addresses this server by, e.g. \"Mintlify Docs\"."
+              "description": "Required for create; the label the agent addresses this server by, e.g. \"Example documentation\"."
             },
             "serverUrl": {
               "type": "string",

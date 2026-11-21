@@ -1,0 +1,243 @@
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "start",
+        "read",
+        "list",
+        "continue",
+        "stop",
+        "advance",
+        "guidance",
+        "ensure-guidance",
+        "compile-brief"
+      ]
+    },
+    "guidance": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "target": {
+          "type": "object",
+          "properties": {
+            "domain": {
+              "type": "string",
+              "maxLength": 253,
+              "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            }
+          },
+          "required": [
+            "domain"
+          ],
+          "additionalProperties": false
+        },
+        "scope": {
+          "type": "object",
+          "properties": {
+            "function": {
+              "type": "string",
+              "enum": [
+                "auto",
+                "sales",
+                "sales_and_revops",
+                "go_to_market",
+                "engineering",
+                "finance",
+                "security",
+                "customer_success",
+                "marketing",
+                "operations",
+                "product",
+                "people",
+                "legal",
+                "whole_company"
+              ],
+              "default": "auto"
+            },
+            "depth": {
+              "type": "string",
+              "enum": [
+                "leadership",
+                "through_managers",
+                "full_function"
+              ],
+              "default": "full_function"
+            },
+            "maxPeople": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 100
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "compileBrief": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "$ref": "#/properties/guidance/properties/conversationId"
+        },
+        "target": {
+          "$ref": "#/properties/guidance/properties/target"
+        },
+        "scope": {
+          "$ref": "#/properties/guidance/properties/scope"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "account_plan",
+            "org_chart",
+            "stack_wedge"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "start": {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100000
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "targetDocumentId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": {}
+        },
+        "inputRows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/start/properties/scope"
+          },
+          "maxItems": 1000
+        },
+        "outputSchema": {
+          "$ref": "#/properties/start/properties/scope"
+        },
+        "promptVersion": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "model": {
+          "type": "string",
+          "enum": [
+            "ranger",
+            "scout"
+          ],
+          "default": "ranger"
+        },
+        "targetCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "commandId",
+        "prompt",
+        "title",
+        "targetDocumentId",
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "read": {
+      "type": "object",
+      "properties": {
+        "jobId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "jobId"
+      ],
+      "additionalProperties": false
+    },
+    "advance": {
+      "$ref": "#/properties/read"
+    },
+    "list": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "continue": {
+      "type": "object",
+      "properties": {
+        "jobId": {
+          "$ref": "#/properties/read/properties/jobId"
+        },
+        "commandId": {
+          "$ref": "#/properties/start/properties/commandId"
+        },
+        "prompt": {
+          "$ref": "#/properties/start/properties/prompt"
+        }
+      },
+      "required": [
+        "jobId",
+        "commandId",
+        "prompt"
+      ],
+      "additionalProperties": false
+    },
+    "stop": {
+      "type": "object",
+      "properties": {
+        "jobId": {
+          "$ref": "#/properties/read/properties/jobId"
+        },
+        "commandId": {
+          "$ref": "#/properties/start/properties/commandId"
+        }
+      },
+      "required": [
+        "jobId",
+        "commandId"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "action"
+  ],
+  "additionalProperties": true,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

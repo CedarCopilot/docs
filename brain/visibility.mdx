@@ -9,7 +9,7 @@ Cedar's data layer gives agents a shared context while retaining the access rule
 
 | Layer | What to inspect |
 | --- | --- |
-| MCP registration | The current session's `tools/list`: advertised families can still contain staff-only, feature-gated or app-only operations. |
+| MCP registration | The current session's `tools/list`: advertised families can still contain feature-gated or app-only operations. |
 | Scope and operation | Baseline scope plus action-specific checks. A family with a read-named scope may still contain guarded mutations. |
 | Organization and target | Caller identity, organization role and supported target-user rules. A supplied ID does not grant access. |
 | Conversation and task | Conversation visibility, task ownership and the authority required by the specific task action. |
@@ -31,4 +31,4 @@ Use CRM event IDs and original content for source statements; use field timeline
 
 For numerical reports, make the denominator and exclusions visible alongside the finding. [Statistical backing](/intelligence/statistical-backing) describes the returned measurement fields and what they establish. For automated work, [execution visibility](/agent-platform/observability) connects configuration, runs, tool results, saved artifacts and delivery status.
 
-[Records and provenance](/brain/evidence-and-records) · [MCP permissions](/getting-started/permissions) · [Complete tool catalog](/reference/index)
+[Records and provenance](/brain/evidence-and-records) · [MCP permissions](/getting-started/permissions) · [Complete tool catalog](/reference/tool-catalog)

@@ -1,10 +1,13 @@
 ---
-title: "Graphs and relationship maps overview"
-sidebarTitle: "Overview"
+title: "Org charts and maps"
 description: "Document-backed nodes, typed relationships and agent resource permissions."
 ---
 
-Cedar's product graph surface represents relationships between document-backed nodes. It can support account maps and organization charts with explicit fields and relationship kinds. The external MCP registry has no standalone graph family; documenting the product surface does not create a `graph` MCP endpoint.
+Cedar's product graph surface represents relationships between document-backed nodes. It can support account maps and organization charts with explicit fields and relationship kinds. For accounts with Task Views enabled, external MCP clients can use the `graph` family on an authorized deal’s org chart. Supply the deal’s `conversationId` and the exact `conversation/{id}/org-chart` path. To create the chart, select the `org-chart` template. Check the tools and scopes available to the connection before editing.
+
+## Build a deal org chart
+
+Start with a deal you can access. Read its chart to see existing contacts and relationships. The authorized read can include a people map with CRM contact status, engagement, recommendations and supporting evidence. Map confirmed reporting lines as edges. For example, a copied email is evidence that someone was present, but knowing who they report to takes another source. External chart tools exclude paid enrichment and destructive graph administration.
 
 ## Graph capabilities
 

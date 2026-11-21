@@ -1,0 +1,228 @@
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "list_templates",
+        "read",
+        "get_schema",
+        "create_graph",
+        "add_node",
+        "set_node",
+        "move_node",
+        "connect",
+        "set_edge",
+        "connections",
+        "find_nodes",
+        "field_values",
+        "lint"
+      ]
+    },
+    "conversationId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "External MCP import: the authorized deal id. Every graph address must be conversation/{id}/org-chart. Internal subagents use their existing run scope instead."
+    },
+    "graph": {
+      "type": "string",
+      "description": "Graph name, path or id. Required for everything except list_graphs/list_templates."
+    },
+    "node": {
+      "type": "string",
+      "description": "A node id, the documentId it points at, OR its title — all three work. You do not need to remember the graph-local node id after add_node."
+    },
+    "create_graph": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string",
+          "description": "Run list_templates to see them. `org-chart` is one."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "add_node": {
+      "type": "object",
+      "properties": {
+        "documentId": {
+          "type": "string",
+          "description": "The document this node IS — for a person, their EXISTING contact/{personId}/profile. The pointed-at document is never modified."
+        },
+        "path": {
+          "type": "string",
+          "description": "A document path; one is created there if nothing exists."
+        },
+        "title": {
+          "type": "string",
+          "description": "Only used when a document has to be created."
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      },
+      "additionalProperties": false
+    },
+    "set_node": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "object",
+          "additionalProperties": {},
+          "description": "`null` clears a value."
+        },
+        "replaceFields": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "fields"
+      ],
+      "additionalProperties": false
+    },
+    "move_node": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "additionalProperties": false
+    },
+    "connect": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Node id, documentId or title."
+        },
+        "target": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "description": "The relation, e.g. `reports_to`. An undeclared kind still draws."
+        },
+        "label": {
+          "type": "string",
+          "description": "What a human calls THIS connection: \"Boss/Manager\"."
+        },
+        "description": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": {}
+        },
+        "meta": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "source",
+        "target",
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "set_edge": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "description": "Changing the kind is a disconnect + connect — it is a different edge."
+        },
+        "label": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "source",
+        "target",
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "find_nodes": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "value": {
+          "description": "Omit to get every node that has this field at all. Matches inside a multi_select."
+        }
+      },
+      "required": [
+        "field"
+      ],
+      "additionalProperties": false
+    },
+    "field_values": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "field"
+      ],
+      "additionalProperties": false
+    },
+    "user_request_summary": {
+      "type": "string",
+      "description": "One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does."
+    },
+    "is_new_request": {
+      "type": "boolean",
+      "description": "true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread."
+    }
+  },
+  "required": [
+    "action",
+    "user_request_summary",
+    "is_new_request"
+  ],
+  "additionalProperties": true,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

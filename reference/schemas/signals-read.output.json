@@ -27,164 +27,6 @@
       ],
       "additionalProperties": false
     },
-    "inventory": {
-      "type": "object",
-      "properties": {
-        "totals": {
-          "type": "object",
-          "properties": {
-            "watchCount": {
-              "type": "integer",
-              "minimum": 0
-            },
-            "desiredActiveWatchCount": {
-              "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-            },
-            "desiredActivePersonCount": {
-              "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-            },
-            "desiredActivePersonDiscoveryWatchCount": {
-              "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-            }
-          },
-          "required": [
-            "watchCount",
-            "desiredActiveWatchCount",
-            "desiredActivePersonCount",
-            "desiredActivePersonDiscoveryWatchCount"
-          ],
-          "additionalProperties": false
-        },
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "watchId": {
-                "type": "string"
-              },
-              "conversationId": {
-                "type": "string"
-              },
-              "ownerUserId": {
-                "type": "string"
-              },
-              "organizationId": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "accountId": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "generation": {
-                "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-              },
-              "desiredState": {
-                "type": "string",
-                "enum": [
-                  "active",
-                  "paused",
-                  "cancelled"
-                ]
-              },
-              "observedState": {
-                "type": "string",
-                "enum": [
-                  "provisioning",
-                  "active",
-                  "partial",
-                  "error",
-                  "paused",
-                  "cancelled"
-                ]
-              },
-              "reasonCode": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "targetCount": {
-                "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-              },
-              "personCount": {
-                "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-              },
-              "activePersonCount": {
-                "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-              },
-              "personDiscoveryWatchCount": {
-                "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-              },
-              "providerBindings": {
-                "type": "object",
-                "properties": {
-                  "count": {
-                    "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-                  },
-                  "currentCount": {
-                    "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-                  },
-                  "states": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-                    }
-                  },
-                  "currentStates": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "$ref": "#/properties/inventory/properties/totals/properties/watchCount"
-                    }
-                  }
-                },
-                "required": [
-                  "count",
-                  "currentCount",
-                  "states",
-                  "currentStates"
-                ],
-                "additionalProperties": false
-              }
-            },
-            "required": [
-              "watchId",
-              "conversationId",
-              "ownerUserId",
-              "organizationId",
-              "accountId",
-              "generation",
-              "desiredState",
-              "observedState",
-              "reasonCode",
-              "targetCount",
-              "personCount",
-              "activePersonCount",
-              "personDiscoveryWatchCount",
-              "providerBindings"
-            ],
-            "additionalProperties": false
-          }
-        },
-        "nextCursor": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "totals",
-        "items",
-        "nextCursor"
-      ],
-      "additionalProperties": false
-    },
     "continuation": {
       "type": "object",
       "properties": {
@@ -1459,8 +1301,20 @@
                       "mentioned",
                       "introduced",
                       "engaged",
-                      "should_engage"
+                      "should_engage",
+                      "critical_to_engage"
                     ]
+                  },
+                  "engagementPriority": {
+                    "type": "string",
+                    "enum": [
+                      "critical",
+                      "recommended",
+                      "none"
+                    ]
+                  },
+                  "engagementReason": {
+                    "type": "string"
                   },
                   "roles": {
                     "type": "array",

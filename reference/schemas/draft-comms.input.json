@@ -96,6 +96,45 @@
           ],
           "description": "OPTIONAL - Set this ONLY when the user asked you to EDIT / REWRITE / REPLACE an existing draft. Pass the Thread ID of the draft to replace (the same \"Thread ID: <id>\" from the context). Cedar will update that thread's existing draft in place instead of creating a second one. Omit for brand-new drafts."
         },
+        "taskNotes": {
+          "type": "string",
+          "maxLength": 4000,
+          "description": "Concise source/request context explaining this new task, including an explicit promise or requested deliverable when known. Do not invent facts."
+        },
+        "taskViews": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskViewId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "expectedSchemaRevision": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "expectedVersion": {
+                "type": "integer",
+                "minimum": 0,
+                "default": 0,
+                "description": "Use 0 only for a new association. To change existing values, read the current association and pass its returned version."
+              },
+              "values": {
+                "type": "object",
+                "additionalProperties": {}
+              }
+            },
+            "required": [
+              "taskViewId",
+              "expectedSchemaRevision",
+              "values"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 20,
+          "description": "For a NEW task, copy current authorized Task View IDs/revisions and grounded non-source values. Omit for edits to an existing task; its values are preserved."
+        },
         "taskDescription": {
           "type": "string",
           "minLength": 1,
@@ -104,7 +143,7 @@
         "taskId": {
           "type": "string",
           "format": "uuid",
-          "description": "OPTIONAL - The id of an EXISTING user task this draft fulfils. Pass it whenever you are drafting in response to a task you looked up (e.g. the user said \"do my Acme follow-up\" and you found that task): it saves the draft for real and attaches it to that task, so the task shows \"Open draft\" instead of still looking untouched. Omit when the draft does not fulfil an existing task — do NOT guess an id."
+          "description": "OPTIONAL - The id of an EXISTING user task this draft fulfils. Pass it whenever you are drafting in response to a task you looked up (e.g. the user said \"do my Example Account follow-up\" and you found that task): it saves the draft for real and attaches it to that task, so the task shows \"Open draft\" instead of still looking untouched. Omit when the draft does not fulfil an existing task — do NOT guess an id."
         },
         "attachments": {
           "type": "array",
@@ -173,10 +212,21 @@
           "format": "uuid",
           "description": "REQUIRED UNLESS outside of an existing conversation — The conversation ID to attach the task to. When provided along with taskDescription, a task card will be shown to the user."
         },
+        "taskNotes": {
+          "$ref": "#/properties/draftEmail/properties/taskNotes"
+        },
+        "taskViews": {
+          "$ref": "#/properties/draftEmail/properties/taskViews"
+        },
         "taskDescription": {
           "type": "string",
           "minLength": 1,
           "description": "OPTIONAL — A concise, actionable task description for the user (e.g., \"Send update to #engineering channel\"). Required when conversationId is provided, as it will be shown on the task card. Describe what the user is accomplishing, not what the agent is doing."
+        },
+        "taskId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Existing task fulfilled by this draft; preserve its identity rather than creating another task."
         },
         "taskType": {
           "type": "string",
@@ -206,7 +256,22 @@
         "chatId": {
           "type": "string",
           "minLength": 1,
-          "description": "Existing LinkedIn chat id from list-linkedin-chats or the attached linkedin_chat context. Read the chat before drafting."
+          "description": "Existing LinkedIn chat id, when a thread exists. For first-touch outreach omit this and provide the verified recipient identity, owned seat and taskId."
+        },
+        "unipileAccountId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Owned LinkedIn seat for a first-touch draft."
+        },
+        "recipientProviderId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Verified LinkedIn provider ID from connection/profile lookup; never guess."
+        },
+        "recipientName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
         },
         "message": {
           "type": "string",
@@ -217,10 +282,14 @@
         "expectedDraftUpdatedAt": {
           "type": "string",
           "description": "For an explicitly requested rewrite only: the current draft version returned by an earlier save or conflict. Never guess it."
+        },
+        "taskId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Existing task this draft fulfills. The current scheduled task is used automatically when present; never guess an ID."
         }
       },
       "required": [
-        "chatId",
         "message"
       ],
       "additionalProperties": false

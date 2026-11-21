@@ -10,7 +10,7 @@ The `task` family supports listing, creation, updates, approvals, cancellation, 
 
 Use `dealList` for a conversation's shared tasks and recommendations, `creationOptions` for eligible assignees, and `createAssigned` for an explicitly assigned manual task or personal reminder. Preserve source Slack permalinks in notes. Recommendations are distinct from persisted tasks; do not claim a recommendation has been assigned before creating it.
 
-`start` prepares caller-owned work in the current Cedar chat and can return a `seedPrompt`; it is not permission to send. Personal reminders do not schedule automatic agent execution. Agent-enabled tasks and their future execution times are a separate path from ordinary due dates.
+In Cedar, opening a task for preparation brings its context into chat. An external client receives a handoff to continue the task. Review the saved output and any separate approval before reporting completion. [Task lifecycle](/workspace/tasks). Personal reminders do not schedule automatic agent execution. Agent-enabled tasks and their future execution times are a separate path from ordinary due dates.
 
 Task channel should reflect a real commitment. Leave it unset for an open-ended “follow up” if the eventual channel is not yet known. A task can be completed without claiming its proposed outreach was delivered; use the actual workflow result as evidence.
 

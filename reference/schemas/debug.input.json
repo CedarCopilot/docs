@@ -9,7 +9,6 @@
         "execution-detail",
         "tool-call-detail",
         "health-report",
-        "create-monitor",
         "test-run"
       ],
       "description": "Which operation to perform — pass its matching params object below (e.g. action: \"health-report\" pairs with healthReport: {...})."
@@ -20,7 +19,7 @@
         "conversationId": {
           "type": "string",
           "format": "uuid",
-          "description": "Conversation to diagnose. Self-scoped: the conversation must belong to your own org unless you are Cedar staff."
+          "description": "A conversation in your organization."
         }
       },
       "required": [
@@ -34,15 +33,15 @@
         "conversationId": {
           "type": "string",
           "format": "uuid",
-          "description": "List executions for this conversation. Self-scoped: the conversation must belong to your own org unless you are Cedar staff."
+          "description": "A conversation in your organization."
         },
         "targetUserId": {
           "type": "string",
-          "description": "List executions for this user instead of a conversation. Defaults to yourself. Any-account if you are Cedar staff, or a teammate's if you are an org admin/owner in their same organization — a plain member passing a different user's id is rejected."
+          "description": "Defaults to yourself. Organization administrators can select a teammate."
         },
         "runId": {
           "type": "string",
-          "description": "Drill into one run's tool calls instead of listing executions (takes priority over conversationId/targetUserId). Self-scoped by default: the run must belong to you, unless you are Cedar staff or an org admin/owner viewing a teammate's run in your own organization."
+          "description": "Your run, or a teammate’s run if you administer the organization."
         },
         "limit": {
           "type": "integer",
@@ -59,7 +58,7 @@
       "properties": {
         "runId": {
           "type": "string",
-          "description": "Run ID to fetch the full debug dump for (execution row, tool calls, sub-agent executions). Self-scoped by default: must be your own run, unless you are Cedar staff or an org admin/owner viewing a teammate's run in your own organization."
+          "description": "Your run, or a teammate’s run if you administer the organization."
         }
       },
       "required": [
@@ -85,11 +84,7 @@
       "properties": {
         "targetUserId": {
           "type": "string",
-          "description": "Per-user health snapshot for this user (meetings, tasks, agent-execution buckets, derived red/yellow issues). Defaults to yourself. Any-account if you are Cedar staff, or a teammate's if you are an org admin/owner in their same organization. IMPORTANT: this per-user view computes a \"post-meeting pipeline degraded\" red-flag signal that the org-wide view (pass orgId instead) deliberately skips because it is too expensive to run for every user in an org — always trust THIS view over the org-wide one when you need an authoritative read on one specific account."
-        },
-        "orgId": {
-          "type": "string",
-          "description": "Org-wide health snapshot (green/yellow/red status per user in the org) instead of one user's detail. Cedar-staff only. IMPORTANT: this view does NOT compute the post-meeting-pipeline red-flag signal the per-user view (targetUserId) does — a user can show green/yellow here but red when the same action is called again scoped to just that user. Do not report an account as healthy based on this view alone; drill into targetUserId for any account that had recent meetings."
+          "description": "Defaults to yourself. Organization administrators can select a teammate."
         },
         "lookbackDays": {
           "type": "integer",
@@ -102,42 +97,6 @@
           "description": "Per-user mode only: filter tasks/executions to AOPs under this org_aop_id."
         }
       },
-      "additionalProperties": false
-    },
-    "createMonitor": {
-      "type": "object",
-      "properties": {
-        "targetUserId": {
-          "type": "string",
-          "description": "The user account this monitor watches."
-        },
-        "orgId": {
-          "type": "string",
-          "description": "Org this monitor belongs to, if applicable."
-        },
-        "monitorType": {
-          "type": "string",
-          "description": "A slug describing the monitor kind, e.g. \"regression\", \"reinvestigate\", \"config_verification\". Not a DB enum — free text."
-        },
-        "triggerConfig": {
-          "type": "object",
-          "additionalProperties": {},
-          "description": "Must include `verify_condition` (a plain-English condition the evaluator checks against each new execution) — omitting it makes every future evaluation return \"uncertain\" instead of ever passing or failing; createMonitor() rejects a call missing it. Conventional keys used by the cedar-configuration skill's config-verification monitors: symptom_class, change_description, verify_condition, original_report, target_executions, event_type_filter."
-        },
-        "alertChannel": {
-          "type": "string",
-          "description": "Slack channel or DM to alert when the monitor fires or resolves."
-        },
-        "investigationId": {
-          "type": "string",
-          "description": "Ties this monitor to an existing Sherlock investigation row. Omit for monitors not tied to one (e.g. cedar-configuration config-verification monitors)."
-        }
-      },
-      "required": [
-        "targetUserId",
-        "monitorType",
-        "triggerConfig"
-      ],
       "additionalProperties": false
     },
     "testRun": {

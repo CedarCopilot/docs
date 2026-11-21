@@ -67,7 +67,7 @@ Use the returned registration and URL in a matching playbook webhook trigger. PO
 
 Use an external job to fetch your selected public pages, normalize meaningful content, retain a baseline, and compare later snapshots. Send a compact diff with source URLs and timestamps into Cedar, or have your MCP client write it to a document and notify the user.
 
-The external MCP's `research web-fetch` and `web-search` actions are in-app-only. Use your client's own web tools for this path. A cron trigger by itself does not create a scraper, diff store, or visitor identity service.
+Inside Cedar, [website](/reference/website) can read known public URLs or request a fresh crawl. It returns page-level statuses and citations. It does not install a change subscription. An external MCP client supplies its own fetch and scheduling for this path. A cron trigger by itself does not create a scraper, diff store, or visitor identity service.
 
 ## Avoid repeated outreach from repeat visits
 

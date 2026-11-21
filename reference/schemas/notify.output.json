@@ -1,6 +1,10 @@
 {
   "type": "object",
   "properties": {
+    "queuedForTaskView": {
+      "type": "boolean",
+      "description": "True when durably handed to Task View delivery, not yet confirmed delivered to a provider."
+    },
     "success": {
       "type": "boolean",
       "description": "Whether the operation succeeded (for `send`, iMessage/WhatsApp legs are fire-and-forget and do not affect this)"
@@ -16,6 +20,14 @@
     "userMessage": {
       "type": "string",
       "description": "UI/agent guidance, e.g. when a notification was proposed rather than sent"
+    },
+    "deliveredOn": {
+      "type": "string",
+      "description": "Confirmed delivery channel, when returned by the sender"
+    },
+    "threadTs": {
+      "type": "string",
+      "description": "Slack thread root returned by the sender for a confirmed delivery"
     },
     "muted": {
       "type": "boolean",

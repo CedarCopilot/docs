@@ -176,7 +176,7 @@
             ],
             "additionalProperties": false
           },
-          "description": "Filter conditions, ANDed together. Filter ANY field: standard columns (name, status, priority, dealValue, nextStepDate, lastContactedAt, aopName, primaryCompanyName, ownerId, …), computed booleans (crmSynced, hasFutureCalendar), or custom fields as \"wm_<fieldKey>\" (the ids in <available_columns>). e.g. [{\"field\":\"status\",\"operator\":\"in\",\"value\":[\"pilot_planned\"]},{\"field\":\"crmSynced\",\"operator\":\"eq\",\"value\":true}]. For a name/company text search use an \"ilike\" filter (e.g. {\"field\":\"primaryCompanyName\",\"operator\":\"ilike\",\"value\":\"%acme%\"}). For the \"ownerId\" field pass the literal \"self\" to scope to the calling user (resolved server-side). SCOPE: results are ORG-WIDE by default — every conversation in the caller's organization, including other members'. When the user asks about THEIR OWN deals (\"my pipeline\", \"deals I own\"), you MUST add {\"field\":\"ownerId\",\"operator\":\"eq\",\"value\":\"self\"} or the answer will silently include other people's deals. Each result carries ownerName / isOwnedByCurrentUser."
+          "description": "Filter conditions, ANDed together. Filter ANY field: standard columns (name, status, priority, dealValue, nextStepDate, lastContactedAt, aopName, primaryCompanyName, ownerId, …), computed booleans (crmSynced, hasFutureCalendar), or custom fields as \"wm_<fieldKey>\" (the ids in <available_columns>). e.g. [{\"field\":\"status\",\"operator\":\"in\",\"value\":[\"pilot_planned\"]},{\"field\":\"crmSynced\",\"operator\":\"eq\",\"value\":true}]. For a name/company text search use an \"ilike\" filter (e.g. {\"field\":\"primaryCompanyName\",\"operator\":\"ilike\",\"value\":\"%example%\"}). For the \"ownerId\" field pass the literal \"self\" to scope to the calling user (resolved server-side). SCOPE: results are ORG-WIDE by default — every conversation in the caller's organization, including other members'. When the user asks about THEIR OWN deals (\"my pipeline\", \"deals I own\"), you MUST add {\"field\":\"ownerId\",\"operator\":\"eq\",\"value\":\"self\"} or the answer will silently include other people's deals. Each result carries ownerName / isOwnedByCurrentUser."
         },
         "eventFilter": {
           "type": "object",
@@ -201,7 +201,7 @@
             },
             "date": {
               "type": "string",
-              "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-10-30 - compute from this."
+              "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-11-21 - compute from this."
             },
             "dateTo": {
               "type": "string",
@@ -394,7 +394,7 @@
         "keyword"
       ],
       "additionalProperties": false,
-      "description": "Operates on the user's connected EXTERNAL CRM (Salesforce/HubSpot/Attio/Copper) — NOT Cedar's own conversation records (that's `find`). If it's unclear whether the user means \"search Cedar's deals\" or \"search our Salesforce/HubSpot\", ask before calling either."
+      "description": "External CRM; clarify ambiguity."
     },
     "timeline": {
       "type": "object",

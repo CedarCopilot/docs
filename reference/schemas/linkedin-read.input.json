@@ -5,7 +5,6 @@
       "type": "string",
       "enum": [
         "list-seats",
-        "view-profile",
         "list-connections",
         "list-connections-page",
         "list-own-posts",
@@ -25,39 +24,13 @@
         "screen-prospects",
         "outreach-status"
       ],
-      "description": "Which read operation to perform — pass its matching params object (e.g. action: \"view-profile\" pairs with viewProfile: {...})."
+      "description": "Which read operation to perform — pass its matching params object (e.g. action: \"read-chat\" pairs with readChat: {...})."
     },
     "listSeats": {
       "type": "object",
       "properties": {},
       "additionalProperties": true,
       "description": "No parameters — lists your connected LinkedIn seats."
-    },
-    "viewProfile": {
-      "type": "object",
-      "properties": {
-        "identifier": {
-          "type": "string",
-          "description": "LinkedIn public identifier (the /in/<slug>) or member URN to view."
-        },
-        "url": {
-          "type": "string",
-          "description": "Full LinkedIn profile URL of the target (e.g. https://www.linkedin.com/in/jane)."
-        },
-        "personId": {
-          "type": "string",
-          "description": "Cedar crm_person id of the target (resolved to a LinkedIn identifier server-side)."
-        },
-        "self": {
-          "type": "boolean",
-          "description": "View the connected seat owner's own profile (smoke test) instead of a target."
-        },
-        "unipileAccountId": {
-          "type": "string",
-          "description": "Unipile account id of the connected LinkedIn seat to act through. Omit to auto-use your single connected seat; if you have several, call list-seats and pass one."
-        }
-      },
-      "additionalProperties": false
     },
     "listConnections": {
       "type": "object",
@@ -69,7 +42,8 @@
           "description": "Max relation pages (50 rows each) to walk. Default 200 — enough for a 10k network. Lower it only to sample."
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "type": "string",
+          "description": "Unipile account id of the connected LinkedIn seat to act through. Omit to auto-use your single connected seat; if you have several, call list-seats and pass one."
         }
       },
       "additionalProperties": false
@@ -83,7 +57,7 @@
           "description": "Opaque nextCursor from the previous page of this same action and seat. Omit for the first page."
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         }
       },
       "additionalProperties": false
@@ -98,7 +72,7 @@
           "$ref": "#/properties/listConnectionsPage/properties/cursor"
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         },
         "postId": {
           "type": "string",
@@ -115,7 +89,7 @@
       "type": "object",
       "properties": {
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         }
       },
       "additionalProperties": false
@@ -142,7 +116,7 @@
           "description": "Cap on reactors collected across all posts (default 500)."
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         }
       },
       "additionalProperties": false
@@ -157,7 +131,7 @@
           "description": "Look back this many days (default 30). This is an ad-hoc read and never advances the background poll's high-water mark."
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         }
       },
       "additionalProperties": false
@@ -180,7 +154,7 @@
           "description": "Include quarantined InMail chats (excluded by default)."
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         }
       },
       "additionalProperties": false
@@ -207,26 +181,24 @@
     "findChat": {
       "type": "object",
       "properties": {
-        "refresh": {
-          "type": "boolean",
-          "description": "Refresh the indexed thread from LinkedIn before returning it."
-        },
         "name": {
           "type": "string",
-          "description": "The person's name as the user said it (\"Isabelle\", \"Isabelle Ilyia\"). Several matches come back as candidates to ask the user about — never pick one yourself."
+          "description": "The person's name as the user said it (\"Example\", \"Example Contact\"). Several matches come back as candidates to ask the user about — never pick one yourself."
         },
         "providerId": {
           "type": "string",
           "description": "Unipile provider id / member URN of the target (most direct)."
         },
         "url": {
-          "$ref": "#/properties/viewProfile/properties/url"
+          "type": "string",
+          "description": "Full LinkedIn profile URL of the target (e.g. https://www.linkedin.com/in/example-profile)."
         },
         "personId": {
-          "$ref": "#/properties/viewProfile/properties/personId"
+          "type": "string",
+          "description": "Cedar crm_person id of the target (resolved to a LinkedIn identifier server-side)."
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         }
       },
       "additionalProperties": false
@@ -244,7 +216,7 @@
           "maximum": 100
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         },
         "url": {
           "type": "string",
@@ -303,7 +275,7 @@
           "maximum": 100
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         }
       },
       "required": [
@@ -321,7 +293,7 @@
           "$ref": "#/properties/search/properties/limit"
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         }
       },
       "additionalProperties": false
@@ -336,7 +308,7 @@
           "$ref": "#/properties/search/properties/limit"
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         },
         "kind": {
           "type": "string",
@@ -398,7 +370,7 @@
           "maximum": 365
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         }
       },
       "required": [
@@ -419,7 +391,7 @@
           "maxItems": 20
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         }
       },
       "required": [
@@ -461,7 +433,7 @@
           "maximum": 400
         },
         "unipileAccountId": {
-          "$ref": "#/properties/viewProfile/properties/unipileAccountId"
+          "$ref": "#/properties/listConnections/properties/unipileAccountId"
         }
       },
       "required": [

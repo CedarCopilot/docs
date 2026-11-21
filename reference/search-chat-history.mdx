@@ -61,70 +61,10 @@ Required baseline scope: `in-app`. Additional role and target checks apply.
 
 ## Response
 
-Inspect `isError` on the MCP result and `success` / `errorMessage` in the action result. Optional response branches are populated only for the relevant action. Some results include additional provider or operation-specific data.
-
-| Parameter | Type | Required | Details |
+| Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `success` | boolean | Yes |   |
-| `message` | string | Yes |   |
-| `results` | object&#91;&#93; | No |   |
-
-<Accordion title="Output JSON Schema">
-
-```json
-{
-  "type": "object",
-  "properties": {
-    "success": {
-      "type": "boolean"
-    },
-    "message": {
-      "type": "string"
-    },
-    "results": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "threadId": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string"
-          },
-          "matchedIn": {
-            "type": "string",
-            "enum": [
-              "title",
-              "message"
-            ]
-          },
-          "snippet": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "threadId",
-          "name",
-          "updatedAt",
-          "matchedIn"
-        ],
-        "additionalProperties": false
-      }
-    }
-  },
-  "required": [
-    "success",
-    "message"
-  ],
-  "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#"
-}
-```
-
-</Accordion>
+| `success` | boolean | Yes |  |
+| `message` | string | Yes |  |
+| `results` | array of object | No |  |
 
 [Download the output schema](/reference/schemas/search-chat-history.output.json).

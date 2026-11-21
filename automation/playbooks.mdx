@@ -1,8 +1,9 @@
 ---
-title: "Playbooks and triggers overview"
-sidebarTitle: "Overview"
+title: "Sales strategy and playbooks"
 description: "Configure persistent Cedar automation through the documented configuration and document tools."
 ---
+
+Start with a decision your team wants to repeat. For a discovery follow-up, record which commitments count, what source the agent should cite, and when the rep should get a task. Put those rules in the playbook. Choose [a trigger](/agent-platform/triggers) to tell Cedar when to apply them.
 
 A playbook (AOP, or Agent Operating Procedure) describes which work Cedar performs, which agents it uses, and when that work runs. MCP is the control interface; Cedar's workers execute persisted triggers after the MCP chat ends.
 
@@ -21,9 +22,10 @@ Document paths and templates come from the loaded skill/account context. Do not 
 
 | Trigger | Fires on |
 | --- | --- |
-| `any` | Supported deal events; signals require explicit opt-in |
+| `any` | Supported deal events. Calendar changes and signals require explicit opt-in |
 | `email` | Inbound or outbound email |
 | `meeting` | A meeting after its transcript lands |
+| `calendar` | Creation, update or cancellation of a linked calendar event |
 | `slack` | A message in a linked Slack channel |
 | `linkedin` | Counterpart LinkedIn messages; the user's own sends alone do not fire it |
 | `linkedin_connection` | Someone accepting a connection request the user sent |

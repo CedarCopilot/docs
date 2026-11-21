@@ -22,6 +22,30 @@
           "type": {
             "type": "string"
           },
+          "viewConfig": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Native saved configuration for owned canvases; preserve these settings when using update-canvas. Null for shared canvases."
+          },
+          "pinnedToHomeView": {
+            "type": "boolean",
+            "const": true,
+            "description": "Every returned canvas is already pinned to HomeView."
+          },
+          "homeViewOrder": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Effective tab position; null does not mean unpinned."
+          },
           "query": {
             "anyOf": [
               {
@@ -31,7 +55,8 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "description": "AOP names (e.g. [\"Deals\"]) — pass directly to find-crm-conversations selectedAopNames"
                   },
                   "columnFilters": {
                     "type": "array",
@@ -63,7 +88,8 @@
                           "type": "string"
                         },
                         "numberValue": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Numeric value for dealValue filters"
                         },
                         "numberOperator": {
                           "type": "string",
@@ -75,10 +101,12 @@
                           ]
                         },
                         "dateFrom": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Resolved absolute ISO date string"
                         },
                         "dateTo": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Resolved absolute ISO date string (for range operator)"
                         },
                         "dateOperator": {
                           "type": "string",
@@ -102,7 +130,8 @@
                         "columnId"
                       ],
                       "additionalProperties": false
-                    }
+                    },
+                    "description": "Column filters — pass directly to find-crm-conversations columnFilters"
                   },
                   "sorts": {
                     "type": "array",
@@ -133,13 +162,15 @@
                         "priority"
                       ],
                       "additionalProperties": false
-                    }
+                    },
+                    "description": "Sort config — pass directly to find-crm-conversations sorts"
                   },
                   "searchQuery": {
                     "type": [
                       "string",
                       "null"
-                    ]
+                    ],
+                    "description": "Global text search — pass to find-crm-conversations searchQuery"
                   },
                   "ownerUserIds": {
                     "anyOf": [
@@ -160,7 +191,8 @@
                       {
                         "type": "null"
                       }
-                    ]
+                    ],
+                    "description": "Owner scope: null = current user only, \"all_org\" = whole org, [id,...] = specific teammates. NOTE: find-crm-conversations does not yet support this — if non-null, mention it to the user."
                   },
                   "pinnedConversationIds": {
                     "anyOf": [
@@ -173,7 +205,8 @@
                       {
                         "type": "null"
                       }
-                    ]
+                    ],
+                    "description": "When non-null, the canvas shows only these specific conversations regardless of filters. Pass as flexible_query filters: { field: \"id\", operator: \"in\", value: [...] }."
                   }
                 },
                 "required": [
@@ -189,13 +222,17 @@
               {
                 "type": "null"
               }
-            ]
+            ],
+            "description": "null for non-conversation canvases (reports, tasks, agenda, calendar)"
           }
         },
         "required": [
           "id",
           "title",
           "type",
+          "viewConfig",
+          "pinnedToHomeView",
+          "homeViewOrder",
           "query"
         ],
         "additionalProperties": false
@@ -208,6 +245,75 @@
       "type": "array",
       "items": {
         "type": "string"
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "field",
+              "doc",
+              "contacts"
+            ]
+          },
+          "fieldId": {
+            "type": "string"
+          },
+          "fieldType": {
+            "type": "string",
+            "enum": [
+              "cedar",
+              "custom"
+            ]
+          },
+          "docPath": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string"
+          },
+          "render": {
+            "type": "string",
+            "enum": [
+              "scalar",
+              "markdown"
+            ]
+          },
+          "displayOrder": {
+            "type": "number"
+          },
+          "ownerAgentId": {
+            "type": "string"
+          },
+          "visibleWhen": {},
+          "addedBy": {
+            "type": "string",
+            "enum": [
+              "seed",
+              "agent",
+              "user"
+            ]
+          },
+          "hidden": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "displayOrder"
+        ],
+        "additionalProperties": false
       }
     },
     "canvas": {

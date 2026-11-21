@@ -1,13 +1,13 @@
 ---
 title: "Agent library"
-description: "Every shipped agent template, its capabilities, prerequisites and workspace."
+description: "Agent template snapshots, initialization, prerequisites and activation boundaries."
 ---
 
-The code registers **46 agent-library templates**. This catalog includes each template's purpose, starting trigger, required connections, configuration files and output type. Installing a template is a Cedar app operation; these are not additional MCP tool names. External clients author supported agent/playbook documents through the configuration and document families.
+The template snapshot below records purpose, starting trigger, required connections, configuration files and output type. Check the current Cedar library for available template identifiers. External MCP clients can use [`agent initialize`](/reference/agent) for supported built-in templates, then personalize through the configuration and document families. Template names are not additional MCP tool names.
 
 ## What installation creates
 
-Provisioning creates the agent definition, files it in the appropriate personal/team/background area, seeds configuration and sample outputs, starts its introductory chat, then wires its trigger. Existing definitions are skipped rather than overwritten. A partially provisioned agent can exist with a failed trigger or workspace step: inspect the returned failures and `triggerWired` status. Sample outputs are examples, not completed work on your records.
+Cedar app provisioning can create the agent definition, configuration and workspace and wire its starting trigger. External `agent initialize` prepares a template without adding a playbook trigger; initialization and activation are separate. The trigger snapshots below are not proof that initialization activates a schedule or event source. Existing definitions are skipped rather than overwritten. A partially provisioned agent can exist with a failed trigger or workspace step: inspect the returned failures and `triggerWired` status. Sample outputs are examples, not completed work on your records.
 
 Read [agent lifecycle](/agent-platform/lifecycle), [files and memory](/agent-platform/files-memory), and [permissions](/agent-platform/permissions) before enabling live work. Template trigger objects below use the product's provisioning format; the canonical playbook XML names are listed in [triggers](/agent-platform/triggers).
 
@@ -55,10 +55,12 @@ Read [agent lifecycle](/agent-platform/lifecycle), [files and memory](/agent-pla
 | [Lost deal debrief](#lost-deal-debrief) | team | Every closed-lost deal: the reason, their words, and the pattern. |
 | [Deal alerts](#deal-alerts) | team | Posts the deal events the room asked for, once each, and nothing else. |
 | [Incumbent campaigns](#incumbent-campaigns) | team | Every deal you did not win, by the provider they stayed on and why. |
-| [Org chart](#org-chart) | personal | Keeps one deal’s buying committee current. |
+| [Org chart](#org-chart) | personal | Map a deal’s buying committee and plan multithreading when you ask. |
 | [Strategist](#strategist) | personal | Decides which conversations need work at all. |
 | [Drafter](#drafter) | personal | Writes the drafts that are waiting in your inbox each morning. |
 | [Daily agenda](#daily-agenda) | personal | Builds the morning agenda from everything that needs you today. |
+| [Upsell actions](#upsell-actions) | personal | Prepare qualified customer expansion work for review. |
+| [Deal cleanup proposals](#deal-cleanup) | personal | Prepare evidence-backed corrections to deal data for review. |
 
 ## next-steps
 
@@ -88,7 +90,7 @@ Configuration files:
 
 ## meeting-prep
 
-**Meeting prep** — Who is in the room, what happened last, what to get answered.
+**Meeting prep** — Who is in the room, what happened last, what to get answered. The default brief and Slack headline include the meeting date, time and timezone.
 
 | Setting | Starting configuration |
 | --- | --- |
@@ -117,7 +119,7 @@ Configuration files:
 
 ## crm-updater
 
-**CRM updater** — Keeps stage, value, close date and fields true to the thread.
+**CRM updater** — Keeps stage, value, close date and fields true to the thread. When instructed to create an opportunity, the default rules prepare a proposal with the required fields and associations for explicit review.
 
 | Setting | Starting configuration |
 | --- | --- |
@@ -323,9 +325,8 @@ Starting trigger:
 
 ```json
 {
-  "type": "event",
-  "scope": "global",
-  "eventType": "meeting.completed"
+  "type": "manual",
+  "scope": "global"
 }
 ```
 
@@ -1304,13 +1305,13 @@ Additional workspace files:
 
 ## org-chart
 
-**Org chart** — Keeps one deal’s buying committee current.
+**Org chart** — Map a deal’s buying committee and plan multithreading when you ask.
 
 | Setting | Starting configuration |
 | --- | --- |
 | Area | personal · your-mid-funnel |
 | Definition | System agent: `org-chart` |
-| Default account setup | Opt in through the library |
+| Default account setup | Seeded by default. Runs when requested or explicitly wired |
 | Output | document at `overview` |
 | Requirements | No additional prerequisite declared by this template; connected account access and grants still apply |
 
@@ -1318,7 +1319,7 @@ Starting trigger:
 
 ```json
 {
-  "type": "any",
+  "type": "manual",
   "scope": "global"
 }
 ```
@@ -1406,3 +1407,11 @@ Starting trigger:
 Configuration files:
 
 - `config/agenda-rules`: Agenda rules
+
+## upsell-actions
+
+**Upsell actions** prepares reviewable expansion work for an agreed customer audience. Confirm the evidence sources, qualification rules, output format and destination Task View during setup. The initial workspace contains guidance and a sample document. Final outreach and activation remain separate decisions. This template requires Task Views for the caller and target account.
+
+## deal-cleanup
+
+**Deal cleanup proposals** prepares dated, evidence-backed corrections for the Stale deal cleanup Task View. For example, a buyer’s revised timeline can support proposing a new close date. Silence alone is insufficient to close a deal. The agent prepares proposals for review and leaves CRM changes and task cancellations to their respective authorized actions. This template requires Task Views for the caller and target account.

@@ -13,9 +13,19 @@ The `conversation-write` family includes normal record updates and explicit repa
 | `reassign-ownership` | Transfer deal ownership through the authorized service |
 | `link-external-crm-deal` | Associate a Cedar conversation with an existing CRM deal |
 | `sync-gmail-thread` | Ingest a known Gmail thread into a conversation |
+| `create-opportunity` | Prepare a structured opportunity against the connected HubSpot, Salesforce or Attio account under its approval policy |
+| `convert-hubspot-lead` | Convert a qualified HubSpot lead using its saved approval and configured destination |
+| `handoff-crm-record` | Hand an existing record to another playbook under saved approval, preserving its source history |
+| `log-email-activity` | Request approval in Cedar chat to log one delivered email against its existing linked HubSpot deal |
 | `mutate` | Perform one of the structural operations below |
 
-Creating a Cedar conversation does not create a Salesforce/HubSpot opportunity. To create an external object, use the external client's authorized CRM connector, then link the existing result back to Cedar where appropriate.
+## Review a proposed CRM deal
+
+Creating a Cedar conversation saves a Cedar record. To create an opportunity in a supported connected CRM, use the dedicated opportunity workflow. Identify the conversation, provider and buying motion, proposed fields and intended associations. Check for an existing deal first. Use the same buying motion for retries; reserve a distinct motion for a genuinely different renewal, upsell or purchase.
+
+In an approval-based workflow, the owner can choose **Review deal** on the task or **Open in chat** to inspect the same saved proposal. Opening the review starts no agent work and creates no CRM object. Check the destination, proposed amount and stage, the basis for the close date, and any company or contact the proposal would create or associate. **Accept** applies the reviewed revision. A changed proposal or connection can require a new review. An account configured for automatic execution can apply eligible work without this interactive step.
+
+Read the final status and deal ID. If the result includes verification warnings, check those fields or associations in the destination CRM before marking the work complete. When the deal already exists, link it using its actual external ID rather than starting another creation request.
 
 ## Structural operations
 

@@ -812,7 +812,7 @@
       "properties": {
         "rows": {
           "type": "string",
-          "description": "One GFM pipe row per line. Leading cell is the rowId; `-` mints one. Cell count after the id must equal the column count exactly — write an empty cell as `| |`.\n  - | Globex | [[conversation: 44a1…]] | |\n  r_07 | Initech | | [[draft: r-99]] |"
+          "description": "One GFM pipe row per line. Leading cell is the rowId; `-` mints one. Cell count after the id must equal the column count exactly — write an empty cell as `| |`.\n  - | Account A | [[conversation: 44a1…]] | |\n  r_07 | Account B | | [[draft: r-99]] |"
         }
       },
       "required": [
@@ -825,16 +825,57 @@
       "properties": {
         "assignments": {
           "type": "string",
-          "description": "One `<rowRef>.<columnKey> = <value>` per line:\n  r_07.outreach = [[draft: r-3821]]   ← stable rowId, always safe\n  acme.company  = Acme Corp           ← unknown rowId → the row is created\n  4.outreach    = Sent                ← 1-based data-row ordinal, needs ifRevision\n  D4            = Sent                ← A1-style, needs ifRevision\nValues are cell markdown; `\\|` is a literal pipe and a trailing `\\` continues onto the next line."
+          "description": "Native rowId.column = value lines; omit when using cells."
+        },
+        "cells": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rowId": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[^\\s.=]+$"
+              },
+              "columnKey": {
+                "$ref": "#/properties/set/properties/cells/items/properties/rowId"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": {}
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "rowId",
+              "columnKey",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "description": "Preferred for multiline prose, workflow fences, and inline email JSON: raw cell values, with no table escaping. Use value:{kind:\"email\",subject,body,to?} for an inline email. Include Deal and Actions together for a new row."
         },
         "ifRevision": {
           "type": "integer",
-          "description": "The `revision` a previous `read` returned. REQUIRED when any line addresses a row by ordinal or A1; the whole call is rejected if the document has moved since. Never needed for rowId-addressed lines."
+          "description": "Copy the latest read revision before writing."
         }
       },
-      "required": [
-        "assignments"
-      ],
       "additionalProperties": false
     },
     "clear": {

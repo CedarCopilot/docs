@@ -6,6 +6,10 @@ description: "Connection scopes, resource grants and the boundaries of each exec
 
 The effective permission is the intersection of the caller's access, workspace connection policy, the agent's grants and the operation's own checks. Writing an instruction to use a tool does not grant that tool or its data.
 
+## Give a producer only the skills it needs
+
+An automation can allow an entire skill or name the individual resources it may load. For example, grant just the relevant setup instructions when personalizing a producer. Tool and document permissions still govern actions and data access. Task View features must also be enabled for the account.
+
 ## Connection and action scopes
 
 The agent workspace exposes available connections and their effective actions. Cedar tool grants can narrow a family to specific actions; meeting access can additionally be refined by recorder. Some channel capabilities share a tool, so a Slack draft grant and an email draft grant are distinct even though both use `draft-comms`.

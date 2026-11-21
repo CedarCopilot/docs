@@ -19,7 +19,7 @@ The web enrichment builder models each output as a named column with a value typ
 
 Column value types include string, number, boolean, enum, URL, email and array. AI outputs support string, number, boolean and enum. The standard derived-operation picker offers `domainOfEmail`, `lower`, `coalesce` and `concat`. Stored runtime configurations additionally support `companyIcpScore`, `isFounderTitle` and `isYcCompany`; those specialized operations are not all selectable in the standard picker.
 
-Provider selection can be pinned per enrichment column. Select **Fiber** for manual person/company enrichment. The editor's `default` choice delegates to configured policy; do not interpret it as an unconditional cheapest-provider promise.
+Provider selection can be pinned per enrichment column. Pin **Fiber** when it is the intended provider for a manual lookup. The editor's `default` choice delegates to configured policy. Rich person/company research falls back to Crustdata when no preference is set; the default does not select by cheapest price.
 
 ## Person and company scope
 

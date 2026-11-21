@@ -1,0 +1,282 @@
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "slack-link",
+        "producers",
+        "history-read",
+        "list",
+        "list-archived",
+        "read",
+        "items",
+        "candidates",
+        "unmatched",
+        "resources",
+        "strategy-status",
+        "draft-outcomes",
+        "importance-preview",
+        "memberships",
+        "open"
+      ]
+    },
+    "list": {
+      "type": "object",
+      "properties": {
+        "afterId": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "list-archived": {
+      "type": "object",
+      "properties": {
+        "afterId": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "limit": {
+          "$ref": "#/properties/list/properties/limit"
+        }
+      },
+      "additionalProperties": false
+    },
+    "read": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "taskViewId"
+      ],
+      "additionalProperties": false
+    },
+    "history-read": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/read/properties/taskViewId"
+        },
+        "afterSeq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit": {
+          "$ref": "#/properties/list/properties/limit"
+        }
+      },
+      "required": [
+        "taskViewId"
+      ],
+      "additionalProperties": false
+    },
+    "slack-link": {
+      "type": "object",
+      "properties": {
+        "permalink": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "permalink"
+      ],
+      "additionalProperties": false
+    },
+    "producers": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/read/properties/taskViewId"
+        },
+        "afterTaskId": {
+          "$ref": "#/properties/read/properties/taskViewId"
+        },
+        "limit": {
+          "$ref": "#/properties/list/properties/limit"
+        }
+      },
+      "required": [
+        "taskViewId"
+      ],
+      "additionalProperties": false
+    },
+    "items": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/read/properties/taskViewId"
+        },
+        "afterItemId": {
+          "type": "string",
+          "description": "Opaque nextCursor from the previous page, bound to the document revision."
+        },
+        "sectionId": {
+          "type": "string"
+        },
+        "query": {
+          "type": "string"
+        },
+        "limit": {
+          "$ref": "#/properties/list/properties/limit"
+        }
+      },
+      "required": [
+        "taskViewId"
+      ],
+      "additionalProperties": false
+    },
+    "candidates": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/read/properties/taskViewId"
+        },
+        "cursor": {
+          "$ref": "#/properties/read/properties/taskViewId"
+        },
+        "limit": {
+          "$ref": "#/properties/list/properties/limit"
+        }
+      },
+      "required": [
+        "taskViewId"
+      ],
+      "additionalProperties": false
+    },
+    "unmatched": {
+      "type": "object",
+      "properties": {
+        "afterTaskId": {
+          "$ref": "#/properties/read/properties/taskViewId"
+        },
+        "query": {
+          "type": "string"
+        },
+        "limit": {
+          "$ref": "#/properties/list/properties/limit"
+        }
+      },
+      "additionalProperties": false
+    },
+    "resources": {
+      "$ref": "#/properties/read"
+    },
+    "strategy-status": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "conversationIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "taskViewId",
+        "conversationIds"
+      ],
+      "additionalProperties": false
+    },
+    "draft-outcomes": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "taskIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "minItems": 1,
+          "maxItems": 50
+        },
+        "asOf": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "taskViewId",
+        "taskIds"
+      ],
+      "additionalProperties": false
+    },
+    "importance-preview": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/read/properties/taskViewId"
+        },
+        "taskIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/read/properties/taskViewId"
+          },
+          "minItems": 1,
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "taskViewId",
+        "taskIds"
+      ],
+      "additionalProperties": false
+    },
+    "memberships": {
+      "type": "object",
+      "properties": {
+        "taskId": {
+          "$ref": "#/properties/read/properties/taskViewId"
+        },
+        "afterId": {
+          "type": "string",
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "taskId"
+      ],
+      "additionalProperties": false
+    },
+    "open": {
+      "$ref": "#/properties/read"
+    },
+    "user_request_summary": {
+      "type": "string",
+      "description": "One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does."
+    },
+    "is_new_request": {
+      "type": "boolean",
+      "description": "true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread."
+    }
+  },
+  "required": [
+    "action",
+    "user_request_summary",
+    "is_new_request"
+  ],
+  "additionalProperties": true,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

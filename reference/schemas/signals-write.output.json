@@ -1459,8 +1459,20 @@
                       "mentioned",
                       "introduced",
                       "engaged",
-                      "should_engage"
+                      "should_engage",
+                      "critical_to_engage"
                     ]
+                  },
+                  "engagementPriority": {
+                    "type": "string",
+                    "enum": [
+                      "critical",
+                      "recommended",
+                      "none"
+                    ]
+                  },
+                  "engagementReason": {
+                    "type": "string"
                   },
                   "roles": {
                     "type": "array",

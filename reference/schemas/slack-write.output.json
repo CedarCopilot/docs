@@ -24,6 +24,67 @@
         }
       },
       "additionalProperties": false
+    },
+    "createChannel": {
+      "type": "object",
+      "properties": {
+        "channelId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "isPrivate": {
+          "type": "boolean"
+        },
+        "url": {
+          "type": "string"
+        },
+        "creatorAdded": {
+          "type": "boolean"
+        },
+        "warning": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "inviteMembers": {
+      "type": "object",
+      "properties": {
+        "channelId": {
+          "type": "string"
+        },
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "inviteExternal": {
+      "type": "object",
+      "properties": {
+        "channelId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "inviteId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "const": "pending_acceptance"
+        },
+        "externalLimited": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
     }
   },
   "required": [
