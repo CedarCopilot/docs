@@ -1,0 +1,261 @@
+{
+  "type": "object",
+  "properties": {
+    "success": {
+      "type": "boolean"
+    },
+    "job": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string",
+          "const": "autumn"
+        },
+        "title": {
+          "type": "string"
+        },
+        "chatThreadId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "dispatching",
+            "dispatch_unknown",
+            "working",
+            "collecting",
+            "awaiting_input",
+            "completed",
+            "partial",
+            "failed",
+            "stopped",
+            "blocked"
+          ]
+        },
+        "status": {
+          "$ref": "#/properties/job/properties/state"
+        },
+        "providerTaskId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "question": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "progress": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "output": {
+          "type": "object",
+          "properties": {
+            "documentId": {
+              "type": "string"
+            },
+            "rowCount": {
+              "type": "number"
+            },
+            "preview": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "complete": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "documentId",
+            "rowCount",
+            "complete"
+          ],
+          "additionalProperties": false
+        },
+        "usage": {
+          "type": "object",
+          "properties": {
+            "vendorCredits": {
+              "type": "number"
+            },
+            "creditsReported": {
+              "type": "boolean"
+            },
+            "usdPerAutumnCredit": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "cedarCreditsCharged": {
+              "type": "number"
+            },
+            "cedarCreditsPending": {
+              "type": "number"
+            },
+            "cedarCreditEquivalent": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "reconciliationRequired": {
+              "type": "boolean"
+            },
+            "inputRecords": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "vendorCredits",
+            "reconciliationRequired",
+            "inputRecords"
+          ],
+          "additionalProperties": false
+        },
+        "delivery": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "delivered",
+            "blocked",
+            "none"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "turns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "commandId": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "start",
+                  "continue"
+                ]
+              },
+              "prompt": {
+                "type": "string"
+              },
+              "state": {
+                "$ref": "#/properties/job/properties/state"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "completedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "outputRows": {
+                "type": "number"
+              },
+              "errorCode": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "commandId",
+              "kind",
+              "prompt",
+              "state",
+              "createdAt",
+              "completedAt",
+              "outputRows",
+              "errorCode"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "provider",
+        "title",
+        "chatThreadId",
+        "state",
+        "status",
+        "providerTaskId",
+        "message",
+        "question",
+        "progress",
+        "output",
+        "usage",
+        "delivery",
+        "errorCode",
+        "createdAt",
+        "updatedAt",
+        "turns"
+      ],
+      "additionalProperties": false
+    },
+    "jobs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/properties/job"
+      }
+    },
+    "guidance": {},
+    "brief": {},
+    "errorCode": {
+      "type": "string"
+    },
+    "errorMessage": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "success"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

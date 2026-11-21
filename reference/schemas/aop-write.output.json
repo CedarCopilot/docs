@@ -35,6 +35,30 @@
       ],
       "additionalProperties": false
     },
+    "createInternal": {
+      "type": "object",
+      "properties": {
+        "aopId": {
+          "type": "string"
+        },
+        "producerDocumentId": {
+          "type": "string"
+        },
+        "configDocumentId": {
+          "type": "string"
+        },
+        "taskViewId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "aopId",
+        "producerDocumentId",
+        "configDocumentId",
+        "taskViewId"
+      ],
+      "additionalProperties": false
+    },
     "updateSelectionProcedure": {
       "type": "object",
       "properties": {

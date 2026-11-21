@@ -1,8 +1,9 @@
 ---
-title: "Connected systems overview"
-sidebarTitle: "Overview"
+title: "Connected data sources"
 description: "Discover integrations, configure MCP connections and understand the external-client boundary."
 ---
+
+Choose the kind of source you want to connect. For CRM fields and sync policy, open [CRM connections](/configuration/crm-connections). For mail, meetings or messaging, open [All channels](/channels/overview) and choose the provider. For a connected MCP server, use the configuration steps below. [Team configuration](/configuration/team) explains how organization defaults reach members.
 
 Cedar can hold connections to CRMs, communication providers and external MCP servers. The `connected-systems` skill explains the external-client workflow; `external-systems` includes broader in-app guidance and must be read with the surface boundary in mind.
 
@@ -28,6 +29,6 @@ Cedar's internal `external-mcp` family dispatches to connected MCP servers. It i
 
 ## External object writes
 
-Creating a CRM task, note, opportunity or Slack channel may require an external provider connector rather than a Cedar conversation mutation. Load `cedar-configuration` with `external-writes`, verify which API owns the object, and read back the provider result. Linking an existing external deal to Cedar remains a supported `conversation-write` action.
+Use [Cedar’s opportunity workflow](/crm/records-and-repair) for structured HubSpot, Salesforce or Attio deal creation under the configured account policy. Use `link-external-crm-deal` when the deal already exists. For a Slack channel, the connected `slack-write` family supports channel creation when the caller and Slack app have the required grants. For other provider objects, check the available native action and its approval requirements before choosing an authorized external connector. Read back the provider result.
 
 [System configuration](/reference/systems-write) · [Connected-systems skill](/skills/connected-systems) · [App-only bridge](/reference/external-mcp)

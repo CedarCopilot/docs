@@ -1,0 +1,1294 @@
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "create",
+        "initialize",
+        "invoke-action",
+        "restore-history",
+        "configure",
+        "saved-policy",
+        "archive",
+        "restore",
+        "associate",
+        "patch-values",
+        "upsert-context",
+        "manual",
+        "organize",
+        "place"
+      ]
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "purpose": {
+          "type": "string",
+          "maxLength": 30000
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_-]{0,79}$"
+              },
+              "label": {
+                "$ref": "#/properties/config/properties/title"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "text",
+                  "long_text",
+                  "number",
+                  "score",
+                  "currency",
+                  "percent",
+                  "date",
+                  "checkbox",
+                  "select",
+                  "multi_select",
+                  "url",
+                  "email",
+                  "doc",
+                  "conversation",
+                  "person",
+                  "company"
+                ]
+              },
+              "instructions": {
+                "$ref": "#/properties/config/properties/purpose"
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/properties/config/properties/title"
+                },
+                "maxItems": 100
+              },
+              "required": {
+                "type": "boolean",
+                "default": false
+              },
+              "rubric": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "number"
+                    },
+                    "description": {
+                      "$ref": "#/properties/config/properties/title"
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "description"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 2,
+                "maxItems": 10
+              },
+              "source": {
+                "type": "string",
+                "enum": [
+                  "task.description",
+                  "task.status",
+                  "task.dueDate",
+                  "task.createdBy",
+                  "task.output",
+                  "conversation.title",
+                  "conversation.nextMeeting",
+                  "conversation.field",
+                  "event.field",
+                  "jev"
+                ]
+              },
+              "sourceField": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200,
+                "pattern": "^[a-zA-Z0-9_.-]+$"
+              }
+            },
+            "required": [
+              "key",
+              "label",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 64
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/properties/config/properties/fields/items/properties/key"
+              },
+              "label": {
+                "$ref": "#/properties/config/properties/title"
+              },
+              "instructions": {
+                "$ref": "#/properties/config/properties/purpose"
+              },
+              "display": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/properties/config/properties/fields/items/properties/key"
+                },
+                "maxItems": 64
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "rowDisplay": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/config/properties/fields/items/properties/key"
+          },
+          "maxItems": 64
+        },
+        "briefDisplay": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/config/properties/fields/items/properties/key"
+          },
+          "maxItems": 8
+        },
+        "presentation": {
+          "type": "string",
+          "enum": [
+            "rows",
+            "cards"
+          ]
+        },
+        "openTarget": {
+          "type": "string",
+          "enum": [
+            "native",
+            "task",
+            "conversation"
+          ]
+        },
+        "output": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "const": "task.output"
+            },
+            "render": {
+              "type": "string",
+              "enum": [
+                "label",
+                "draft_preview"
+              ]
+            }
+          },
+          "required": [
+            "source"
+          ],
+          "additionalProperties": false
+        },
+        "contextDisplay": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/config/properties/fields/items/properties/key"
+          },
+          "maxItems": 64
+        },
+        "slackDisplay": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/config/properties/fields/items/properties/key"
+          },
+          "maxItems": 10
+        },
+        "placement": {
+          "type": "object",
+          "properties": {
+            "instructions": {
+              "$ref": "#/properties/config/properties/purpose"
+            },
+            "admitHumanCreatedTasks": {
+              "type": "boolean"
+            },
+            "priorityInstructions": {
+              "$ref": "#/properties/config/properties/purpose"
+            },
+            "priorityField": {
+              "$ref": "#/properties/config/properties/fields/items/properties/key"
+            },
+            "dateSections": {
+              "type": "object",
+              "properties": {
+                "dateField": {
+                  "$ref": "#/properties/config/properties/fields/items/properties/key"
+                },
+                "todaySectionId": {
+                  "$ref": "#/properties/config/properties/fields/items/properties/key"
+                },
+                "earlierSectionId": {
+                  "$ref": "#/properties/config/properties/fields/items/properties/key"
+                },
+                "unknownSectionId": {
+                  "$ref": "#/properties/config/properties/fields/items/properties/key"
+                }
+              },
+              "required": [
+                "dateField",
+                "todaySectionId",
+                "earlierSectionId"
+              ],
+              "additionalProperties": false
+            },
+            "excludedTaskIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "maxItems": 2500
+            }
+          },
+          "required": [
+            "instructions"
+          ],
+          "additionalProperties": false
+        },
+        "delivery": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "const": "silent"
+                },
+                "maxTasks": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                "selectionInstructions": {
+                  "$ref": "#/properties/config/properties/purpose"
+                },
+                "refreshPriorityAtDelivery": {
+                  "type": "boolean"
+                },
+                "monitoringDestination": {
+                  "type": "object",
+                  "properties": {
+                    "slackChannelId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    }
+                  },
+                  "required": [
+                    "slackChannelId"
+                  ],
+                  "additionalProperties": false
+                },
+                "notifyWhenDue": {
+                  "type": "boolean"
+                },
+                "importantTaskReminders": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "instructions": {
+                      "$ref": "#/properties/config/properties/purpose"
+                    },
+                    "engagementWindowDays": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 90
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "instructions",
+                    "engagementWindowDays"
+                  ],
+                  "additionalProperties": false
+                },
+                "dueNotificationPriority": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "gmailLabels": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "replaceLegacyRoutes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "recap",
+                      "inbound-response",
+                      "crm-proposal",
+                      "custom"
+                    ]
+                  },
+                  "maxItems": 4
+                }
+              },
+              "required": [
+                "mode"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "const": "live"
+                },
+                "monitoringDestination": {
+                  "$ref": "#/properties/config/properties/delivery/anyOf/0/properties/monitoringDestination"
+                },
+                "notifyOnCreate": {
+                  "type": "boolean"
+                },
+                "notifyWhenDue": {
+                  "type": "boolean"
+                },
+                "importantTaskReminders": {
+                  "$ref": "#/properties/config/properties/delivery/anyOf/0/properties/importantTaskReminders"
+                },
+                "dueNotificationPriority": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "mentionAssignee": {
+                  "type": "boolean"
+                },
+                "slackChannelId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "replaceLegacyRoutes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "recap",
+                      "inbound-response",
+                      "crm-proposal",
+                      "custom"
+                    ]
+                  },
+                  "maxItems": 4
+                },
+                "gmailLabels": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "required": [
+                "mode",
+                "slackChannelId"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "const": "scheduled"
+                },
+                "maxTasks": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                "selectionInstructions": {
+                  "$ref": "#/properties/config/properties/purpose"
+                },
+                "refreshPriorityAtDelivery": {
+                  "type": "boolean"
+                },
+                "monitoringDestination": {
+                  "$ref": "#/properties/config/properties/delivery/anyOf/0/properties/monitoringDestination"
+                },
+                "notifyWhenDue": {
+                  "type": "boolean"
+                },
+                "importantTaskReminders": {
+                  "$ref": "#/properties/config/properties/delivery/anyOf/0/properties/importantTaskReminders"
+                },
+                "dueNotificationPriority": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "mentionAssignee": {
+                  "type": "boolean"
+                },
+                "cron": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "timezone": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "slackChannelId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "replaceLegacyRoutes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "recap",
+                      "inbound-response",
+                      "crm-proposal",
+                      "custom"
+                    ]
+                  },
+                  "maxItems": 4
+                },
+                "gmailLabels": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "required": [
+                "mode",
+                "cron",
+                "timezone",
+                "slackChannelId"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "when": {
+                    "type": "string",
+                    "enum": [
+                      "unprepared",
+                      "prepared"
+                    ]
+                  },
+                  "id": {
+                    "$ref": "#/properties/config/properties/fields/items/properties/key"
+                  },
+                  "label": {
+                    "$ref": "#/properties/config/properties/title"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "builtin"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "open",
+                      "expand_output",
+                      "draft",
+                      "send",
+                      "mark_done",
+                      "ignore",
+                      "reopen"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "kind",
+                  "action"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "when": {
+                    "$ref": "#/properties/config/properties/actions/items/anyOf/0/properties/when"
+                  },
+                  "id": {
+                    "$ref": "#/properties/config/properties/fields/items/properties/key"
+                  },
+                  "label": {
+                    "$ref": "#/properties/config/properties/title"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "agent_prompt"
+                  },
+                  "prompt": {
+                    "$ref": "#/properties/config/properties/purpose"
+                  },
+                  "createResource": {
+                    "type": "object",
+                    "properties": {
+                      "taskId": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "conversationId": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "proposalRevision": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "resource": {
+                        "type": "string",
+                        "enum": [
+                          "org-chart",
+                          "deal-room"
+                        ]
+                      },
+                      "resourcePath": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                      },
+                      "specialistDocumentId": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "required": [
+                      "taskId",
+                      "conversationId",
+                      "proposalRevision",
+                      "resource",
+                      "resourcePath",
+                      "specialistDocumentId"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "kind",
+                  "prompt"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "when": {
+                    "$ref": "#/properties/config/properties/actions/items/anyOf/0/properties/when"
+                  },
+                  "id": {
+                    "$ref": "#/properties/config/properties/fields/items/properties/key"
+                  },
+                  "label": {
+                    "$ref": "#/properties/config/properties/title"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "context"
+                  },
+                  "prompt": {
+                    "$ref": "#/properties/config/properties/purpose"
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "kind",
+                  "prompt"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "when": {
+                    "$ref": "#/properties/config/properties/actions/items/anyOf/0/properties/when"
+                  },
+                  "id": {
+                    "$ref": "#/properties/config/properties/fields/items/properties/key"
+                  },
+                  "label": {
+                    "$ref": "#/properties/config/properties/title"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "tool_call"
+                  },
+                  "capability": {
+                    "type": "string",
+                    "enum": [
+                      "task.prepare",
+                      "task.revise",
+                      "task.complete",
+                      "task.cancel",
+                      "task.reopen",
+                      "task.open"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "kind",
+                  "capability"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "maxItems": 32
+        }
+      },
+      "required": [
+        "title",
+        "purpose",
+        "fields",
+        "sections",
+        "rowDisplay",
+        "contextDisplay",
+        "placement",
+        "delivery",
+        "actions"
+      ],
+      "additionalProperties": false
+    },
+    "initialize": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "taskViewId"
+      ],
+      "additionalProperties": false
+    },
+    "create": {
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "requestId"
+      ],
+      "additionalProperties": false
+    },
+    "configure": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "taskViewId",
+        "expectedRevision"
+      ],
+      "additionalProperties": false
+    },
+    "restore-history": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "expectedRevision": {
+          "$ref": "#/properties/configure/properties/expectedRevision"
+        },
+        "seq": {
+          "$ref": "#/properties/configure/properties/expectedRevision"
+        }
+      },
+      "required": [
+        "taskViewId",
+        "expectedRevision",
+        "seq"
+      ],
+      "additionalProperties": false
+    },
+    "invoke-action": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "expectedRevision": {
+          "$ref": "#/properties/configure/properties/expectedRevision"
+        },
+        "actionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        }
+      },
+      "required": [
+        "taskViewId",
+        "expectedRevision",
+        "actionId"
+      ],
+      "additionalProperties": false
+    },
+    "saved-policy": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "expectedRevision": {
+          "$ref": "#/properties/configure/properties/expectedRevision"
+        },
+        "instructions": {
+          "type": "string",
+          "maxLength": 30000
+        },
+        "priorityInstructions": {
+          "type": "string",
+          "maxLength": 30000
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/config/properties/sections/items"
+          },
+          "maxItems": 100
+        },
+        "importantTaskReminders": {
+          "anyOf": [
+            {
+              "$ref": "#/properties/config/properties/delivery/anyOf/0/properties/importantTaskReminders"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "taskViewId",
+        "expectedRevision"
+      ],
+      "additionalProperties": false
+    },
+    "archive": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "expectedRevision": {
+          "$ref": "#/properties/configure/properties/expectedRevision"
+        }
+      },
+      "required": [
+        "taskViewId",
+        "expectedRevision"
+      ],
+      "additionalProperties": false
+    },
+    "restore": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "expectedRevision": {
+          "$ref": "#/properties/configure/properties/expectedRevision"
+        }
+      },
+      "required": [
+        "taskViewId",
+        "expectedRevision"
+      ],
+      "additionalProperties": false
+    },
+    "associate": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "expectedSchemaRevision": {
+          "$ref": "#/properties/configure/properties/expectedRevision"
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "$ref": "#/properties/initialize/properties/taskViewId"
+              },
+              "expectedVersion": {
+                "$ref": "#/properties/configure/properties/expectedRevision"
+              },
+              "values": {
+                "type": "object",
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 30000
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "maxLength": 200
+                      },
+                      "maxItems": 100
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": [
+                            "doc",
+                            "conversation",
+                            "person",
+                            "company"
+                          ]
+                        },
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "taskId",
+              "expectedVersion",
+              "values"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "taskViewId",
+        "expectedSchemaRevision",
+        "candidates"
+      ],
+      "additionalProperties": false
+    },
+    "patch-values": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "taskId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "expectedSchemaRevision": {
+          "$ref": "#/properties/configure/properties/expectedRevision"
+        },
+        "expectedVersion": {
+          "$ref": "#/properties/configure/properties/expectedRevision"
+        },
+        "values": {
+          "$ref": "#/properties/associate/properties/candidates/items/properties/values"
+        }
+      },
+      "required": [
+        "taskViewId",
+        "taskId",
+        "expectedSchemaRevision",
+        "expectedVersion",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "upsert-context": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/properties/config/properties/fields/items/properties/key"
+              },
+              "kind": {
+                "type": "string",
+                "const": "context"
+              },
+              "values": {
+                "$ref": "#/properties/associate/properties/candidates/items/properties/values"
+              },
+              "sectionId": {
+                "$ref": "#/properties/config/properties/fields/items/properties/key"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "values"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "taskViewId",
+        "expectedRevision",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "manual": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "expectedRevision": {
+          "$ref": "#/properties/configure/properties/expectedRevision"
+        },
+        "expectedCandidateVersions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/properties/configure/properties/expectedRevision"
+          }
+        },
+        "expectedTaskStates": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "expectedTaskFingerprints": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "upsert-context"
+                  },
+                  "item": {
+                    "$ref": "#/properties/upsert-context/properties/items/items"
+                  }
+                },
+                "required": [
+                  "op",
+                  "item"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "admit"
+                  },
+                  "item": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "$ref": "#/properties/config/properties/fields/items/properties/key"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "const": "task"
+                          },
+                          "placementOrigin": {
+                            "type": "string",
+                            "enum": [
+                              "automatic",
+                              "human"
+                            ]
+                          },
+                          "admission": {
+                            "type": "string",
+                            "const": "required"
+                          },
+                          "taskId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "sectionId": {
+                            "$ref": "#/properties/config/properties/fields/items/properties/key"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "taskId"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "$ref": "#/properties/upsert-context/properties/items/items"
+                      }
+                    ]
+                  },
+                  "beforeItemId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  }
+                },
+                "required": [
+                  "op",
+                  "item"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "remove"
+                  },
+                  "itemId": {
+                    "$ref": "#/properties/manual/properties/operations/items/anyOf/1/properties/beforeItemId"
+                  }
+                },
+                "required": [
+                  "op",
+                  "itemId"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "move"
+                  },
+                  "itemId": {
+                    "$ref": "#/properties/manual/properties/operations/items/anyOf/1/properties/beforeItemId"
+                  },
+                  "sectionId": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/properties/manual/properties/operations/items/anyOf/1/properties/beforeItemId"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "beforeItemId": {
+                    "$ref": "#/properties/manual/properties/operations/items/anyOf/1/properties/beforeItemId"
+                  }
+                },
+                "required": [
+                  "op",
+                  "itemId",
+                  "sectionId"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "reorder"
+                  },
+                  "sectionId": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/properties/manual/properties/operations/items/anyOf/1/properties/beforeItemId"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "itemIds": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/properties/manual/properties/operations/items/anyOf/1/properties/beforeItemId"
+                    },
+                    "maxItems": 2500
+                  }
+                },
+                "required": [
+                  "op",
+                  "sectionId",
+                  "itemIds"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "maxItems": 2500
+        }
+      },
+      "required": [
+        "taskViewId",
+        "expectedRevision",
+        "expectedCandidateVersions",
+        "operations"
+      ],
+      "additionalProperties": false
+    },
+    "organize": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "preview",
+            "apply"
+          ]
+        }
+      },
+      "required": [
+        "taskViewId",
+        "mode"
+      ],
+      "additionalProperties": false
+    },
+    "place": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "$ref": "#/properties/initialize/properties/taskViewId"
+        },
+        "taskIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/initialize/properties/taskViewId"
+          },
+          "minItems": 1,
+          "maxItems": 20
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "preview",
+            "apply"
+          ]
+        }
+      },
+      "required": [
+        "taskViewId",
+        "taskIds",
+        "mode"
+      ],
+      "additionalProperties": false
+    },
+    "user_request_summary": {
+      "type": "string",
+      "description": "One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does."
+    },
+    "is_new_request": {
+      "type": "boolean",
+      "description": "true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread."
+    }
+  },
+  "required": [
+    "action",
+    "user_request_summary",
+    "is_new_request"
+  ],
+  "additionalProperties": true,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

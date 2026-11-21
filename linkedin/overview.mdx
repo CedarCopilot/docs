@@ -1,10 +1,11 @@
 ---
-title: "LinkedIn overview"
-sidebarTitle: "Overview"
+title: "LinkedIn"
 description: "A connected LinkedIn seat for prospecting, relationship context, and authorized outreach."
 ---
 
-Cedar's LinkedIn integration uses a connected Unipile seat. `linkedin-read` covers 20 operations; `linkedin-write` covers four. Cedar resolves a single connected seat automatically. With multiple seats, use `list-seats` and provide the returned `unipileAccountId`. You cannot select another user's seat.
+For outreach copy, use the shared [drafting skill](/skills/drafting) with an agent authorized to draft for LinkedIn.
+
+Cedar's LinkedIn integration uses a connected Unipile seat. `linkedin-read` handles prospecting and relationship lookup. Use `linkedin-write` for a visible profile visit, a message, an invitation, InMail or attaching a chat to a deal. Cedar resolves a single connected seat automatically. With multiple seats, use `list-seats` and provide the returned `unipileAccountId`. You cannot select another user's seat.
 
 Cedar automatically checks account health and action limits, queues scheduled messages, and defers scheduled DMs when its own hourly or daily send cap is reached. These protections help reduce overload; they cannot guarantee freedom from provider restrictions. [Limits and recommendations](/linkedin/limits).
 
@@ -12,7 +13,8 @@ Cedar automatically checks account health and action limits, queues scheduled me
 
 | Area | Actions | Typical use |
 | --- | --- | --- |
-| Seats and profile | `list-seats`, `view-profile` | Verify connection health, inspect a person or your own profile |
+| Seats | `linkedin-read list-seats` | Verify connection health |
+| Profile visit | `linkedin-write view-profile` | Make a real, potentially notified visit; requires `linkedin:write` |
 | Search | `search`, `search-parameters` | Classic, Sales Navigator, or Recruiter searches and reference IDs |
 | Batches | `profiles`, `companies` | Bounded profile/company reads and cache-aware lookups |
 | Network | `list-connections`, `list-connections-page`, `connections-page` | Bounded or resumable network traversal |
@@ -26,7 +28,7 @@ Cedar automatically checks account health and action limits, queues scheduled me
 
 Live provider calls can consume a LinkedIn rate window. Prefer cached batch profiles when sufficient and preserve pagination cursors. Reading one person's profile is not free simply because the tool has a read scope.
 
-Native LinkedIn profile access is distinct from third-party enrichment through `research`. For manual person or company enrichment, these guides use Fiber explicitly; see [research](/modules/research).
+Native LinkedIn profile access is distinct from third-party enrichment through `research`. To use Fiber for a manual lookup, select it explicitly. Rich research follows the account’s provider policy and otherwise defaults to Crustdata. See [research](/modules/research).
 
 ## Provider and account limitations
 

@@ -4,9 +4,12 @@
     "action": {
       "type": "string",
       "enum": [
-        "sync-thread"
+        "sync-thread",
+        "create-channel",
+        "invite-members",
+        "invite-external"
       ],
-      "description": "Which Slack write operation to perform — currently only \"sync-thread\" (pairs with syncThread: {...})."
+      "description": "Which Slack write operation to perform. Pass only its matching params object."
     },
     "syncThread": {
       "type": "object",
@@ -32,6 +35,69 @@
       ],
       "additionalProperties": false,
       "description": "Pull a specific Slack thread from the connected user's LIVE Slack into an existing deal, where it's stored and attached to the conversation timeline. Get channelId/threadTs from slack-read's search-live first. This INGESTS + ATTACHES only — it does not search."
+    },
+    "createChannel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[a-z0-9_-]+$"
+        },
+        "isPrivate": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "inviteMembers": {
+      "type": "object",
+      "properties": {
+        "channelId": {
+          "type": "string",
+          "pattern": "^[CG][A-Z0-9]+$"
+        },
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[UW][A-Z0-9]+$"
+          },
+          "minItems": 1,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "channelId",
+        "userIds"
+      ],
+      "additionalProperties": false
+    },
+    "inviteExternal": {
+      "type": "object",
+      "properties": {
+        "channelId": {
+          "$ref": "#/properties/inviteMembers/properties/channelId"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "externalLimited": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "channelId",
+        "email"
+      ],
+      "additionalProperties": false
     },
     "user_request_summary": {
       "type": "string",

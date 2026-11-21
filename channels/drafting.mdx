@@ -1,6 +1,5 @@
 ---
-title: "Drafting overview"
-sidebarTitle: "Overview"
+title: "Message drafts"
 description: "Understand what an email, Slack or LinkedIn draft actually creates."
 ---
 
@@ -10,9 +9,13 @@ Drafting prepares content for review; it does not authorize an outbound send. Lo
 | --- | --- |
 | `draft-email` | Saves a real provider draft with a pre-composed HTML body; `propose: true` instead produces a preview without persistence |
 | `draft-slack-message` | An ephemeral preview plus a Cedar task carrying the send action; Slack itself has no saved draft created by this tool |
-| `draft-linkedin-message` | A plain-text draft stored in Cedar for an existing LinkedIn chat; no CRM deal is required |
+| `draft-linkedin-message` | A plain-text draft stored in Cedar for an existing chat, or for a verified first-touch recipient on an existing task |
 | `show-draft` | Displays an existing draft using its real draft ID |
 
 For email attachments, discover uploaded documents and pass supported upload document IDs. Keep the intended recipients, reply thread, final body and attachment selection explicit. Categories can label why an email draft was produced, and Slack task types can classify its review task.
 
 A saved draft, preview card and completed send are distinct results. Inspect the operation response and describe the state it actually created. Use [Email](/capabilities/email), [Slack](/capabilities/slack) or [LinkedIn](/capabilities/linkedin) for authorized channel sends and [scheduling](/channels/scheduling) for a future send.
+
+## When another reply arrives first
+
+For an email-triggered run preparing an email or Slack draft, Cedar checks for newer mailbox activity and an existing draft before saving. If Cedar reports that the thread has moved on, reopen it, read the latest exchange and inspect any existing draft. Repeating the original draft request can duplicate a reply the rep already prepared. For multiple timed touches to one person, use a [person sequence](/recipes/person-outreach-sequence).

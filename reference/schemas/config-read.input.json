@@ -8,6 +8,7 @@
         "read-settings",
         "list-fields",
         "list-org-members",
+        "get-user-identity",
         "find-bot-slack-channels"
       ]
     },
@@ -73,7 +74,7 @@
               "data_services"
             ]
           },
-          "description": "Which sections to load. \"data_services\" returns provider defaults, policy origins, versions, watcher defaults and credential availability (never secrets). \"connections\" returns the connectionId required by apply-change's CRM/Slack change types — call this before apply-change whenever you need one and don't already have it. \"user_settings\" includes agentExecutionEnabled/pushDraftsToExternalClient for visibility, but neither is settable from any tool: they are not fields on any apply-change change type, and agentExecutionEnabled is additionally writable only by Cedar staff. Report them; never try to change them. \"inboxes\" returns custom inbox tabs, layout, and shared inboxSortingInstructions (read before changing sorting preferences or managing inbox tabs). \"task_groups\" returns the task lanes (get group ids before a manage_task_group update/delete/reorder). \"credentials\" returns the stored credential entries this user can reach (own + org): name, scope, instructions and which FIELD NAMES are stored. Never values."
+          "description": "Which sections to load. \"data_services\" returns provider defaults, policy origins, versions, watcher defaults and credential availability (never secrets). \"connections\" returns the connectionId required by apply-change's CRM/Slack change types — call this before apply-change whenever you need one and don't already have it. \"user_settings\" includes agentExecutionEnabled/pushDraftsToExternalClient for visibility, but neither is settable from any tool: they are not fields on any apply-change change type, and agentExecutionEnabled is read-only here. Report them; never try to change them. \"inboxes\" returns custom inbox tabs, layout, and shared inboxSortingInstructions (read before changing sorting preferences or managing inbox tabs). \"task_groups\" returns the task lanes (get group ids before a manage_task_group update/delete/reorder). \"credentials\" returns the stored credential entries this user can reach (own + org): name, scope, instructions and which FIELD NAMES are stored. Never values."
         }
       },
       "additionalProperties": false
@@ -117,6 +118,10 @@
     "listOrgMembers": {
       "type": "object",
       "properties": {
+        "includeTeams": {
+          "type": "boolean",
+          "description": "Include accessible teams and their resolved member IDs."
+        },
         "search": {
           "type": "string",
           "description": "Case-insensitive substring match on a member's name OR email. Omit to list everyone."

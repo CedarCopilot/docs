@@ -46,6 +46,26 @@
           },
           "description": "List of fields that were updated"
         },
+        "alreadyPresentFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "description": "Requested structured entries verified against freshly read Cedar values and already present. These are not new writes or confirmation of an external CRM push."
+        },
         "blockedFields": {
           "type": "array",
           "items": {
@@ -83,6 +103,24 @@
             "additionalProperties": false
           },
           "description": "Requested fields that were NOT written, each with the reason. Present whenever anything you asked for was dropped, even when other fields were written. Tell the user which field and why; never guess a cause."
+        },
+        "approvalRequired": {
+          "type": "boolean"
+        },
+        "noAction": {
+          "type": "boolean"
+        },
+        "reviewTaskIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Existing review questions; these are not executable CRM changes."
+        },
+        "writeDisposition": {
+          "type": "string",
+          "const": "rejected_before_write"
         },
         "proposed": {
           "type": "boolean",
@@ -161,15 +199,27 @@
                                     "mentioned",
                                     "introduced",
                                     "engaged",
-                                    "should_engage"
+                                    "should_engage",
+                                    "critical_to_engage"
                                   ]
+                                },
+                                "engagementPriority": {
+                                  "type": "string",
+                                  "enum": [
+                                    "critical",
+                                    "recommended",
+                                    "none"
+                                  ]
+                                },
+                                "engagementReason": {
+                                  "type": "string"
                                 },
                                 "roles": {
                                   "type": "array",
                                   "items": {
-                                    "type": "string",
-                                    "minLength": 1
-                                  }
+                                    "type": "string"
+                                  },
+                                  "maxItems": 3
                                 },
                                 "support": {
                                   "type": "string",
@@ -210,7 +260,8 @@
                               "required": [
                                 "id"
                               ],
-                              "additionalProperties": false
+                              "additionalProperties": false,
+                              "description": "New ID: name, engagement, roles, support, summary, evidence required; existing ID: changed properties only."
                             },
                             "minItems": 1,
                             "maxItems": 40
@@ -285,7 +336,12 @@
                                 }
                               },
                               "required": [
-                                "id"
+                                "id",
+                                "title",
+                                "occurredAt",
+                                "kind",
+                                "summary",
+                                "sourceEventIds"
                               ],
                               "additionalProperties": false
                             },
@@ -317,7 +373,44 @@
                         "const": "update"
                       },
                       "value": {
-                        "$ref": "#/properties/updateFields/properties/proposedFields/items/properties/entryOperation/anyOf/1/properties/value"
+                        "type": "object",
+                        "properties": {
+                          "entries": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "$ref": "#/properties/updateFields/properties/proposedFields/items/properties/entryOperation/anyOf/1/properties/value/properties/entries/items/properties/id"
+                                },
+                                "title": {
+                                  "$ref": "#/properties/updateFields/properties/proposedFields/items/properties/entryOperation/anyOf/1/properties/value/properties/entries/items/properties/title"
+                                },
+                                "occurredAt": {
+                                  "$ref": "#/properties/updateFields/properties/proposedFields/items/properties/entryOperation/anyOf/1/properties/value/properties/entries/items/properties/occurredAt"
+                                },
+                                "kind": {
+                                  "$ref": "#/properties/updateFields/properties/proposedFields/items/properties/entryOperation/anyOf/1/properties/value/properties/entries/items/properties/kind"
+                                },
+                                "summary": {
+                                  "$ref": "#/properties/updateFields/properties/proposedFields/items/properties/entryOperation/anyOf/1/properties/value/properties/entries/items/properties/summary"
+                                },
+                                "sourceEventIds": {
+                                  "$ref": "#/properties/updateFields/properties/proposedFields/items/properties/entryOperation/anyOf/1/properties/value/properties/entries/items/properties/sourceEventIds"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "minItems": 1
+                          }
+                        },
+                        "required": [
+                          "entries"
+                        ],
+                        "additionalProperties": false
                       }
                     },
                     "required": [
@@ -407,7 +500,8 @@
                   "pushed",
                   "failed",
                   "skipped",
-                  "not_attempted"
+                  "not_attempted",
+                  "unknown"
                 ]
               },
               "retryable": {
@@ -457,6 +551,35 @@
         },
         "isRecoverable": {
           "type": "boolean"
+        },
+        "retryGuidance": {
+          "type": "object",
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "read_latest_and_rebuild",
+                "repair_structured_fields"
+              ]
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "maxAttempts": {
+              "type": "number",
+              "const": 2
+            }
+          },
+          "required": [
+            "action",
+            "fields",
+            "maxAttempts"
+          ],
+          "additionalProperties": false,
+          "description": "At most two corrected attempts in this execution. Re-read current fields and rebuild from evidence; never replay stale arguments. Stop on a hold, nonrecoverable failure, or exhausted budget. A rejected call wrote nothing; only report fields confirmed by a later successful tool result."
         },
         "isExpected": {
           "type": "boolean",
@@ -650,6 +773,101 @@
             ],
             "additionalProperties": false
           }
+        }
+      },
+      "additionalProperties": false
+    },
+    "createOpportunity": {
+      "type": "object",
+      "properties": {
+        "taskId": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "reused": {
+          "type": "boolean"
+        },
+        "dealId": {
+          "type": "string"
+        },
+        "verificationWarnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "proposed": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "convertHubspotLead": {
+      "type": "object",
+      "properties": {
+        "proposed": {
+          "type": "boolean"
+        },
+        "leadId": {
+          "type": "string"
+        },
+        "dealId": {
+          "type": "string"
+        },
+        "dealConversationId": {
+          "type": "string"
+        },
+        "dealName": {
+          "type": "string"
+        },
+        "dealStageId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "logEmailActivity": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "const": "hubspot"
+        },
+        "dealId": {
+          "type": "string"
+        },
+        "activityId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "logged",
+            "already_logged"
+          ]
+        },
+        "proposed": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "handoffCrmRecord": {
+      "type": "object",
+      "properties": {
+        "proposed": {
+          "type": "boolean"
+        },
+        "sourceConversationId": {
+          "type": "string"
+        },
+        "targetConversationId": {
+          "type": "string"
         }
       },
       "additionalProperties": false

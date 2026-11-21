@@ -1,0 +1,32 @@
+---
+title: "Design a human-in-the-loop workflow"
+sidebarTitle: "Human-in-the-loop workflows"
+description: "Plan what Cedar can prepare, where a rep needs to make a decision, and how that decision carries into the next system."
+---
+
+A good handoff lets a rep make a decision in one place. That’s hard when the evidence is in a meeting transcript, the owner is in the CRM, and the rep reviews the work in Slack. A workflow may need the rep twice for different reasons. If the second review makes them find the deal again or repeat their first decision, the automation has handed the work back too early.
+
+Start with the decision only the rep can make. Then work backward: what can the agent look up, reconcile, draft, or rule out before asking? At the handoff, show the proposed action, the evidence behind it, and what the rep’s choice will change.
+
+## Example: multithread a deal after a call
+
+During a discovery call, the buyer says security needs to review data retention and finance wants a rollout estimate. The rep already knows the security lead but wants the buyer to introduce finance. Here’s how to design the workflow so the rep can make that relationship decision after the call, then review the actual outreach before it starts.
+
+| Step | What happens |
+| --- | --- |
+| **1. Build the deal org chart** | Once the transcript is available, the agent checks the participants, prior correspondence and CRM contacts. It creates or updates the [deal org chart](/agent-platform/graphs), shows who owns each review, and leaves unverified relationships open. If chart generation requires approval in this workflow, the rep approves that step before the agent builds it. |
+| **2. Let the rep choose whom to approach** | The agent brings the chart and a shortlist to the rep in a [Task View](/tasks/task-views). For each person it explains why outreach makes sense now and how the rep could reach them. For security, it links the existing email thread. For finance, it flags that an introduction is still needed. The rep selects the security lead and leaves finance for later. |
+| **3. Prepare a sequence for each selected person** | The agent carries the rep’s selections forward and prepares [one draft sequence per selected contact](/automation/outreach-sequences). Here it drafts a reply on data retention for the security lead and a follow-up timed to the review. Finance gets no draft. |
+| **4. Ask the rep to approve the sequences** | The rep opens each saved sequence with its recipient, sender, messages, channels and timing already filled in. They can edit the steps, approve that sequence for delivery, or leave it pending. Only approved sequences proceed to delivery. |
+
+The first handoff gives the rep enough context to choose **whose relationship to develop next**. The second gives them the exact words and timing to decide **whether this outreach should go ahead**. Keep the chart, selected contacts and saved sequences linked to the same deal so the rep can resume review without reconstructing the call.
+
+## Design it with your MCP-connected assistant
+
+Cedar provides built-in skills through MCP that can help you design a human-in-the-loop workflow before configuring it. In a [connected client](/getting-started/quickstart), ask your assistant to list the skills available to your account with [load-skill](/reference/skills). Start with [cedar-configuration](/skills/cedar-configuration) for playbooks and triggers, [agent-setup](/skills/agent-setup) when adapting a library agent, and [task-views](/skills/task-views) for the rep’s review queue when available.
+
+Try this prompt:
+
+> Help me design a post-call multithreading workflow using the Cedar skills available to my account. I want to see the deal org chart and a shortlist of people I could reach, with the reason and contact path for each. After I choose whom to approach, prepare one sequence per selected person and bring each back for approval. Show where I would make both decisions and flag any step my connections don’t support. Give me the design before changing any settings.
+
+Walk through the proposed flow with one example before enabling it. At each pause, check whether the rep has enough information to act and whether the next step uses the choice they just made.

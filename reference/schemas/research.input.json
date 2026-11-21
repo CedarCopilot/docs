@@ -5,7 +5,9 @@
       "type": "string",
       "enum": [
         "capabilities",
+        "chat-usage",
         "choose-enrichment",
+        "identify-company",
         "enrich-company",
         "enrich-person",
         "web-search",
@@ -36,13 +38,32 @@
         },
         "domain": {
           "type": "string",
-          "description": "Company's website domain (e.g., \"stripe.com\") — preferred identifier"
+          "description": "Company's website domain (e.g., \"example.com\") — preferred identifier"
         },
         "companyName": {
           "type": "string",
-          "description": "Company name — used to resolve the domain when no domain is available (e.g., \"Stripe\")"
+          "description": "Company name — used to resolve the domain when no domain is available (e.g., \"Example Account\")"
         }
       },
+      "additionalProperties": false
+    },
+    "identifyCompany": {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 253
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "domain"
+      ],
       "additionalProperties": false
     },
     "chooseEnrichment": {
@@ -128,7 +149,7 @@
         },
         "site": {
           "type": "string",
-          "description": "Restrict results to a specific domain (e.g. \"techcrunch.com\")."
+          "description": "Restrict results to a specific domain (e.g. \"example.com\")."
         },
         "geolocation": {
           "type": "string",
@@ -161,7 +182,15 @@
           },
           "minItems": 1,
           "maxItems": 10,
-          "description": "URLs to fetch content for (1-10)."
+          "description": "Public URLs to fetch content for (1-10)."
+        },
+        "refresh": {
+          "type": "boolean"
+        },
+        "maxCharacters": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 50000
         }
       },
       "required": [

@@ -7,12 +7,158 @@
     "errorMessage": {
       "type": "string"
     },
+    "batch": {
+      "type": "object",
+      "properties": {
+        "batchDocumentId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "batchGeneration": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "prepared",
+            "committed",
+            "aborted"
+          ]
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "actionKey": {
+                "$ref": "#/properties/batch/properties/batchGeneration"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "create",
+                  "update",
+                  "reference"
+                ]
+              },
+              "taskId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "created",
+                  "existing",
+                  "updated",
+                  "unchanged",
+                  "referenced",
+                  "blocked",
+                  "error"
+                ]
+              },
+              "changed": {
+                "type": "boolean"
+              },
+              "errorCode": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              },
+              "assignmentVersion": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "actionKey",
+              "action",
+              "taskId",
+              "outcome",
+              "changed"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "taskIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "delivery": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "pending",
+            "disabled",
+            "unavailable",
+            "not_requested"
+          ]
+        },
+        "effects": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "pending",
+            "not_requested"
+          ]
+        }
+      },
+      "required": [
+        "batchDocumentId",
+        "batchGeneration",
+        "state",
+        "results",
+        "taskIds",
+        "delivery"
+      ],
+      "additionalProperties": false
+    },
+    "attachDocument": {
+      "type": "object",
+      "properties": {
+        "attached": {
+          "type": "boolean"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "attached",
+            "unchanged"
+          ]
+        },
+        "taskId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "documentId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "taskRevision": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "attached",
+        "outcome",
+        "taskId",
+        "documentId",
+        "taskRevision"
+      ],
+      "additionalProperties": false
+    },
     "deal": {
       "type": "object",
       "properties": {
         "data": {
           "type": "string",
-          "description": "JSON task/people data, including owner, assignedBy and assignmentNote."
+          "description": "JSON task/people data, including owner, assignedBy, assignmentNote and creation confirmation. Use confirmation.text to report verified Task View/section placement and reminder timing; never guess a destination."
         },
         "taskId": {
           "type": "string"
@@ -22,6 +168,1273 @@
         },
         "seedPrompt": {
           "type": "string"
+        },
+        "handoff": {
+          "type": "object",
+          "properties": {
+            "outcome": {
+              "type": "string",
+              "const": "handoff"
+            },
+            "executed": {
+              "type": "boolean",
+              "const": false
+            },
+            "intent": {
+              "type": "string",
+              "enum": [
+                "prepare",
+                "research",
+                "revise"
+              ]
+            },
+            "taskId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "taskRevision": {
+              "type": "string"
+            },
+            "launchingTaskViewId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "selectedAction": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "when": {
+                      "type": "string",
+                      "enum": [
+                        "unprepared",
+                        "prepared"
+                      ]
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9_-]{0,79}$"
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "kind": {
+                      "type": "string",
+                      "const": "builtin"
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "open",
+                        "expand_output",
+                        "draft",
+                        "send",
+                        "mark_done",
+                        "ignore",
+                        "reopen"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label",
+                    "kind",
+                    "action"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "when": {
+                      "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/when"
+                    },
+                    "id": {
+                      "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                    },
+                    "label": {
+                      "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/label"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "const": "agent_prompt"
+                    },
+                    "prompt": {
+                      "type": "string",
+                      "maxLength": 30000
+                    },
+                    "createResource": {
+                      "type": "object",
+                      "properties": {
+                        "taskId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "conversationId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "proposalRevision": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "resource": {
+                          "type": "string",
+                          "enum": [
+                            "org-chart",
+                            "deal-room"
+                          ]
+                        },
+                        "resourcePath": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 2000
+                        },
+                        "specialistDocumentId": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      },
+                      "required": [
+                        "taskId",
+                        "conversationId",
+                        "proposalRevision",
+                        "resource",
+                        "resourcePath",
+                        "specialistDocumentId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label",
+                    "kind",
+                    "prompt"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "when": {
+                      "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/when"
+                    },
+                    "id": {
+                      "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                    },
+                    "label": {
+                      "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/label"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "const": "context"
+                    },
+                    "prompt": {
+                      "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/1/properties/prompt"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label",
+                    "kind",
+                    "prompt"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "when": {
+                      "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/when"
+                    },
+                    "id": {
+                      "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                    },
+                    "label": {
+                      "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/label"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "const": "tool_call"
+                    },
+                    "capability": {
+                      "type": "string",
+                      "enum": [
+                        "task.prepare",
+                        "task.revise",
+                        "task.complete",
+                        "task.cancel",
+                        "task.reopen",
+                        "task.open"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label",
+                    "kind",
+                    "capability"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "instructions": {
+              "type": "string"
+            },
+            "context": {
+              "type": "object",
+              "properties": {
+                "task": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "notes": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "dueDate": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "ownerId": {
+                      "type": "string"
+                    },
+                    "assignmentVersion": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "description",
+                    "notes",
+                    "status",
+                    "dueDate",
+                    "ownerId",
+                    "assignmentVersion"
+                  ],
+                  "additionalProperties": false
+                },
+                "taskViews": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "taskViewId": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "revision": {
+                        "type": "number"
+                      },
+                      "archived": {
+                        "type": "boolean"
+                      },
+                      "config": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/label"
+                          },
+                          "purpose": {
+                            "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/1/properties/prompt"
+                          },
+                          "fields": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                                },
+                                "label": {
+                                  "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/label"
+                                },
+                                "type": {
+                                  "type": "string",
+                                  "enum": [
+                                    "text",
+                                    "long_text",
+                                    "number",
+                                    "score",
+                                    "currency",
+                                    "percent",
+                                    "date",
+                                    "checkbox",
+                                    "select",
+                                    "multi_select",
+                                    "url",
+                                    "email",
+                                    "doc",
+                                    "conversation",
+                                    "person",
+                                    "company"
+                                  ]
+                                },
+                                "instructions": {
+                                  "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/1/properties/prompt"
+                                },
+                                "options": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/label"
+                                  },
+                                  "maxItems": 100
+                                },
+                                "required": {
+                                  "type": "boolean",
+                                  "default": false
+                                },
+                                "rubric": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "value": {
+                                        "type": "number"
+                                      },
+                                      "description": {
+                                        "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/label"
+                                      }
+                                    },
+                                    "required": [
+                                      "value",
+                                      "description"
+                                    ],
+                                    "additionalProperties": false
+                                  },
+                                  "minItems": 2,
+                                  "maxItems": 10
+                                },
+                                "source": {
+                                  "type": "string",
+                                  "enum": [
+                                    "task.description",
+                                    "task.status",
+                                    "task.dueDate",
+                                    "task.createdBy",
+                                    "task.output",
+                                    "conversation.title",
+                                    "conversation.nextMeeting",
+                                    "conversation.field",
+                                    "event.field",
+                                    "jev"
+                                  ]
+                                },
+                                "sourceField": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 200,
+                                  "pattern": "^[a-zA-Z0-9_.-]+$"
+                                }
+                              },
+                              "required": [
+                                "key",
+                                "label",
+                                "type"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "maxItems": 64
+                          },
+                          "sections": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                                },
+                                "label": {
+                                  "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/label"
+                                },
+                                "instructions": {
+                                  "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/1/properties/prompt"
+                                },
+                                "display": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                                  },
+                                  "maxItems": 64
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "label"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "maxItems": 100
+                          },
+                          "rowDisplay": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                            },
+                            "maxItems": 64
+                          },
+                          "briefDisplay": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                            },
+                            "maxItems": 8
+                          },
+                          "presentation": {
+                            "type": "string",
+                            "enum": [
+                              "rows",
+                              "cards"
+                            ]
+                          },
+                          "openTarget": {
+                            "type": "string",
+                            "enum": [
+                              "native",
+                              "task",
+                              "conversation"
+                            ]
+                          },
+                          "output": {
+                            "type": "object",
+                            "properties": {
+                              "source": {
+                                "type": "string",
+                                "const": "task.output"
+                              },
+                              "render": {
+                                "type": "string",
+                                "enum": [
+                                  "label",
+                                  "draft_preview"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "source"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "contextDisplay": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                            },
+                            "maxItems": 64
+                          },
+                          "slackDisplay": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                            },
+                            "maxItems": 10
+                          },
+                          "placement": {
+                            "type": "object",
+                            "properties": {
+                              "instructions": {
+                                "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/1/properties/prompt"
+                              },
+                              "admitHumanCreatedTasks": {
+                                "type": "boolean"
+                              },
+                              "priorityInstructions": {
+                                "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/1/properties/prompt"
+                              },
+                              "priorityField": {
+                                "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                              },
+                              "dateSections": {
+                                "type": "object",
+                                "properties": {
+                                  "dateField": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                                  },
+                                  "todaySectionId": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                                  },
+                                  "earlierSectionId": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                                  },
+                                  "unknownSectionId": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/0/properties/id"
+                                  }
+                                },
+                                "required": [
+                                  "dateField",
+                                  "todaySectionId",
+                                  "earlierSectionId"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "excludedTaskIds": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "maxItems": 2500
+                              }
+                            },
+                            "required": [
+                              "instructions"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "delivery": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "mode": {
+                                    "type": "string",
+                                    "const": "silent"
+                                  },
+                                  "maxTasks": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 5
+                                  },
+                                  "selectionInstructions": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/1/properties/prompt"
+                                  },
+                                  "refreshPriorityAtDelivery": {
+                                    "type": "boolean"
+                                  },
+                                  "monitoringDestination": {
+                                    "type": "object",
+                                    "properties": {
+                                      "slackChannelId": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 200
+                                      }
+                                    },
+                                    "required": [
+                                      "slackChannelId"
+                                    ],
+                                    "additionalProperties": false
+                                  },
+                                  "notifyWhenDue": {
+                                    "type": "boolean"
+                                  },
+                                  "importantTaskReminders": {
+                                    "type": "object",
+                                    "properties": {
+                                      "enabled": {
+                                        "type": "boolean"
+                                      },
+                                      "instructions": {
+                                        "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/1/properties/prompt"
+                                      },
+                                      "engagementWindowDays": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 90
+                                      }
+                                    },
+                                    "required": [
+                                      "enabled",
+                                      "instructions",
+                                      "engagementWindowDays"
+                                    ],
+                                    "additionalProperties": false
+                                  },
+                                  "dueNotificationPriority": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 1000
+                                  },
+                                  "gmailLabels": {
+                                    "type": "boolean",
+                                    "default": false
+                                  },
+                                  "replaceLegacyRoutes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "enum": [
+                                        "recap",
+                                        "inbound-response",
+                                        "crm-proposal",
+                                        "custom"
+                                      ]
+                                    },
+                                    "maxItems": 4
+                                  }
+                                },
+                                "required": [
+                                  "mode"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "mode": {
+                                    "type": "string",
+                                    "const": "live"
+                                  },
+                                  "monitoringDestination": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/config/properties/delivery/anyOf/0/properties/monitoringDestination"
+                                  },
+                                  "notifyOnCreate": {
+                                    "type": "boolean"
+                                  },
+                                  "notifyWhenDue": {
+                                    "type": "boolean"
+                                  },
+                                  "importantTaskReminders": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/config/properties/delivery/anyOf/0/properties/importantTaskReminders"
+                                  },
+                                  "dueNotificationPriority": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 1000
+                                  },
+                                  "mentionAssignee": {
+                                    "type": "boolean"
+                                  },
+                                  "slackChannelId": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 200
+                                  },
+                                  "replaceLegacyRoutes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "enum": [
+                                        "recap",
+                                        "inbound-response",
+                                        "crm-proposal",
+                                        "custom"
+                                      ]
+                                    },
+                                    "maxItems": 4
+                                  },
+                                  "gmailLabels": {
+                                    "type": "boolean",
+                                    "default": false
+                                  }
+                                },
+                                "required": [
+                                  "mode",
+                                  "slackChannelId"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "mode": {
+                                    "type": "string",
+                                    "const": "scheduled"
+                                  },
+                                  "maxTasks": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 5
+                                  },
+                                  "selectionInstructions": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/selectedAction/anyOf/1/properties/prompt"
+                                  },
+                                  "refreshPriorityAtDelivery": {
+                                    "type": "boolean"
+                                  },
+                                  "monitoringDestination": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/config/properties/delivery/anyOf/0/properties/monitoringDestination"
+                                  },
+                                  "notifyWhenDue": {
+                                    "type": "boolean"
+                                  },
+                                  "importantTaskReminders": {
+                                    "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/config/properties/delivery/anyOf/0/properties/importantTaskReminders"
+                                  },
+                                  "dueNotificationPriority": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 1000
+                                  },
+                                  "mentionAssignee": {
+                                    "type": "boolean"
+                                  },
+                                  "cron": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 200
+                                  },
+                                  "timezone": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "slackChannelId": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 200
+                                  },
+                                  "replaceLegacyRoutes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "enum": [
+                                        "recap",
+                                        "inbound-response",
+                                        "crm-proposal",
+                                        "custom"
+                                      ]
+                                    },
+                                    "maxItems": 4
+                                  },
+                                  "gmailLabels": {
+                                    "type": "boolean",
+                                    "default": false
+                                  }
+                                },
+                                "required": [
+                                  "mode",
+                                  "cron",
+                                  "timezone",
+                                  "slackChannelId"
+                                ],
+                                "additionalProperties": false
+                              }
+                            ]
+                          },
+                          "actions": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/properties/deal/properties/handoff/properties/selectedAction"
+                            },
+                            "maxItems": 32
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "purpose",
+                          "fields",
+                          "sections",
+                          "rowDisplay",
+                          "contextDisplay",
+                          "placement",
+                          "delivery",
+                          "actions"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "availableActionIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "actionPlan": {
+                        "type": "object",
+                        "properties": {
+                          "outputReady": {
+                            "type": "boolean"
+                          },
+                          "actionLabels": {
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "string"
+                            }
+                          },
+                          "availableActionIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "primaryActionId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "secondaryActionIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "taskControls": {
+                            "type": "object",
+                            "properties": {
+                              "snooze": {
+                                "type": "boolean"
+                              },
+                              "complete": {
+                                "type": "boolean"
+                              },
+                              "cancel": {
+                                "type": "boolean"
+                              },
+                              "reopen": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": [
+                              "snooze",
+                              "complete",
+                              "cancel",
+                              "reopen"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "outputReady",
+                          "availableActionIds",
+                          "primaryActionId",
+                          "secondaryActionIds",
+                          "taskControls"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "values": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 30000
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "maxLength": 200
+                              },
+                              "maxItems": 100
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "enum": [
+                                    "doc",
+                                    "conversation",
+                                    "person",
+                                    "company"
+                                  ]
+                                },
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "id"
+                              ],
+                              "additionalProperties": false
+                            }
+                          ]
+                        }
+                      },
+                      "resources": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "path": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "path",
+                            "title"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "hasMoreResources": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "taskViewId",
+                      "name",
+                      "revision",
+                      "archived",
+                      "config",
+                      "values",
+                      "resources",
+                      "hasMoreResources"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "membershipCoverage": {
+                  "type": "string"
+                },
+                "conversation": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "aopId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "aopId"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sources": {
+                  "type": "object",
+                  "properties": {
+                    "producerContext": {
+                      "type": "object",
+                      "properties": {
+                        "taskId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "none",
+                            "available",
+                            "unavailable",
+                            "ambiguous"
+                          ]
+                        },
+                        "origin": {
+                          "type": "string",
+                          "enum": [
+                            "none",
+                            "notes",
+                            "creation"
+                          ]
+                        },
+                        "documents": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/resources/items/properties/id"
+                              },
+                              "path": {
+                                "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/resources/items/properties/path"
+                              },
+                              "title": {
+                                "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/resources/items/properties/title"
+                              },
+                              "revision": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "path",
+                              "title",
+                              "revision"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "hasMoreResources": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "taskId",
+                        "status",
+                        "origin",
+                        "documents",
+                        "hasMoreResources"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "document": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/resources/items/properties/id"
+                            },
+                            "path": {
+                              "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/resources/items/properties/path"
+                            },
+                            "title": {
+                              "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/resources/items/properties/title"
+                            },
+                            "revision": {
+                              "type": "number"
+                            },
+                            "content": {
+                              "type": "string"
+                            },
+                            "truncated": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "path",
+                            "title",
+                            "revision",
+                            "content",
+                            "truncated"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "timeline": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "eventType": {
+                            "type": "string"
+                          },
+                          "direction": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "occurredAt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "eventType",
+                          "direction",
+                          "occurredAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "supportingDocumentRoot": {
+                      "type": "string"
+                    },
+                    "supportingDocuments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/resources/items/properties/id"
+                          },
+                          "path": {
+                            "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/resources/items/properties/path"
+                          },
+                          "title": {
+                            "$ref": "#/properties/deal/properties/handoff/properties/context/properties/taskViews/items/properties/resources/items/properties/title"
+                          },
+                          "revision": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "path",
+                          "title",
+                          "revision"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "hasMoreSupportingDocuments": {
+                      "type": "boolean"
+                    },
+                    "documentsIncluded": {
+                      "type": "boolean"
+                    },
+                    "threadId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "producerContext",
+                    "document",
+                    "timeline",
+                    "supportingDocumentRoot",
+                    "supportingDocuments",
+                    "hasMoreSupportingDocuments",
+                    "documentsIncluded",
+                    "threadId"
+                  ],
+                  "additionalProperties": false
+                },
+                "preferences": {
+                  "type": "object",
+                  "properties": {
+                    "signatureEnabled": {
+                      "type": "boolean"
+                    },
+                    "signatureContent": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "timezone": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "signatureEnabled",
+                    "signatureContent",
+                    "timezone"
+                  ],
+                  "additionalProperties": false
+                },
+                "output": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "reference": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "nativeAuthority": {
+                      "type": "string",
+                      "const": "independently-required"
+                    },
+                    "instructions": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "reference",
+                    "nativeAuthority",
+                    "instructions"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "task",
+                "taskViews",
+                "membershipCoverage",
+                "conversation",
+                "sources",
+                "preferences",
+                "output"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "outcome",
+            "executed",
+            "intent",
+            "taskId",
+            "taskRevision",
+            "launchingTaskViewId",
+            "instructions",
+            "context"
+          ],
+          "additionalProperties": false
         },
         "prepared": {
           "type": "boolean",
@@ -33,6 +1446,12 @@
     "list": {
       "type": "object",
       "properties": {
+        "proposalRevisions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
         "inventory": {
           "type": "object",
           "properties": {
@@ -116,6 +1535,44 @@
       },
       "additionalProperties": false
     },
+    "prepareDelivery": {
+      "type": "object",
+      "properties": {
+        "review": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "cadence"
+            },
+            "version": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64
+            },
+            "canApprove": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "version",
+            "canApprove"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "reviewDelivery": {
+      "type": "object",
+      "properties": {
+        "review": {
+          "$ref": "#/properties/prepareDelivery/properties/review"
+        }
+      },
+      "additionalProperties": false
+    },
     "applyApproval": {
       "type": "object",
       "properties": {
@@ -135,13 +1592,75 @@
     "create": {
       "type": "object",
       "properties": {
+        "assigneeUserId": {
+          "type": "string",
+          "description": "Actual persisted task owner."
+        },
         "taskId": {
           "type": "string",
           "description": "ID of the created task"
         },
+        "taskViews": {
+          "type": "object",
+          "properties": {
+            "associations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taskViewId": {
+                    "type": "string"
+                  },
+                  "outcome": {
+                    "type": "string",
+                    "enum": [
+                      "associated",
+                      "unavailable"
+                    ]
+                  },
+                  "version": {
+                    "type": "number"
+                  },
+                  "placement": {
+                    "type": "string",
+                    "enum": [
+                      "placed",
+                      "pending",
+                      "unavailable"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "taskViewId",
+                  "outcome"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "placement": {
+              "type": "string",
+              "enum": [
+                "placed",
+                "pending",
+                "unavailable"
+              ]
+            }
+          },
+          "required": [
+            "associations",
+            "placement"
+          ],
+          "additionalProperties": false
+        },
         "conversationId": {
-          "type": "string",
-          "description": "ID of the conversation"
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Conversation ID"
         },
         "scheduledFor": {
           "type": "string",
@@ -287,6 +1806,39 @@
     "update": {
       "type": "object",
       "properties": {
+        "taskViews": {
+          "$ref": "#/properties/create/properties/taskViews"
+        },
+        "isRecoverable": {
+          "type": "boolean"
+        },
+        "taskEffectOutcome": {
+          "$ref": "#/properties/create/properties/outcome",
+          "description": "Persisted task and scheduling outcomes. Never recreate a confirmed task to retry a later effect."
+        },
+        "blocked": {
+          "type": "boolean"
+        },
+        "noAction": {
+          "type": "boolean"
+        },
+        "skipped": {
+          "type": "boolean"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "updated",
+            "unchanged",
+            "blocked",
+            "error"
+          ],
+          "description": "Actual persistence outcome. blocked/unchanged do not mean a task was marked done."
+        },
+        "taskStatus": {
+          "type": "string",
+          "description": "Persisted task status after the update attempt."
+        },
         "taskId": {
           "type": "string",
           "description": "ID of the updated task"
@@ -294,6 +1846,11 @@
         "changed": {
           "type": "boolean",
           "description": "Whether a row actually moved. `success: true` with `changed: false` means nothing was written — the values already matched, or the task is protected from this run."
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Persisted deadline when a date was requested."
         },
         "scheduledFor": {
           "type": "string",

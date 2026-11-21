@@ -21,6 +21,10 @@ Read the returned instructions in full. Account-specific playbook context is ass
 
 Each resource is independently loadable using the same skill name and its exact resource key.
 
+### task-views
+
+On an account with Task Views enabled, use `{"name":"cedar-configuration","resource":"task-views"}` for account-level Task View configuration. Use the dedicated [Task Views skill](/skills/task-views) when organizing work in a particular view.
+
 ### choosing-a-trigger
 
 Load when deciding WHEN a rule should run, or when a rule fires too often — first, when timing is the unknown; when whether it is POSSIBLE is the unknown, check that first (agent-capabilities, limits-and-escalation). Covers the trigger ladder, gates that bind only in playbook prose, conditions no event can observe, and dedup. NOT for a live agent that is not firing — see diagnose-and-repair.
@@ -185,24 +189,3 @@ Load when asked how a user actually edits or accepts drafts: acceptance rate, wh
   "resource": "draft-analytics"
 }
 ```
-
-## Tools and surface compatibility
-
-Use the canonical family tools in your connection’s `tools/list`. Skill source may still mention older granular names. The source dependencies below describe implementation composition; they are **not additional external MCP registrations**. The [complete capability index](/reference/coverage) records callable family/action contracts.
-
-- `billing-read`
-- `usage-observations-read`
-- `usage-observations-retry`
-- `billing-write`
-- `billing-admin`
-- `data-settings`
-- `read-document`
-- `write-document`
-- `list-documents`
-- `read-connection-settings`
-- `get-recent-executions`
-- `get-sent-emails`
-- `diagnose-conversation`
-- `apply-config-change`
-- `execute-conversation-mutation`
-- `send-user-feedback`

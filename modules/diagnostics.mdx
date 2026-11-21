@@ -12,14 +12,14 @@ description: "Trace configuration, execution, and delivery separately."
 4. Read `execution-detail` for its output and tool calls. Child runs require a separate detail call for their own tools.
 5. Use `tool-call-detail` for the full input/output of the failing call.
 
-`health-report` is a broader account snapshot. Organization-wide staff views can omit expensive checks present in an individual report; do not equate a summary with complete account health.
+`health-report` is a broader account snapshot. Use it to inspect the selected account.
 
 ## Common symptoms
 
 | Symptom | Check |
 | --- | --- |
 | Tool absent | OAuth scopes, viewer role, feature gate, deployed version, refreshed tool discovery |
-| Listed tool returns forbidden | Action-specific scope, account role, resource ownership, staff-only action |
+| Listed tool returns forbidden | Action-specific scope, account role, resource ownership |
 | LinkedIn has no seat | Connect/reconnect in Settings; choose an explicit owned seat if several exist |
 | LinkedIn capped | Immediate call failed versus scheduled item deferred; relevant lookup/send window |
 | Slack search asks for reconnection | Missing Slack `search:read` grant |
@@ -31,7 +31,9 @@ description: "Trace configuration, execution, and delivery separately."
 
 ## Test runs are real work
 
-`debug test-run` can execute an authored/edited agent. `deliverForReal: false` suppresses sends, but database and connected-system writes can still happen. It is not a general dry-run mode. Scope the test inputs accordingly. `create-monitor` is Cedar-staff-only, not a customer-facing universal monitor scheduler.
+`debug test-run` can execute an authored/edited agent. `deliverForReal: false` suppresses sends, but database and connected-system writes can still happen. It is not a general dry-run mode. Scope the test inputs accordingly.
+
+For a task prepared in a background run, check the task, its latest saved output and the delivery result separately. An execution can finish successfully while leaving a draft for the rep to review.
 
 ## Report a problem
 

@@ -705,6 +705,12 @@
                 }
               ]
             },
+            "blockedEmailDomains": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "signatureEnabled": {
               "type": [
                 "boolean",
@@ -1236,6 +1242,8 @@
                     "enum": [
                       "text",
                       "number",
+                      "score",
+                      "percent",
                       "date",
                       "boolean",
                       "select",
@@ -1293,6 +1301,30 @@
                               "additionalProperties": false
                             },
                             "maxItems": 3
+                          },
+                          "checklist": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "label": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "instruction": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "label"
+                              ],
+                              "additionalProperties": false
+                            }
                           }
                         },
                         "required": [
@@ -1587,12 +1619,45 @@
               },
               "email": {
                 "type": "string"
+              },
+              "image": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               }
             },
             "required": [
               "id",
               "name",
-              "email"
+              "email",
+              "image"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "teams": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "memberIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "memberIds"
             ],
             "additionalProperties": false
           }
@@ -1600,6 +1665,56 @@
       },
       "required": [
         "members"
+      ],
+      "additionalProperties": false
+    },
+    "userIdentity": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "image": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "isOrganizationAdmin": {
+          "type": "boolean"
+        },
+        "isReadOnly": {
+          "type": "boolean"
+        },
+        "actingAs": {
+          "type": "boolean"
+        },
+        "authenticatedActorUserId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "organizationId",
+        "name",
+        "email",
+        "image",
+        "isOrganizationAdmin",
+        "isReadOnly",
+        "actingAs",
+        "authenticatedActorUserId"
       ],
       "additionalProperties": false
     },

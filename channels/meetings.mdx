@@ -1,7 +1,9 @@
 ---
-title: "Meeting discovery and synchronization"
+title: "Meetings & calendar"
 description: "Find synced calls, recover missing recordings and inspect recorder capabilities."
 ---
+
+To plan the next conversation, use the [calendar skill](/skills/calendar) for availability and [calendar operations](/channels/calendar) for supported event changes. Meeting evidence and calendar changes use separate tool actions.
 
 The `meetings` family separates Cedar's stored evidence from the connected recorder's API.
 
@@ -13,6 +15,8 @@ The `meetings` family separates Cedar's stored evidence from the connected recor
 
 Start with `find` for a named call or pasted recording link. The stored search behaves consistently across recorder providers. A missing meeting may require `sync`, with title, participant or URL filters to narrow its recorder window.
 
-Synchronization requires exactly one match. Zero or multiple matches do not silently choose a meeting; inspect the returned candidates and resolve the ambiguity. Recorder capabilities vary, particularly for transcript-content searches and wide historical windows.
+Synchronization requires exactly one match. Zero or multiple matches do not silently choose a meeting; inspect the returned candidates and resolve the ambiguity. Recorder capabilities vary. Use a narrow date window and a confirmed recorder ID when available. For Circleback, a title fragment or participant domain can narrow the provider search; an exact participant email can still require scanning the selected window. If the recorder rate-limits the request, stop before widening or repeating it.
 
 After discovery, use conversation evidence tools to read the full relevant source. A calendar event is a scheduled appointment; a synced recording is evidence of a meeting that occurred. [Calendar](/channels/calendar) manages the former.
+
+For an internal pipeline meeting, a configured playbook can turn captured commitments into new tasks, updates to existing tasks, or references to work already under way. Use the [pipeline review walkthrough](/recipes/pipeline-review) to check owners and see where the follow-ups landed.

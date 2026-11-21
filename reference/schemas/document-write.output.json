@@ -1,6 +1,10 @@
 {
   "type": "object",
   "properties": {
+    "writeDisposition": {
+      "type": "string",
+      "const": "rejected_before_write"
+    },
     "success": {
       "type": "boolean"
     },

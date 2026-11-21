@@ -10,9 +10,13 @@
         "mutate",
         "reassign-ownership",
         "link-external-crm-deal",
-        "sync-gmail-thread"
+        "sync-gmail-thread",
+        "convert-hubspot-lead",
+        "create-opportunity",
+        "handoff-crm-record",
+        "log-email-activity"
       ],
-      "description": "Which write operation to perform — pass its matching params object below (e.g. action: \"update-fields\" pairs with updateFields: {...})."
+      "description": "Matching params only."
     },
     "create": {
       "type": "object",
@@ -20,32 +24,32 @@
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "Name for the new conversation, e.g. the company or deal name."
+          "description": "Name."
         },
         "status": {
           "type": "string",
-          "description": "Initial status value, e.g. \"Lead\", \"Active\", \"Closed Won\". Must match one of the status options configured in the AOP."
+          "description": "Configured AOP status."
         },
         "aopId": {
           "type": "string",
           "format": "uuid",
-          "description": "ID of the AOP (playbook) to assign to this conversation. Omit to use the default AOP. Use list-aops to list available AOPs."
+          "description": "list-aops UUID; omit for default."
         },
         "priority": {
           "type": "string",
-          "description": "Priority level, e.g. \"High\", \"Medium\", \"Low\". Omit if not applicable."
+          "description": "Omit if inapplicable."
         },
         "nextStep": {
           "type": "string",
-          "description": "Initial next step or action item for this conversation."
+          "description": "Next action."
         },
         "objective": {
           "type": "string",
-          "description": "Goal or objective for this conversation."
+          "description": "Goal."
         },
         "dealValue": {
           "type": "number",
-          "description": "Deal value in the smallest currency unit (e.g. cents for USD)."
+          "description": "Smallest currency unit (USD cents)."
         },
         "participantEmails": {
           "type": "array",
@@ -53,22 +57,22 @@
             "type": "string",
             "format": "email"
           },
-          "description": "Email addresses of the main contacts to link to this conversation. If a single email is provided, that person is set as the main contact."
+          "description": "Contacts; single=primary."
         },
         "companyDomains": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Company domains to link to this conversation, e.g. [\"acme.com\"]. Use lookup-company-fuzzy to resolve the domain if you only know the company name."
+          "description": "Use lookup-company-fuzzy."
         },
         "searchEmails": {
           "type": "boolean",
-          "description": "When true, Cedar will search the user's inbox in the background for past threads involving the linked company domain and attach them to the new conversation. Requires companyDomain to be set."
+          "description": "Attach history; needs companyDomain."
         },
         "companyDomain": {
           "type": "string",
-          "description": "Primary company domain hint used by searchEmails to find historical threads. Required when searchEmails is true."
+          "description": "Required domain if searchEmails."
         }
       },
       "required": [
@@ -83,15 +87,15 @@
         "conversationId": {
           "type": "string",
           "format": "uuid",
-          "description": "Pass after get-conversation; omit only if the active UI conversation ID is in context."
+          "description": "Cedar UUID; optional only in active UI."
         },
         "title": {
           "type": "string",
-          "description": "Required chat approval title: e.g. \"Update deal size to $50K\" or \"Set status to Qualified\"."
+          "description": "Change title."
         },
         "reasoning": {
           "type": "string",
-          "description": "Required: evidence for each value, e.g. \"Email mentioned 600 students enrolled across both programs\"; omit only for a direct user request alone."
+          "description": "Evidence per value; omit only for direct user requests."
         },
         "fields": {
           "type": "array",
@@ -102,6 +106,35 @@
                 "type": "string",
                 "description": "Exact field name from get-conversation."
               },
+              "changeSummary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180,
+                "description": "Text delta; full value separate. No invented counts/resolutions or success. Omit for scalars."
+              },
+              "confidence": {
+                "type": "string",
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "description": "Opt-in only: high=direct; medium=review; low=ask."
+              },
+              "decision": {
+                "type": "string",
+                "enum": [
+                  "change",
+                  "keep"
+                ],
+                "description": "Default change; keep never writes; confident keep silent."
+              },
+              "uncertainty": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000,
+                "description": "Low/medium: missing fact."
+              },
               "mode": {
                 "type": "string",
                 "enum": [
@@ -111,7 +144,7 @@
                   "append",
                   "update"
                 ],
-                "description": "People: upsert value={people:[{id,...changes}]}; history: append complete new entries or update existing IDs in value={entries:[...]}. Omitted properties stay; arrays replace. New rows need all required data. replace=value only; patch=old_string+new_string only. Null/omitted never clears; \"\" clears."
+                "description": "People upsert; history append/update. Keys merge; arrays replace. replace=value; patch=old_string/new_string."
               },
               "value": {
                 "anyOf": [
@@ -174,15 +207,27 @@
                                     "mentioned",
                                     "introduced",
                                     "engaged",
-                                    "should_engage"
+                                    "should_engage",
+                                    "critical_to_engage"
                                   ]
+                                },
+                                "engagementPriority": {
+                                  "type": "string",
+                                  "enum": [
+                                    "critical",
+                                    "recommended",
+                                    "none"
+                                  ]
+                                },
+                                "engagementReason": {
+                                  "type": "string"
                                 },
                                 "roles": {
                                   "type": "array",
                                   "items": {
-                                    "type": "string",
-                                    "minLength": 1
-                                  }
+                                    "type": "string"
+                                  },
+                                  "maxItems": 3
                                 },
                                 "support": {
                                   "type": "string",
@@ -223,7 +268,8 @@
                               "required": [
                                 "id"
                               ],
-                              "additionalProperties": false
+                              "additionalProperties": false,
+                              "description": "New ID: name, engagement, roles, support, summary, evidence required; existing ID: changed properties only."
                             },
                             "maxItems": 40
                           }
@@ -364,11 +410,35 @@
                               },
                               "rubric": {
                                 "type": "string"
+                              },
+                              "checklist": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "label": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "completed": {
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "label",
+                                    "completed"
+                                  ],
+                                  "additionalProperties": false
+                                }
                               }
                             },
                             "required": [
-                              "stage",
-                              "rows"
+                              "stage"
                             ],
                             "additionalProperties": false
                           },
@@ -392,15 +462,15 @@
                     ]
                   }
                 ],
-                "description": "Scalar or native people/history/journey object, or JSON string. Preserve stable IDs. Omit for patches."
+                "description": "Scalar/object/JSON; preserve IDs. Omit for patches."
               },
               "old_string": {
                 "type": "string",
-                "description": "Exact substring appearing once in current value from get-conversation."
+                "description": "Unique current-value substring from get-conversation."
               },
               "new_string": {
                 "type": "string",
-                "description": "Patch replacement text; \"\" deletes old_string."
+                "description": "Patch text; \"\" deletes old_string."
               },
               "signal": {
                 "type": "string",
@@ -409,7 +479,7 @@
                   "yellow",
                   "green"
                 ],
-                "description": "Set only when the field description instructs a signal; follow its red/yellow/green rubric."
+                "description": "Only if instructed; follow field red/yellow/green rubric."
               },
               "signalReasoning": {
                 "type": "string",
@@ -417,19 +487,19 @@
               },
               "reasoning": {
                 "type": "string",
-                "description": "Always provide one sentence linking this field value to event evidence (e.g. \"Tony confirmed department and dean support for the subscription\")."
+                "description": "Evidence: source/person/date; no Why/field/confidence prefix. Gaps in uncertainty. No raw IDs. Use plain language and descriptive verified links; never invent URLs."
               },
               "strength": {
                 "type": "number",
-                "description": "Owned type:list scorecard only (e.g. coaching.followup.rs1): 1–100 rating; value=verbatim evidence, reasoning=one-line justification. All three go on one event atom, never a persistent field. Omit otherwise."
+                "description": "Owned type:list scorecard only: 1–100; value=verbatim evidence, reasoning=justification, together on one event atom, never persistent fields."
               },
               "contextQuote": {
                 "type": "string",
-                "description": "Owned list scorecard full triple only: verbatim lead-in immediately before value. Never fabricate; omit for bare quotes."
+                "description": "Scorecard triple only: verbatim lead-in; omit for bare quotes."
               },
               "reactionQuote": {
                 "type": "string",
-                "description": "Owned list scorecard triple with contextQuote only: other party's verbatim reaction immediately after value; omit if absent."
+                "description": "Scorecard triple with contextQuote: verbatim reaction; omit if absent."
               }
             },
             "required": [
@@ -437,11 +507,11 @@
             ],
             "additionalProperties": false
           },
-          "description": "Only fields get-conversation marks writable=true; otherwise relay blockedReason. Omit/empty only when linking via linkCrmDeal."
+          "description": "get writable fields only; relay blockedReason; empty needs linkCrmDeal."
         },
         "targetDealId": {
           "type": "string",
-          "description": "Multiple linked CRM opportunities: Deal ID from <linked_crm_deal>; otherwise omit."
+          "description": "Deal ID if multiple."
         },
         "linkCrmDeal": {
           "type": "object",
@@ -464,7 +534,7 @@
             "dealId"
           ],
           "additionalProperties": false,
-          "description": "Link a newly-created CRM deal/opportunity: save dealId in integration_metadata and close open crm-opportunity tasks. Runs before field updates so they sync to that deal."
+          "description": "Link dealId before sync; new: create-opportunity."
         }
       },
       "additionalProperties": false
@@ -475,7 +545,7 @@
         "conversationId": {
           "type": "string",
           "format": "uuid",
-          "description": "ID of the conversation to add the event to. This is provided in the <conversation_id> section of your prompt."
+          "description": "Cedar UUID."
         },
         "eventType": {
           "type": "string",
@@ -485,28 +555,28 @@
             "text",
             "custom"
           ],
-          "description": "Type of event: \"meeting\" for in-person or video meetings, \"call\" for phone calls, \"text\" for text/chat messages, \"custom\" for any other interaction."
+          "description": "Meeting, call, chat or custom."
         },
         "title": {
           "type": "string",
           "minLength": 1,
-          "description": "Short descriptive title for the event, e.g. \"Intro call with John\""
+          "description": "Short event title."
         },
         "occurredAt": {
           "type": "string",
-          "description": "ISO 8601 datetime when the event occurred, e.g. \"2026-03-20T14:00:00Z\". Use the current time if not specified."
+          "description": "ISO datetime; default now."
         },
         "description": {
           "type": "string",
-          "description": "Short description of the event."
+          "description": "Event summary."
         },
         "notes": {
           "type": "string",
-          "description": "Personal notes about the event. For meetings stored as meeting.notes; for calls stored as call.notes."
+          "description": "Personal meeting/call.notes."
         },
         "transcript": {
           "type": "string",
-          "description": "Transcript or verbatim content. For meetings stored as meeting.aiNotes; for calls appended to call.notes."
+          "description": "Verbatim; use requirePaste."
         },
         "participants": {
           "type": "array",
@@ -526,15 +596,15 @@
             ],
             "additionalProperties": false
           },
-          "description": "Participants in the event. Only relevant for meetings and calls."
+          "description": "Meeting/call attendees."
         },
         "content": {
           "type": "string",
-          "description": "The full text/message content. Only used when eventType is \"text\"."
+          "description": "Body for eventType:text only."
         },
         "requirePaste": {
           "type": "boolean",
-          "description": "Set to true whenever any transcript content is involved — even if the user already pasted it in the chat. ALWAYS use requirePaste instead of the transcript field. The frontend renders a textarea so the user pastes directly there. Do NOT pass transcript when requirePaste is true."
+          "description": "True for transcripts; omit transcript."
         }
       },
       "required": [
@@ -550,7 +620,7 @@
       "properties": {
         "description": {
           "type": "string",
-          "description": "ONE plain-English sentence describing what will happen — shown to the user in the approval card. No IDs, no technical terms."
+          "description": "Approval card: one plain sentence; no IDs/jargon."
         },
         "mutation": {
           "anyOf": [
@@ -569,26 +639,26 @@
                 "targetConversationId": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Destination conversation ID — an EXISTING deal. Provide this OR newConversation, not both."
+                  "description": "Existing destination; exclusive with newConversation."
                 },
                 "newConversation": {
                   "type": "object",
                   "properties": {
                     "name": {
                       "type": "string",
-                      "description": "Name for the new deal (defaults to the company domain, else \"New deal\")"
+                      "description": "New name; defaults to company domain, else \"New deal\"."
                     },
                     "companyDomain": {
                       "type": "string",
-                      "description": "Domain of the deal's REAL counterparty (the company the deal is actually with), used to tie the company to the new deal. Supply this yourself from the event context — do NOT default to the sender's domain if the event was misrouted, since a wrong sender-domain is usually what caused the misrouting. Omit if genuinely unsure (the deal is created with no primary company)."
+                      "description": "Real counterparty domain from event evidence, not a misrouted sender's domain. Omit if unsure; no primary company is set."
                     },
                     "aopId": {
                       "type": "string",
-                      "description": "AOP to assign to the new deal; omit to let Cedar pick the best one from the event."
+                      "description": "New deal AOP; omit for automatic selection from event."
                     }
                   },
                   "additionalProperties": false,
-                  "description": "Create a NEW deal and move the event onto it. Provide this OR targetConversationId, not both."
+                  "description": "Create destination and move event; exclusive with targetConversationId."
                 }
               },
               "required": [
@@ -638,7 +708,7 @@
                     "full"
                   ],
                   "default": "reconcile",
-                  "description": "'reconcile' (default): re-derive fields + tasks from the events now on the deal — NO draft. 'full': re-run the whole on-event pipeline for one event (incl. drafting) to reproduce a missing output — requires eventId."
+                  "description": "reconcile: fields+tasks, no draft (default). full: rerun one event including drafting; requires eventId."
                 },
                 "eventId": {
                   "type": "string",
@@ -698,12 +768,12 @@
                 "sourceConversationId": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Conversation to merge FROM — all its events, tasks, and history will be moved into the target, then it will be deleted"
+                  "description": "Source: move events/tasks/history to target, then delete."
                 },
                 "targetConversationId": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Conversation to merge INTO — this one survives"
+                  "description": "Surviving target conversation."
                 }
               },
               "required": [
@@ -723,12 +793,12 @@
                 "sourceCompanyId": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Company to merge FROM — will be aliased to the target permanently"
+                  "description": "Source company: permanently alias to target."
                 },
                 "targetCompanyId": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Company to merge INTO — the canonical company that survives"
+                  "description": "Surviving canonical company."
                 }
               },
               "required": [
@@ -752,7 +822,7 @@
                 "dryRun": {
                   "type": "boolean",
                   "default": true,
-                  "description": "When true, previews what would change without applying"
+                  "description": "Preview only when true."
                 }
               },
               "required": [
@@ -771,7 +841,7 @@
                 "conversationId": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Let Cedar's AI re-pick the best AOP from this conversation's email history"
+                  "description": "Repick AOP from this conversation’s email history."
                 }
               },
               "required": [
@@ -807,7 +877,7 @@
         },
         "conversationId": {
           "type": "string",
-          "description": "Primary conversation ID for the card UI context (shown alongside description)."
+          "description": "Primary conversation ID for approval card."
         }
       },
       "required": [
@@ -822,11 +892,11 @@
         "conversationId": {
           "type": "string",
           "format": "uuid",
-          "description": "ID of the conversation to reassign ownership of."
+          "description": "Cedar UUID."
         },
         "newOwnerUserId": {
           "type": "string",
-          "description": "Cedar user ID of the org member who should become the new owner."
+          "description": "New owner’s Cedar org member ID."
         }
       },
       "required": [
@@ -839,9 +909,7 @@
       "type": "object",
       "properties": {
         "conversationId": {
-          "type": "string",
-          "format": "uuid",
-          "description": "The Cedar conversation to link — NOT the external CRM's own record id."
+          "$ref": "#/properties/reassignOwnership/properties/conversationId"
         },
         "providerId": {
           "type": "string",
@@ -855,7 +923,7 @@
         "dealId": {
           "type": "string",
           "minLength": 1,
-          "description": "The external CRM's own deal/opportunity id — from search-external-crm-deals's result."
+          "description": "External deal ID from search-external-crm-deals."
         }
       },
       "required": [
@@ -864,30 +932,217 @@
         "dealId"
       ],
       "additionalProperties": false,
-      "description": "Operates on the user's connected EXTERNAL CRM (Salesforce/HubSpot/Attio/Copper) — NOT Cedar's own conversation records (that's `find`). If it's unclear whether the user means \"search Cedar's deals\" or \"search our Salesforce/HubSpot\", ask before calling either."
+      "description": "External CRM; clarify ambiguity."
     },
     "syncGmailThread": {
       "type": "object",
       "properties": {
         "conversationId": {
-          "type": "string",
-          "format": "uuid",
-          "description": "The EXISTING Cedar deal to pull the email into."
+          "$ref": "#/properties/reassignOwnership/properties/conversationId"
         },
         "threadId": {
           "type": "string",
-          "description": "Exact Gmail thread id, if you already have it. Provide this OR searchQuery."
+          "description": "Gmail ID or searchQuery."
         },
         "searchQuery": {
           "type": "string",
-          "description": "A Gmail search string (full Gmail syntax, e.g. \"from:jane@acme.com subject:intro after:2026/01/01\") to find the thread when you do not have its id. If several threads match, the tool returns them as candidates for you to disambiguate rather than guessing. Provide this OR threadId."
+          "description": "Alternative to threadId; disambiguate."
         }
       },
       "required": [
         "conversationId"
       ],
       "additionalProperties": false,
-      "description": "Search the user's LIVE Gmail for an email that never synced into Cedar and pull it into an existing deal, where it processes like a normal inbound (draft included). Use this only AFTER find-event confirms the email is not in Cedar at all — it is the \"bring it in from the mailbox\" repair."
+      "description": "Check find-event first; imports live Gmail, processes drafts."
+    },
+    "convertHubspotLead": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Source Lead conversation UUID; native ID is server-resolved."
+        },
+        "targetDealAopId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Source owner's active Deals playbook UUID."
+        },
+        "dealName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "dealPipelineId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Configured Deal pipeline ID; never choose a default."
+        },
+        "dealStageId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Configured open Deal stage ID."
+        },
+        "qualifiedStageId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Qualified stage ID in the source Lead pipeline."
+        }
+      },
+      "required": [
+        "conversationId",
+        "targetDealAopId",
+        "dealName",
+        "dealPipelineId",
+        "dealStageId",
+        "qualifiedStageId"
+      ],
+      "additionalProperties": false
+    },
+    "createOpportunity": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "hubspot",
+            "salesforce",
+            "attio"
+          ]
+        },
+        "intentKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "default": "new-business",
+          "description": "First sale: new-business. Renewal/upsell: explicit distinct cycle/product. Never company alias, event ID or run ID."
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 12000
+        },
+        "instructions": {
+          "type": "string",
+          "maxLength": 100000
+        },
+        "proposedFields": {
+          "type": "object",
+          "additionalProperties": {},
+          "default": {}
+        },
+        "associations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "description": "fromType,toType,toId; optional fromId ($opportunity), sourced name,label,Attio field."
+        },
+        "approvalMode": {
+          "type": "string",
+          "enum": [
+            "required",
+            "automatic"
+          ],
+          "default": "required"
+        },
+        "notifySettings": {
+          "type": "object",
+          "additionalProperties": {},
+          "description": "notify:boolean, slackChannelId, threadTs, message, receiptMessage; dealContext:{pricingTerms,counterparty,evidence,nextStep,baaOwner,stageEvidence,closeDateBasis:estimated/agreed}."
+        },
+        "savedTask": {
+          "type": "object",
+          "properties": {
+            "taskId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "revision": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "taskId",
+            "revision"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "conversationId",
+        "provider",
+        "summary"
+      ],
+      "additionalProperties": false
+    },
+    "handoffCrmRecord": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Source CRM-bound conversation UUID."
+        },
+        "targetAopId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Source owner's active destination playbook UUID."
+        },
+        "targetRecordId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Existing target record ID; source resolves provider/account, target playbook resolves object."
+        }
+      },
+      "required": [
+        "conversationId",
+        "targetAopId",
+        "targetRecordId"
+      ],
+      "additionalProperties": false
+    },
+    "logEmailActivity": {
+      "type": "object",
+      "properties": {
+        "threadId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "messageId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Exact message in the selected mailbox thread."
+        },
+        "conversationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "provider": {
+          "type": "string",
+          "const": "hubspot",
+          "description": "CRM providers with an email activity writer."
+        },
+        "dealId": {
+          "type": "string",
+          "pattern": "^[1-9]\\d{0,24}$",
+          "description": "Existing linked external deal ID."
+        }
+      },
+      "required": [
+        "threadId",
+        "messageId",
+        "conversationId",
+        "provider",
+        "dealId"
+      ],
+      "additionalProperties": false
     },
     "user_request_summary": {
       "type": "string",

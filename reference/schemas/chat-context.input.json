@@ -26,7 +26,8 @@
                   "linkedin_chat",
                   "whatsapp_chat",
                   "file",
-                  "task"
+                  "task",
+                  "sequence"
                 ]
               },
               "id": {
@@ -97,7 +98,7 @@
       "properties": {
         "query": {
           "type": "string",
-          "description": "The name/phrase to resolve, e.g. \"Numeral\" or \"the Acme deal\"."
+          "description": "The name/phrase to resolve, e.g. \"Example Account\" or \"the Example Account deal\"."
         },
         "kind": {
           "type": "string",
@@ -108,7 +109,8 @@
             "linkedin_chat",
             "whatsapp_chat",
             "file",
-            "task"
+            "task",
+            "sequence"
           ],
           "default": "conversation",
           "description": "Entity kind to resolve. Only \"conversation\" is supported today."

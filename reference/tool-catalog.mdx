@@ -3,9 +3,9 @@ title: "Tool catalog"
 description: "Every registered tool, grouped by module and availability."
 ---
 
-This inventory covers **44 external registrations** (including staff and feature-gated tools), **8 Cedar-app-only tools**, and **20 registered skills**. Customer connections receive only the tools their scopes, role, and features permit.
+Use this catalog to find tools by product area. Each reference identifies where the tool is available. Your role, scopes and enabled features determine which tools appear in your connection’s `tools/list`.
 
-Every action and nested configuration variant is indexed in the [capability coverage index](/reference/coverage). Every skill and resource is listed in the [skill catalog](/skills/index). [Download the complete catalog](/reference/catalog.json).
+Action selectors and nested configuration options are indexed in the [capability coverage index](/reference/coverage). Registered skill families and their named resources are listed in the [skill catalog](/skills/catalog). [Download the complete catalog](/reference/catalog.json).
 
 ## Overview
 
@@ -31,17 +31,17 @@ Every action and nested configuration variant is indexed in the [capability cove
 
 - [`send-user-feedback`](/reference/send-user-feedback)
 
-### Staff administration
-
-- [`analytics`](/reference/analytics)
-- [`billing-admin`](/reference/billing-admin)
-- [`cedar-staff-debug`](/reference/cedar-staff-debug)
-
 ## Agent platform
+
+### Agents
+
+- [`agent`](/reference/agent)
 
 ### User tasks
 
 - [`task`](/reference/task)
+- [`sequence`](/reference/sequence)
+- [`task-views-read` and `task-views-write`](/reference/task-views)
 
 ### Playbooks and triggers
 
@@ -131,6 +131,8 @@ Every action and nested configuration variant is indexed in the [capability cove
 ### Enrichment and research tools
 
 - [`research`](/reference/research)
+- [`website` (app only)](/reference/website)
+- [`research-job` (app only)](/reference/research-job)
 
 ### Data services
 
@@ -171,6 +173,10 @@ Every action and nested configuration variant is indexed in the [capability cove
 
 - [`table`](/reference/table)
 
+### Graphs
+
+- [`graph`](/reference/graph)
+
 ### Boards
 
 - [`board`](/reference/board)
@@ -181,4 +187,4 @@ Every action and nested configuration variant is indexed in the [capability cove
 
 ## Surface boundaries
 
-App-only operations are labeled inside their parent area with explicit availability warnings. Graphs, outbound flow creation and third-party campaign management do not become external MCP operations merely because related Cedar features exist. See [capability boundaries](/getting-started/capability-boundaries).
+App-only operations are labeled inside their parent area with explicit availability warnings. Enabled accounts can edit their authorized deal org charts and author reviewable sequence drafts. Creating a draft does not enroll a person or start sending. Third-party campaign management remains outside this contract. See [capability boundaries](/getting-started/capability-boundaries).

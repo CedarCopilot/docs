@@ -6,6 +6,10 @@ description: "Configure connected Salesforce, HubSpot, Attio and Copper behavior
 
 `connection-write` changes the behavior of an existing connected integration. Read `config-read read-settings` with `sections: ["connections"]` first; each operation needs the correct connection ID and current configuration.
 
+## Control output on unlinked conversations
+
+If your account requires a linked external CRM deal for agent outputs, Cedar generally holds drafts, response tasks and scheduled follow-ups on unlinked conversations. The playbook can allow a high-signal exception. Creating or linking the opportunity itself is exempt from this output rule. Once a deal is linked, normal stage rules and approvals still apply.
+
 ## Mapping values
 
 `update_crm_field_mappings` supports adding, updating and removing mappings between Cedar fields and provider fields, including supported template mappings and per-placeholder transforms. Multi-select handling belongs in the mapping configuration where supported.

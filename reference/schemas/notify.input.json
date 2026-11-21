@@ -12,6 +12,65 @@
     "send": {
       "type": "object",
       "properties": {
+        "presentation": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "company": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "person": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000
+            }
+          },
+          "required": [
+            "type",
+            "summary"
+          ],
+          "additionalProperties": false,
+          "description": "For background notifications supply presentation {type, company?, person?, summary} and why {reason, instructionPaths?}. Use verified names and one short source-grounded summary; Cedar owns the header and Why / change this button. Put full prep/details in slack.threadReplies. Keep internal IDs in hidden task/source context, never visible prose; use verified descriptive source links. No raw IDs. Use plain language and descriptive verified links; never invent URLs. For saved output pass its returned taskId. Preserve drafting eligibility, destinations and custom content. Do not invent a draft, contact, source URL or reason. Use the saved document ID with Cedar App Links for Open prep; never append an agent path inside a conversationId query value."
+        },
+        "why": {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "instructionPaths": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "maxItems": 2
+            }
+          },
+          "required": [
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "taskId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Exact saved task ID when notifying about task output. Its current owner and Task View notification policy are verified; omit for general notifications."
+        },
         "text": {
           "type": "string",
           "description": "Delivered to the user's chosen notification channel (Slack, email, iMessage, or WhatsApp)."
@@ -57,7 +116,15 @@
                         "default": "default"
                       },
                       "op": {
-                        "type": "string",
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "string",
+                            "const": "why_change_task"
+                          }
+                        ],
                         "description": "Operation key from the registry, e.g. cancel_task, snooze_task, agent_prompt"
                       },
                       "args": {
@@ -145,7 +212,7 @@
                     "description": "Slack shortcode e.g. white_check_mark"
                   },
                   "op": {
-                    "type": "string"
+                    "$ref": "#/properties/send/properties/slack/properties/buttons/items/anyOf/0/properties/op/anyOf/0"
                   },
                   "args": {
                     "type": "object",
@@ -227,7 +294,7 @@
                     ]
                   },
                   "op": {
-                    "type": "string"
+                    "$ref": "#/properties/send/properties/slack/properties/buttons/items/anyOf/0/properties/op/anyOf/0"
                   },
                   "args": {
                     "type": "object",

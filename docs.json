@@ -1,8 +1,8 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Cedar MCP",
-  "description": "Build GTM workflows with Cedar: LinkedIn, signals, Slack, email, CRM, and automation.",
+  "name": "Cedar",
+  "description": "Use Cedar to review your pipeline, prepare outreach, manage tasks and automate RevOps workflows.",
   "colors": {
     "primary": "#34785A",
     "light": "#4C9873",
@@ -23,268 +23,430 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Overview",
+        "tab": "Start here",
         "groups": [
           {
-            "group": "Get started",
+            "group": "Getting started",
             "pages": [
               "index",
-              "getting-started/modules",
+              "getting-started/welcome",
               "getting-started/quickstart",
-              "getting-started/calling-tools",
-              "getting-started/permissions",
-              "getting-started/capability-boundaries"
+              "getting-started/human-in-the-loop",
+              "getting-started/modules"
             ]
           },
           {
-            "group": "Reference and recipes",
+            "group": "Where reps work",
             "pages": [
-              "reference/index",
-              "reference/coverage",
-              "recipes/gtm-engineer",
-              "recipes/website-to-outreach"
-            ]
-          },
-          {
-            "group": "Workspace tools",
-            "pages": [
-              {
-                "group": "Saved views",
-                "pages": [
-                  "workspace/saved-views",
-                  "capabilities/views",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/ui-config"
-                    ]
-                  }
-                ]
-              },
+              "getting-started/first-deal",
+              "slack/task-views",
+              "workspace/review-with-mcp",
               {
                 "group": "Workspace preferences",
                 "pages": [
                   "workspace/preferences",
-                  "capabilities/workspace",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/workspace-write"
-                    ]
-                  }
+                  "capabilities/workspace"
                 ]
               }
             ]
           },
           {
-            "group": "Administration and support",
+            "group": "Where outputs go",
             "pages": [
+              "tasks/task-views",
+              "workspace/conversation-overview",
               {
-                "group": "Billing",
+                "group": "Saved views",
                 "pages": [
-                  "modules/billing",
-                  "capabilities/billing",
-                  "operations/billing-and-budgets",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/billing-read",
-                      "reference/billing-write"
-                    ]
-                  }
+                  "workspace/saved-views",
+                  "capabilities/views"
                 ]
               },
-              {
-                "group": "Usage and delivery recovery",
-                "pages": [
-                  "channels/usage",
-                  "capabilities/usage",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/usage-observations-read",
-                      "reference/usage-observations-retry"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Customer support",
-                "pages": [
-                  "channels/support",
-                  "capabilities/support",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/send-user-feedback"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Staff administration",
-                "pages": [
-                  "operations/support-and-staff",
-                  "capabilities/staff",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/analytics",
-                      "reference/billing-admin",
-                      "reference/cedar-staff-debug"
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Agent platform",
-        "groups": [
-          {
-            "group": "Agent platform",
-            "pages": [
-              "agent-platform/overview",
-              "operations/app-only"
-            ]
-          },
-          {
-            "group": "Work and outputs",
-            "pages": [
               {
                 "group": "User tasks",
                 "pages": [
                   "tasks/overview",
                   "capabilities/tasks",
-                  "workspace/tasks",
-                  "tasks/visibility",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/task"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Specialized documents",
-                "pages": [
-                  "agent-platform/specialized-documents",
-                  "documents/lists-and-agendas",
-                  "agent-platform/table-workspaces",
-                  "documents/reports",
-                  "documents/flowcharts"
+                  "tasks/visibility"
                 ]
               }
             ]
           },
           {
-            "group": "Build agents",
+            "group": "Agent outputs",
             "pages": [
               {
-                "group": "Agents",
+                "group": "Message drafts",
                 "pages": [
-                  "agent-platform/lifecycle",
-                  "agent-platform/library",
-                  "agent-platform/system-agents",
-                  "automation/agent-authoring"
+                  "channels/drafting",
+                  "capabilities/drafting"
                 ]
               },
               {
-                "group": "Playbooks and triggers",
+                "group": "Workflow documents",
                 "pages": [
-                  "automation/playbooks",
-                  "capabilities/playbooks",
+                  "agent-platform/workflows",
+                  "capabilities/workflows"
+                ]
+              },
+              {
+                "group": "Reports and coaching",
+                "pages": [
+                  "documents/reports"
+                ]
+              },
+              "documents/deal-rooms",
+              {
+                "group": "Documents and briefs",
+                "pages": [
+                  "modules/documents-tables",
+                  "capabilities/documents",
+                  "documents/sharing",
+                  "knowledge/templates",
+                  {
+                    "group": "Specialized documents",
+                    "pages": [
+                      "agent-platform/specialized-documents",
+                      "documents/lists-and-agendas",
+                      "documents/flowcharts"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Tables",
+                "pages": [
+                  "documents/tables",
+                  "capabilities/tables",
+                  "agent-platform/table-workspaces"
+                ]
+              },
+              {
+                "group": "Boards",
+                "pages": [
+                  "agent-platform/boards",
+                  "capabilities/boards"
+                ]
+              },
+              {
+                "group": "Org charts and maps",
+                "pages": [
+                  "agent-platform/graphs"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Agent execution",
+            "pages": [
+              {
+                "group": "Cedar’s agent harness",
+                "pages": [
+                  "agent-platform/execution",
                   "agent-platform/triggers",
                   "agent-platform/invocations",
                   {
-                    "group": "Tool reference",
+                    "group": "Agents",
                     "pages": [
-                      "reference/aop-write"
+                      "agent-platform/lifecycle",
+                      "agent-platform/library",
+                      "agent-platform/system-agents",
+                      "automation/agent-authoring"
+                    ]
+                  },
+                  {
+                    "group": "Files, memory and outputs",
+                    "pages": [
+                      "agent-platform/files-memory"
+                    ]
+                  },
+                  {
+                    "group": "Agent permissions and sharing",
+                    "pages": [
+                      "agent-platform/permissions",
+                      "agent-platform/sharing"
+                    ]
+                  },
+                  {
+                    "group": "Delegation and code execution",
+                    "pages": [
+                      "agent-platform/delegation",
+                      "capabilities/delegation",
+                      "automation/batch-operations"
+                    ]
+                  },
+                  {
+                    "group": "Chat context and history",
+                    "pages": [
+                      "agent-platform/chat",
+                      "capabilities/chat"
+                    ]
+                  },
+                  {
+                    "group": "Diagnostics",
+                    "pages": [
+                      "modules/diagnostics",
+                      "capabilities/diagnostics",
+                      "agent-platform/observability"
+                    ]
+                  },
+                  "skills/cedar-configuration",
+                  "skills/agent-setup"
+                ]
+              },
+              "agent-platform/your-runtime",
+              "agent-platform/overview",
+              "operations/app-only"
+            ]
+          },
+          {
+            "group": "Agent superpowers",
+            "pages": [
+              {
+                "group": "Work across channels",
+                "pages": [
+                  {
+                    "group": "LinkedIn",
+                    "pages": [
+                      "linkedin/overview",
+                      "capabilities/linkedin",
+                      "linkedin/prospecting",
+                      "linkedin/messaging",
+                      "linkedin/limits",
+                      "automation/queueing"
+                    ]
+                  },
+                  {
+                    "group": "Slack",
+                    "pages": [
+                      "slack/overview",
+                      "capabilities/slack",
+                      "slack/watch-channels",
+                      "slack/notifications"
+                    ]
+                  },
+                  {
+                    "group": "Email",
+                    "pages": [
+                      "modules/email",
+                      "capabilities/email",
+                      "email/search-and-attachments",
+                      "email/drafts-and-delivery",
+                      "skills/drafting",
+                      "email/tracking",
+                      "capabilities/email-tracking"
+                    ]
+                  },
+                  {
+                    "group": "Meetings & calendar",
+                    "pages": [
+                      "channels/meetings",
+                      "modules/tasks-calendar",
+                      "capabilities/meetings",
+                      "channels/calendar",
+                      "capabilities/calendar",
+                      "skills/calendar"
+                    ]
+                  },
+                  {
+                    "group": "All channels",
+                    "pages": [
+                      "channels/overview",
+                      "integrations/whatsapp",
+                      "channels/imessage"
                     ]
                   }
                 ]
               },
               {
-                "group": "Files, memory and outputs",
+                "group": "Understand accounts & buyers",
                 "pages": [
-                  "agent-platform/files-memory"
+                  {
+                    "group": "Research & enrich accounts",
+                    "pages": [
+                      "modules/research",
+                      "skills/research",
+                      "enrichment/overview",
+                      "enrichment/web-app",
+                      "enrichment/column-builder",
+                      "enrichment/fields",
+                      "capabilities/research",
+                      "channels/data-services",
+                      "capabilities/data-services"
+                    ]
+                  },
+                  "intelligence/lead-qualification",
+                  "intelligence/buying-committee",
+                  {
+                    "group": "Monitor buying signals",
+                    "pages": [
+                      "signals/overview",
+                      "capabilities/signals",
+                      "signals/watchers",
+                      "signals/website",
+                      "signals/internal"
+                    ]
+                  },
+                  {
+                    "group": "Search the knowledge base",
+                    "pages": [
+                      "knowledge/overview",
+                      "skills/knowledge-base"
+                    ]
+                  }
                 ]
               },
               {
-                "group": "Agent permissions and sharing",
+                "group": "Maintain CRM & analyze revenue",
                 "pages": [
-                  "agent-platform/permissions",
-                  "agent-platform/sharing"
+                  {
+                    "group": "Extract fields & maintain CRM",
+                    "pages": [
+                      "modules/crm",
+                      "skills/conversation",
+                      "skills/field-query",
+                      "skills/multi-conversation-operations",
+                      "capabilities/crm",
+                      "crm/search-and-evidence",
+                      "crm/records-and-repair",
+                      "crm/field-history",
+                      "capabilities/field-intelligence"
+                    ]
+                  },
+                  {
+                    "group": "Review & forecast pipeline",
+                    "pages": [
+                      "intelligence/overview",
+                      "skills/deal-intelligence-analysis",
+                      "skills/run-sql",
+                      "crm/metrics",
+                      "capabilities/crm-analytics",
+                      "intelligence/statistical-backing",
+                      "intelligence/deal-analysis"
+                    ]
+                  },
+                  {
+                    "group": "Coach reps",
+                    "pages": [
+                      "intelligence/coaching",
+                      "skills/coaching"
+                    ]
+                  },
+                  {
+                    "group": "Analyze customer & competitive themes",
+                    "pages": [
+                      "intelligence/customer-themes",
+                      "skills/analysis-decomposition"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Prepare & coordinate work",
+                "pages": [
+                  {
+                    "group": "Manage next steps & tasks",
+                    "pages": [
+                      "workspace/tasks",
+                      "skills/tasks",
+                      "skills/task-views",
+                      "skills/task-view-analytics",
+                      "skills/notifications",
+                      "channels/notifications",
+                      "capabilities/notifications"
+                    ]
+                  },
+                  {
+                    "group": "Build outreach sequences",
+                    "pages": [
+                      "automation/outreach-sequences",
+                      "channels/scheduling",
+                      "capabilities/scheduling"
+                    ]
+                  },
+                  {
+                    "group": "Create briefs & collateral",
+                    "pages": [
+                      "knowledge/collateral",
+                      "skills/documents",
+                      "skills/collateral"
+                    ]
+                  },
+                  {
+                    "group": "Build tables & boards",
+                    "pages": [
+                      "documents/build-tables-and-boards",
+                      "skills/tables"
+                    ]
+                  },
+                  {
+                    "group": "Use connected tools",
+                    "pages": [
+                      "agent-platform/connected-tools",
+                      "skills/external-systems",
+                      "skills/connected-systems"
+                    ]
+                  }
                 ]
               }
             ]
           },
           {
-            "group": "Platform tools",
+            "group": "Foundation",
             "pages": [
               {
-                "group": "Connected systems",
+                "group": "Sales strategy and playbooks",
+                "pages": [
+                  "automation/playbooks",
+                  "capabilities/playbooks"
+                ]
+              },
+              {
+                "group": "Deal context and evidence",
+                "pages": [
+                  "brain/overview",
+                  "brain/evidence-and-records",
+                  "brain/visibility",
+                  {
+                    "group": "SQL reporting",
+                    "pages": [
+                      "channels/sql",
+                      "capabilities/sql"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Connected data sources",
                 "pages": [
                   "integrations/external-systems",
                   "capabilities/systems",
-                  "agent-platform/connected-tools",
                   {
-                    "group": "Tool reference",
+                    "group": "Connections",
                     "pages": [
-                      "reference/systems-write",
-                      "reference/external-mcp"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Workflow buttons",
-                "pages": [
-                  "agent-platform/workflows",
-                  "capabilities/workflows",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/workflow"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Delegation and code execution",
-                "pages": [
-                  "agent-platform/delegation",
-                  "capabilities/delegation",
-                  "automation/batch-operations",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/delegate"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Chat context and history",
-                "pages": [
-                  "agent-platform/chat",
-                  "capabilities/chat",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/chat-context",
-                      "reference/search-chat-history",
-                      "reference/load-chat-history",
-                      "reference/switch-chat-thread"
+                      "configuration/crm-connections",
+                      "capabilities/connections"
                     ]
                   }
                 ]
               }
             ]
           },
+          {
+            "group": "RevOps playbooks",
+            "pages": [
+              "recipes/gtm-engineer",
+              "recipes/account-research",
+              "recipes/website-to-outreach",
+              "recipes/pipeline-review",
+              "recipes/person-outreach-sequence"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Administration & support",
+        "groups": [
           {
             "group": "Configuration and teams",
             "pages": [
@@ -293,27 +455,14 @@
                 "pages": [
                   "modules/configuration",
                   "capabilities/configuration",
-                  "configuration/fields",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/config-read",
-                      "reference/config-write"
-                    ]
-                  }
+                  "configuration/fields"
                 ]
               },
               {
                 "group": "Organization administration",
                 "pages": [
                   "configuration/team",
-                  "capabilities/organization",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/config-propagate"
-                    ]
-                  }
+                  "capabilities/organization"
                 ]
               },
               {
@@ -325,521 +474,155 @@
             ]
           },
           {
-            "group": "Skills and resources",
+            "group": "Billing",
             "pages": [
-              {
-                "group": "Skill loading",
-                "pages": [
-                  "reference/skills",
-                  "capabilities/skills",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/load-skill",
-                      "reference/load-brain-skills"
-                    ]
-                  }
-                ]
-              },
-              "skills/index",
-              {
-                "group": "Workflow skills",
-                "pages": [
-                  "skills/drafting",
-                  "skills/knowledge-base",
-                  "skills/calendar",
-                  "skills/conversation",
-                  "skills/tasks",
-                  "skills/multi-conversation-operations",
-                  "skills/customer-support",
-                  "skills/external-systems",
-                  "skills/connected-systems",
-                  "skills/research",
-                  "skills/documents",
-                  "skills/tables",
-                  "skills/notifications",
-                  "skills/cedar-configuration",
-                  "skills/collateral",
-                  "skills/coaching",
-                  "skills/run-sql",
-                  "skills/field-query"
-                ]
-              },
-              {
-                "group": "Brain analysis skills",
-                "pages": [
-                  "skills/deal-intelligence-analysis",
-                  "skills/analysis-decomposition"
-                ]
-              }
+              "modules/billing",
+              "capabilities/billing",
+              "operations/billing-and-budgets"
             ]
           },
           {
-            "group": "Operate and observe",
+            "group": "Usage and delivery recovery",
             "pages": [
-              {
-                "group": "Execution and queues",
-                "pages": [
-                  "agent-platform/execution"
-                ]
-              },
-              {
-                "group": "Diagnostics",
-                "pages": [
-                  "modules/diagnostics",
-                  "capabilities/diagnostics",
-                  "agent-platform/observability",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/debug"
-                    ]
-                  }
-                ]
-              }
+              "channels/usage",
+              "capabilities/usage"
+            ]
+          },
+          {
+            "group": "Customer support",
+            "pages": [
+              "channels/support",
+              "capabilities/support",
+              "skills/customer-support"
             ]
           }
         ]
       },
       {
-        "tab": "Channels",
+        "tab": "MCP reference",
         "groups": [
+          {
+            "group": "Using the MCP",
+            "pages": [
+              "reference/tool-catalog",
+              "getting-started/calling-tools",
+              "getting-started/permissions",
+              "getting-started/capability-boundaries",
+              "reference/coverage",
+              "skills/catalog",
+              "reference/skills",
+              "capabilities/skills"
+            ]
+          },
+          {
+            "group": "Workspace and administration",
+            "pages": [
+              "reference/ui-config",
+              "reference/workspace-write",
+              "reference/billing-read",
+              "reference/billing-write",
+              "reference/usage-observations-read",
+              "reference/usage-observations-retry",
+              "reference/send-user-feedback",
+              "reference/config-read",
+              "reference/config-write",
+              "reference/config-propagate",
+              "reference/connection-write"
+            ]
+          },
+          {
+            "group": "Agents and work",
+            "pages": [
+              "reference/task",
+              "reference/task-views",
+              "reference/agent",
+              "reference/aop-write",
+              "reference/systems-write",
+              "reference/external-mcp",
+              "reference/workflow",
+              "reference/delegate",
+              "reference/chat-context",
+              "reference/search-chat-history",
+              "reference/load-chat-history",
+              "reference/switch-chat-thread",
+              "reference/load-skill",
+              "reference/load-brain-skills",
+              "reference/debug",
+              "reference/sequence"
+            ]
+          },
           {
             "group": "Channels",
             "pages": [
-              "channels/overview"
+              "reference/linkedin-read",
+              "reference/linkedin-write",
+              "reference/email-tracking",
+              "reference/mail",
+              "reference/send-email",
+              "reference/slack-read",
+              "reference/slack-write",
+              "reference/meetings",
+              "reference/calendar",
+              "reference/draft-comms",
+              "reference/schedule-send",
+              "reference/notify"
             ]
           },
-          {
-            "group": "Communication channels",
-            "pages": [
-              {
-                "group": "LinkedIn",
-                "pages": [
-                  "linkedin/overview",
-                  "capabilities/linkedin",
-                  "linkedin/prospecting",
-                  "linkedin/messaging",
-                  "linkedin/limits",
-                  "automation/queueing",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/linkedin-read",
-                      "reference/linkedin-write"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Email",
-                "pages": [
-                  "modules/email",
-                  "capabilities/email",
-                  "email/search-and-attachments",
-                  "email/drafts-and-delivery",
-                  {
-                    "group": "Email tracking",
-                    "pages": [
-                      "email/tracking",
-                      "capabilities/email-tracking",
-                      {
-                        "group": "Tool reference",
-                        "pages": [
-                          "reference/email-tracking"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/mail",
-                      "reference/send-email"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Slack",
-                "pages": [
-                  "slack/overview",
-                  "capabilities/slack",
-                  "slack/watch-channels",
-                  "slack/notifications",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/slack-read",
-                      "reference/slack-write"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "WhatsApp",
-                "pages": [
-                  "integrations/whatsapp"
-                ]
-              },
-              {
-                "group": "iMessage",
-                "pages": [
-                  "channels/imessage"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Meetings and calendars",
-            "pages": [
-              {
-                "group": "Meetings",
-                "pages": [
-                  "modules/tasks-calendar",
-                  "capabilities/meetings",
-                  "channels/meetings",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/meetings"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Calendar",
-                "pages": [
-                  "channels/calendar",
-                  "capabilities/calendar",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/calendar"
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Shared channel tools",
-            "pages": [
-              {
-                "group": "Drafting",
-                "pages": [
-                  "channels/drafting",
-                  "capabilities/drafting",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/draft-comms"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Message scheduling",
-                "pages": [
-                  "channels/scheduling",
-                  "capabilities/scheduling",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/schedule-send"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Notifications",
-                "pages": [
-                  "channels/notifications",
-                  "capabilities/notifications",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/notify"
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Enrichment",
-        "groups": [
           {
             "group": "Enrichment",
             "pages": [
-              "enrichment/overview"
+              "reference/research",
+              "reference/website",
+              "reference/research-job",
+              "reference/data-settings"
             ]
           },
           {
-            "group": "Web app",
+            "group": "Pipeline and signals",
             "pages": [
-              {
-                "group": "Enrichment web module",
-                "pages": [
-                  "enrichment/web-app",
-                  "enrichment/column-builder",
-                  "enrichment/fields"
-                ]
-              }
+              "reference/conversation-analytics",
+              "reference/signals-read",
+              "reference/signals-write"
             ]
           },
           {
-            "group": "Tools and provider configuration",
+            "group": "Brain",
             "pages": [
-              {
-                "group": "Enrichment and research tools",
-                "pages": [
-                  "modules/research",
-                  "capabilities/research",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/research"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Data services",
-                "pages": [
-                  "channels/data-services",
-                  "capabilities/data-services",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/data-settings"
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Pipeline intelligence",
-        "groups": [
-          {
-            "group": "Pipeline intelligence",
-            "pages": [
-              "intelligence/overview"
-            ]
-          },
-          {
-            "group": "Metrics and analysis",
-            "pages": [
-              {
-                "group": "CRM analytics",
-                "pages": [
-                  "crm/metrics",
-                  "capabilities/crm-analytics",
-                  "intelligence/statistical-backing",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/conversation-analytics"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Deal and pipeline analysis",
-                "pages": [
-                  "intelligence/deal-analysis"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Signals and monitoring",
-            "pages": [
-              {
-                "group": "Signals",
-                "pages": [
-                  "signals/overview",
-                  "capabilities/signals",
-                  "signals/watchers",
-                  "signals/website",
-                  "signals/internal",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/signals-read",
-                      "reference/signals-write"
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Coaching and outputs",
-            "pages": [
-              {
-                "group": "Coaching",
-                "pages": [
-                  "intelligence/coaching"
-                ]
-              },
-              {
-                "group": "Collateral",
-                "pages": [
-                  "knowledge/collateral"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Brain",
-        "groups": [
-          {
-            "group": "Brain · data layer",
-            "pages": [
-              "brain/overview",
-              "brain/evidence-and-records",
-              "brain/visibility"
-            ]
-          },
-          {
-            "group": "Records and evidence tools",
-            "pages": [
-              {
-                "group": "CRM conversations",
-                "pages": [
-                  "modules/crm",
-                  "capabilities/crm",
-                  "crm/search-and-evidence",
-                  "crm/records-and-repair",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/conversation-read",
-                      "reference/conversation-write"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Field intelligence",
-                "pages": [
-                  "crm/field-history",
-                  "capabilities/field-intelligence",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/taxonomy-fields"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "SQL reporting",
-                "pages": [
-                  "channels/sql",
-                  "capabilities/sql",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/run-sql"
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Knowledge and structured resources",
-            "pages": [
-              {
-                "group": "Knowledge base",
-                "pages": [
-                  "knowledge/overview"
-                ]
-              },
-              {
-                "group": "Documents",
-                "pages": [
-                  "modules/documents-tables",
-                  "capabilities/documents",
-                  "documents/sharing",
-                  "knowledge/templates",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/document-read",
-                      "reference/document-write"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Tables",
-                "pages": [
-                  "documents/tables",
-                  "capabilities/tables",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/table"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Boards",
-                "pages": [
-                  "agent-platform/boards",
-                  "capabilities/boards",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/board"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Graphs and relationship maps",
-                "pages": [
-                  "agent-platform/graphs"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Connected data",
-            "pages": [
-              {
-                "group": "Connections",
-                "pages": [
-                  "configuration/crm-connections",
-                  "capabilities/connections",
-                  {
-                    "group": "Tool reference",
-                    "pages": [
-                      "reference/connection-write"
-                    ]
-                  }
-                ]
-              }
+              "reference/conversation-read",
+              "reference/conversation-write",
+              "reference/taxonomy-fields",
+              "reference/run-sql",
+              "reference/document-read",
+              "reference/document-write",
+              "reference/table",
+              "reference/board",
+              "reference/graph"
             ]
           }
         ]
       }
     ]
   },
-  "seo": {
-    "metatags": {
-      "canonical": "https://docs.cedarcopilot.com"
+  "redirects": [
+    {
+      "source": "/reference",
+      "destination": "/reference/tool-catalog"
+    },
+    {
+      "source": "/reference/index",
+      "destination": "/reference/tool-catalog"
+    },
+    {
+      "source": "/skills",
+      "destination": "/skills/catalog"
+    },
+    {
+      "source": "/skills/index",
+      "destination": "/skills/catalog"
+    },
+    {
+      "source": "/agent-platform/automation-layers",
+      "destination": "/"
     }
-  }
+  ]
 }
