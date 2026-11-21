@@ -6,3 +6,15 @@ description: "Prepare a timed series of touches for one contact and hand it to a
 Choose the contact, inspect their existing sequences and decide what each touch should accomplish. Draft the messages with the [drafting skill](/skills/drafting). Check the sender, destination, order and timing of every step.
 
 Use the [sequence tool](/reference/sequence) to save or revise the draft and attach it to eligible work. Preparation leaves delivery for a separate approval decision. Follow the [person-specific outreach walkthrough](/recipes/person-outreach-sequence) to see the review flow end to end.
+
+## Set up a reusable email review template
+
+In the authenticated outbound CLI, run `account whoami` to verify the template owner. Use `profile list` to choose a sender profile connected to exactly one Google or Microsoft mailbox that belongs to that owner. Then run the setup command for the relevant workflow.
+
+```sh
+pnpm outbound sequence review-template --kind outreach --profile <sender-profile-id>
+```
+
+Use `meeting-reminders` for the three-day and one-day reminder steps. The outreach preset provides an initial email and two follow-ups. Setup returns the template ID, ordered step IDs and mailbox ID. The new template contains no contacts or queued messages.
+
+Use the returned IDs to prepare a separate task for the person or meeting. Supply only the eligible steps, recipients, message text and timing, then review the resulting plan. Repeating setup for an untouched template returns its same ID. If the template is paused or the mailbox has changed, review that configuration before preparing another plan.
