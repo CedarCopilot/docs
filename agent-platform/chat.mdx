@@ -14,6 +14,14 @@ description: "Attach the right evidence, resolve a primary conversation and revi
 
 Attaching context does not copy its permissions to the user or agent. The underlying record still requires access. When a user changes the subject, update the primary conversation so subsequent work is grounded in the intended deal.
 
+## Review proposed actions
+
+In **Cedar (fast)**, **GPT-6 Luna** and **GPT-6.1 Sol (low reasoning)**, approving a supported action card checks your current permissions and applies the approved action. After the action succeeds, Cedar continues the original request. Declining the card lets Cedar continue without performing that action. Approving one card does not approve any later proposal.
+
+If the action completed but the following response failed, use **Retry** to continue from the saved result. Cedar does not need to apply that completed action again.
+
+<Note>Claude modes with low, medium or high reasoning keep their current approval flow. External MCP clients manage their own chat state and approvals.</Note>
+
 ## Search, load and navigate
 
 | Family | Capability |
