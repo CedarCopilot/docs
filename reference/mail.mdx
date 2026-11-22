@@ -11,7 +11,7 @@ Generated from Cedar's actual registration and Zod schemas. Your connection's `t
 
 <Accordion title="Full tool behavior and constraints">
 
-Mail operations. ACTIONS: (1) fetch-attachments — download and read email attachment content by Gmail message ID. Pass messageId (from "Message ID:" on the email) and optionally attachmentId to fetch one file. (2) list-sent — fetch emails the Cedar agent drafted that were actually sent, to compare drafted vs. sent bodies. Use maxSimilarity &lt; 0.7 to find emails the user rewrote significantly. Each result's messageId can be passed straight into fetch-attachments to pull its attachments (null for older rows). (3) find — query sent/received emails by STRUCTURED criteria: direction (inbound/outbound), has attachments, sender, subject/snippet substring, date range. Use this instead of semantic search when you need emails matching specific metadata — e.g. "sent emails with attachments", "emails from X last week". Returns messageId values you can pass straight into fetch-attachments. (4) search-live — search the user's LIVE Gmail mailbox by full Gmail query syntax (search.messages-style, e.g. "from:person@example.com newer_than:30d has:attachment"); returns thread ids + subject/from/snippet. Use this (not find/search-semantic) for mail that may never have synced, or when you need the freshest state. (5) read-thread — read a full email thread LIVE from the mailbox by threadId (from search-live), including per-message observed open/click counts, timestamps, tracking-enabled flags and full event history with observed IP addresses when available. NOTE: for semantic (meaning-based) search over ALREADY-SYNCED mail, use conversation.search-semantic with filters.eventType: "email"; search-live is a raw live-mailbox query instead. Each action takes its params in a same-named object (e.g. action: "fetch-attachments" pairs with a fetchAttachments: &#123;messageId&#125; object) — omit every params object except the one matching your chosen action.
+Mail operations. ACTIONS: (1) fetch-attachments — download and read email attachment content by Gmail message ID. Pass messageId (from "Message ID:" on the email) and optionally attachmentId to fetch one file. (2) list-sent — fetch emails the Cedar agent drafted that were actually sent, to compare drafted vs. sent bodies. Use maxSimilarity &lt; 0.7 to find emails the user rewrote significantly. Each result's messageId can be passed straight into fetch-attachments to pull its attachments (null for older rows). (3) find — query sent/received emails by STRUCTURED criteria: direction (inbound/outbound), has attachments, sender, subject/snippet substring, date range. Use this instead of semantic search when you need emails matching specific metadata — e.g. "sent emails with attachments", "emails from X last week". Returns messageId values you can pass straight into fetch-attachments. (4) search-live — search the user's LIVE Gmail mailbox by full Gmail query syntax (search.messages-style, e.g. "from:person@example.com newer_than:30d has:attachment"); returns thread ids + subject/from/snippet. Use this (not find/search-semantic) for mail that may never have synced, or when you need the freshest state. (5) read-thread — read a full email thread LIVE from the mailbox by threadId (from search-live), including per-message observed open/click counts, timestamps, tracking-enabled flags and full event history with observed IP addresses when available. draft-learning — read the authenticated owner’s full draft cohort, sent/unsent outcomes and paginated draft/sent examples. Pass draftLearning with start and end timestamps. NOTE: for semantic (meaning-based) search over ALREADY-SYNCED mail, use conversation.search-semantic with filters.eventType: "email"; search-live is a raw live-mailbox query instead. Each action takes its params in a same-named object (e.g. action: "fetch-attachments" pairs with a fetchAttachments: &#123;messageId&#125; object) — omit every params object except the one matching your chosen action.
 
 </Accordion>
 
@@ -21,6 +21,7 @@ Mail operations. ACTIONS: (1) fetch-attachments — download and read email atta
 | --- | --- | --- |
 | `fetch-attachments` | Read attachment content by a real message ID, optionally selecting one attachment. | `email:read` |
 | `list-sent` | Find Cedar-drafted emails that were actually sent and compare draft versus sent content. | `email:read` |
+| `draft-learning` | Count unique drafts in your creation window and compare paged excerpts by outcome. | `email:read` |
 | `find` | Query synced email using structured sender, direction, attachment, text and date criteria. | `email:read` |
 | `search-live` | Search the live Gmail mailbox using Gmail query syntax, including mail not yet synced. | `email:read` |
 | `read-thread` | Read a complete live email thread with available observed tracking evidence. | `email:read` |
@@ -37,9 +38,10 @@ Path, account role, feature gates, target ownership, and billing permissions can
 
 | Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `action` | `fetch-attachments` · `list-sent` · `find` · `search-live` · `read-thread` | Yes | Which operation to perform — pass its matching params object below (e.g. action: "fetch-attachments" pairs with fetchAttachments: &#123;...&#125;). |
+| `action` | `fetch-attachments` · `list-sent` · `draft-learning` · `find` · `search-live` · `read-thread` | Yes | Which operation to perform — pass its matching params object below (e.g. action: "fetch-attachments" pairs with fetchAttachments: &#123;...&#125;). |
 | `fetchAttachments` | object | No |  |
 | `listSent` | object | No |  |
+| `draftLearning` | object | No | Use with the draft-learning action. |
 | `find` | object | No |  |
 | `searchLive` | object | No |  |
 | `readThread` | object | No |  |
@@ -62,6 +64,10 @@ Path, account role, feature gates, target ownership, and billing permissions can
 | `userId` | string | No | DEPRECATED alias for targetUserId, kept so existing callers keep working. It is NOT the authenticated identity: it names whose sent email to read, and goes through the same authorization gate. |
 | `limit` | integer | No | Max emails to return. default: 15 minimum: 1 maximum: 50 |
 | `maxSimilarity` | number | No | Filter to emails where the user changed the draft significantly. 0.6 = user rewrote &gt;40% of the content. Use this to find examples of what the agent gets wrong. minimum: 0 maximum: 1 |
+
+### draftLearning
+
+Pass `start` (inclusive) and `end` (exclusive) as ISO timestamps with a timezone. The maximum window is 31 days. The report contains `totalDrafts`, `groups`, `examples` and `nextCursor`. For another page pass the returned cursor as `afterDraftId` with the same window. Counts describe the complete window on every page. This action reads only the authenticated owner’s drafts.
 
 ### find
 

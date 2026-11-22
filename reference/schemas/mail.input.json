@@ -6,6 +6,7 @@
       "enum": [
         "fetch-attachments",
         "list-sent",
+        "draft-learning",
         "find",
         "search-live",
         "read-thread"
@@ -174,6 +175,31 @@
     "is_new_request": {
       "type": "boolean",
       "description": "true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread."
+    },
+    "draftLearning": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Inclusive draft creation time."
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Exclusive draft creation time. Maximum window 31 days."
+        },
+        "afterDraftId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [

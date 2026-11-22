@@ -18044,7 +18044,7 @@
     {
       "name": "mail",
       "title": "Read email",
-      "description": "Mail operations. ACTIONS: (1) fetch-attachments — download and read email attachment content by Gmail message ID. Pass messageId (from \"Message ID:\" on the email) and optionally attachmentId to fetch one file. (2) list-sent — fetch emails the Cedar agent drafted that were actually sent, to compare drafted vs. sent bodies. Use maxSimilarity < 0.7 to find emails the user rewrote significantly. Each result's messageId can be passed straight into fetch-attachments to pull its attachments (null for older rows). (3) find — query sent/received emails by STRUCTURED criteria: direction (inbound/outbound), has attachments, sender, subject/snippet substring, date range. Use this instead of semantic search when you need emails matching specific metadata — e.g. \"sent emails with attachments\", \"emails from X last week\". Returns messageId values you can pass straight into fetch-attachments. (4) search-live — search the user's LIVE Gmail mailbox by full Gmail query syntax (search.messages-style, e.g. \"from:person@example.com newer_than:30d has:attachment\"); returns thread ids + subject/from/snippet. Use this (not find/search-semantic) for mail that may never have synced, or when you need the freshest state. (5) read-thread — read a full email thread LIVE from the mailbox by threadId (from search-live), including per-message observed open/click counts, timestamps, tracking-enabled flags and full event history with observed IP addresses when available. NOTE: for semantic (meaning-based) search over ALREADY-SYNCED mail, use conversation.search-semantic with filters.eventType: \"email\"; search-live is a raw live-mailbox query instead. Each action takes its params in a same-named object (e.g. action: \"fetch-attachments\" pairs with a fetchAttachments: {messageId} object) — omit every params object except the one matching your chosen action.",
+      "description": "Mail operations. ACTIONS: (1) fetch-attachments — download and read email attachment content by Gmail message ID. Pass messageId (from \"Message ID:\" on the email) and optionally attachmentId to fetch one file. (2) list-sent — fetch emails the Cedar agent drafted that were actually sent, to compare drafted vs. sent bodies. Use maxSimilarity < 0.7 to find emails the user rewrote significantly. Each result's messageId can be passed straight into fetch-attachments to pull its attachments (null for older rows). (3) find — query sent/received emails by STRUCTURED criteria: direction (inbound/outbound), has attachments, sender, subject/snippet substring, date range. Use this instead of semantic search when you need emails matching specific metadata — e.g. \"sent emails with attachments\", \"emails from X last week\". Returns messageId values you can pass straight into fetch-attachments. (4) search-live — search the user's LIVE Gmail mailbox by full Gmail query syntax (search.messages-style, e.g. \"from:person@example.com newer_than:30d has:attachment\"); returns thread ids + subject/from/snippet. Use this (not find/search-semantic) for mail that may never have synced, or when you need the freshest state. (5) read-thread — read a full email thread LIVE from the mailbox by threadId (from search-live), including per-message observed open/click counts, timestamps, tracking-enabled flags and full event history with observed IP addresses when available. draft-learning — read the authenticated owner’s full draft cohort, sent/unsent outcomes and paginated draft/sent examples. Pass draftLearning with start and end timestamps. NOTE: for semantic (meaning-based) search over ALREADY-SYNCED mail, use conversation.search-semantic with filters.eventType: \"email\"; search-live is a raw live-mailbox query instead. Each action takes its params in a same-named object (e.g. action: \"fetch-attachments\" pairs with a fetchAttachments: {messageId} object) — omit every params object except the one matching your chosen action.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -18053,6 +18053,7 @@
             "enum": [
               "fetch-attachments",
               "list-sent",
+              "draft-learning",
               "find",
               "search-live",
               "read-thread"
@@ -18221,6 +18222,31 @@
           "is_new_request": {
             "type": "boolean",
             "description": "true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread."
+          },
+          "draftLearning": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Inclusive draft creation time."
+              },
+              "end": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Exclusive draft creation time. Maximum window 31 days."
+              },
+              "afterDraftId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              }
+            },
+            "required": [
+              "start",
+              "end"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -18903,6 +18929,139 @@
               }
             },
             "additionalProperties": false
+          },
+          "draftLearning": {
+            "type": "object",
+            "properties": {
+              "report": {
+                "type": "object",
+                "properties": {
+                  "totalDrafts": {
+                    "type": "number"
+                  },
+                  "groups": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "category": {
+                          "type": "string"
+                        },
+                        "outcome": {
+                          "type": "string"
+                        },
+                        "count": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "category",
+                        "outcome",
+                        "count"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "examples": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "draftId": {
+                          "type": "string"
+                        },
+                        "category": {
+                          "type": "string"
+                        },
+                        "outcome": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "threadId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "sentAt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "attributionMethod": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "subject": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "draftedExcerpt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "sentExcerpt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "semanticSimilarity": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "wordCountSimilarity": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "draftId",
+                        "category",
+                        "outcome",
+                        "createdAt",
+                        "threadId",
+                        "sentAt",
+                        "attributionMethod",
+                        "subject",
+                        "draftedExcerpt",
+                        "sentExcerpt",
+                        "semanticSimilarity",
+                        "wordCountSimilarity"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "nextCursor": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "totalDrafts",
+                  "groups",
+                  "examples",
+                  "nextCursor"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
           }
         },
         "required": [
@@ -18935,7 +19094,8 @@
         "list-sent": "email:read",
         "find": "email:read",
         "search-live": "email:read",
-        "read-thread": "email:read"
+        "read-thread": "email:read",
+        "draft-learning": "email:read"
       }
     },
     {
