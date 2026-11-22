@@ -8,6 +8,7 @@
         "find",
         "search-semantic",
         "search-external-crm-deals",
+        "related-activity",
         "timeline",
         "field-evolution",
         "value-as-of",
@@ -397,6 +398,41 @@
       "additionalProperties": false,
       "description": "External CRM; clarify ambiguity."
     },
+    "relatedActivity": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "cursor": {
+          "type": "object",
+          "properties": {
+            "occurredAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "id": {
+              "$ref": "#/properties/relatedActivity/properties/conversationId"
+            }
+          },
+          "required": [
+            "occurredAt",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      },
+      "required": [
+        "conversationId"
+      ],
+      "additionalProperties": false
+    },
     "timeline": {
       "type": "object",
       "properties": {
@@ -527,14 +563,14 @@
         "maxInline": {
           "type": "integer",
           "minimum": 1,
-          "description": "Return inline only up to this many entries; above it the full timeline is written to the doc sink and a handle is returned. Default 200."
+          "description": "Inline limit (default 200); larger results return a document handle."
         }
       },
       "required": [
         "conversationIds"
       ],
       "additionalProperties": false,
-      "description": "Read one time-ordered stream across events + both taxonomy planes for one or more deals, filtered by any combination of the cube. Masks: raw spine = kinds:[\"event\"]; one field = fieldIds:[\"…\"]; cross-deal = N conversationIds. Large results → the doc sink."
+      "description": "Time-ordered events and taxonomy entries for conversationIds. Use kinds:[\"event\"] for events or fieldIds for one field."
     },
     "fieldEvolution": {
       "type": "object",
@@ -595,7 +631,7 @@
         },
         "fieldId": {
           "type": "string",
-          "description": "The single field whose change/occurrence series to trace over time."
+          "description": "Field ID to trace."
         },
         "maxInline": {
           "type": "integer",
@@ -607,18 +643,18 @@
         "fieldId"
       ],
       "additionalProperties": false,
-      "description": "One field's change/occurrence series over time, grouped by deal (the \"how did X evolve\" curve)."
+      "description": "One field's change/occurrence series over time, grouped by deal."
     },
     "valueAsOf": {
       "type": "object",
       "properties": {
         "conversationId": {
           "type": "string",
-          "description": "The deal to read."
+          "description": "Deal ID."
         },
         "fieldId": {
           "type": "string",
-          "description": "The versioned field to resolve."
+          "description": "Versioned field ID."
         },
         "at": {
           "type": "object",
@@ -637,7 +673,7 @@
             }
           },
           "additionalProperties": false,
-          "description": "Exactly one of stage | date | eventId — the point in time to resolve the value at."
+          "description": "Exactly one cutoff: stage, date, or eventId."
         }
       },
       "required": [
@@ -818,6 +854,6 @@
     "user_request_summary",
     "is_new_request"
   ],
-  "additionalProperties": true,
+  "additionalProperties": false,
   "$schema": "http://json-schema.org/draft-07/schema#"
 }

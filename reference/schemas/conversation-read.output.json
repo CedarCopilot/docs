@@ -571,6 +571,103 @@
       },
       "additionalProperties": false
     },
+    "relatedActivity": {
+      "type": "object",
+      "properties": {
+        "availableLinks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "account",
+              "contact"
+            ]
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "occurredAt": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "summary": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "customEventType": {
+                "type": "string"
+              },
+              "customFields": {
+                "type": "object",
+                "additionalProperties": {}
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "account",
+                    "contact"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "id",
+              "occurredAt",
+              "title",
+              "summary",
+              "customEventType",
+              "customFields",
+              "reasons"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "occurredAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "occurredAt",
+                "id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "availableLinks",
+        "events",
+        "nextCursor"
+      ],
+      "additionalProperties": false
+    },
     "timeline": {
       "type": "object",
       "properties": {
@@ -626,7 +723,8 @@
               "series": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/properties/timeline/properties/entries/items"
+                  "type": "object",
+                  "additionalProperties": {}
                 }
               }
             },
@@ -638,7 +736,26 @@
           }
         },
         "buffer": {
-          "$ref": "#/properties/timeline/properties/buffer"
+          "type": "object",
+          "properties": {
+            "buffered": {
+              "type": "boolean",
+              "const": true
+            },
+            "path": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string"
+            },
+            "word_count": {
+              "type": "number"
+            },
+            "access_instructions": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -787,7 +904,26 @@
           }
         },
         "buffer": {
-          "$ref": "#/properties/timeline/properties/buffer"
+          "type": "object",
+          "properties": {
+            "buffered": {
+              "type": "boolean",
+              "const": true
+            },
+            "path": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string"
+            },
+            "word_count": {
+              "type": "number"
+            },
+            "access_instructions": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -806,7 +942,26 @@
           }
         },
         "buffer": {
-          "$ref": "#/properties/timeline/properties/buffer"
+          "type": "object",
+          "properties": {
+            "buffered": {
+              "type": "boolean",
+              "const": true
+            },
+            "path": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string"
+            },
+            "word_count": {
+              "type": "number"
+            },
+            "access_instructions": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false

@@ -11,7 +11,7 @@ Generated from Cedar's actual registration and Zod schemas. Your connection's `t
 
 <Accordion title="Full tool behavior and constraints">
 
-CRM conversation read/query over Cedar's OWN records (NOT the connected external CRM — that's action 4; ask if unclear). ACTIONS: (1) get — fetch a conversation by ID (brief timeline default; write_to_file for full content; expandEventId to inline one event); email entries include observed open/click tracking summaries when available. (2) find — locate Cedar conversations via `filters` (field/operator/value, ANDed): standard columns, computed booleans, or custom fields as "wm_&lt;fieldKey&gt;"; add extraFields for more columns. Call load-skill("conversation") for the full field reference. (3) search-semantic — vector/FTS search over conversation content (Turbopuffer); best for finding WHICH events matter. For ONE named call/email, do not answer from hits (a top-k slice, not the full transcript) — resolve its eventId here or via get's timeline, then re-read it whole via (1) get with expandEventId. (4) search-external-crm-deals — search the connected EXTERNAL CRM for a deal by keyword (get providerId from config read-settings first). DEAL-INTELLIGENCE (over extracted sub-event taxonomy atoms): (5) timeline — one time-ordered stream across events + both taxonomy planes for 1+ deals, filtered by fieldIds/kinds/stages/reps/scores/payload/time. (6) field-evolution — one field's series over time, grouped by deal. (7) value-as-of — a versioned field's value+scores at a stage/date/event. (8) describe-field — a field's plane/scores/vocab/payload keys (learn before filtering). (9) raw-content — resolve a deal's RAW verbatim events to a doc-sink buffer (stage-marked); read via read-document (#lines/#words) + search-documents (regex). (10) search — semantic search over the atoms (same cube); hits point back. Large results → the doc sink. (11) definitions — discover organization-owned account/contact fields or event contracts. Pass each action's params in a same-named object; omit the others.
+Read Cedar CRM records. For connected CRM deals use action 4. ACTIONS: (1) get — conversation by ID; brief timeline by default, write_to_file for full content, expandEventId for one event. Email entries show observed opens/clicks when available. (2) find — locate Cedar conversations via `filters` (field/operator/value, ANDed): standard columns, computed booleans, or custom fields as "wm_&lt;fieldKey&gt;"; add extraFields for more columns. Call load-skill("conversation") for the full field reference. (3) search-semantic — find relevant events by vector/full-text search. For a named call/email, get its eventId here or in the timeline, then use get with expandEventId for the full source. (4) search-external-crm-deals — search the connected EXTERNAL CRM for a deal by keyword (get providerId from config read-settings first). related-activity — retrieve shared custom events linked through the deal account or its contacts. DEAL-INTELLIGENCE (over extracted sub-event taxonomy atoms): (5) timeline — one time-ordered stream across events + both taxonomy planes for 1+ deals, filtered by fieldIds/kinds/stages/reps/scores/payload/time. (6) field-evolution — one field's series over time, grouped by deal. (7) value-as-of — a versioned field's value+scores at a stage/date/event. (8) describe-field — a field's plane/scores/vocab/payload keys (learn before filtering). (9) raw-content — resolve a deal's RAW verbatim events to a doc-sink buffer (stage-marked); read via read-document (#lines/#words) + search-documents (regex). (10) search — semantic search over the atoms (same cube); hits point back. Large results → the doc sink. (11) definitions — discover account/contact field or event definitions. Choose kind; page with after/limit, or read an exact key and version. Pass each action's params in a same-named object; omit the others.
 
 </Accordion>
 
@@ -23,6 +23,7 @@ CRM conversation read/query over Cedar's OWN records (NOT the connected external
 | `find` | Find Cedar conversations using the family’s supported filters. | `crm:read` |
 | `search-semantic` | Search meaning across already-synced conversation evidence. | `crm:read` |
 | `search-external-crm-deals` | Find deals in the connected external CRM, separately from Cedar conversations. | `crm:read` |
+| `related-activity` | Read shared custom events linked through the deal’s primary account or contacts. | `crm:read` |
 | `timeline` | Read a time-ordered stream across events and extracted fields for selected deals. | `crm:read` |
 | `field-evolution` | Inspect one field's change or occurrence series over time, grouped by deal. | `crm:read` |
 | `value-as-of` | Read a versioned field's value and scores at the resolved historical cutoff. | `crm:read` |
@@ -58,11 +59,12 @@ Every finite input choice is listed here, including array values and nested vari
 
 | Parameter | Type | Required | Details |
 | --- | --- | --- | --- |
-| `action` | "get" · "find" · "search-semantic" · "search-external-crm-deals" · "timeline" · "field-evolution" · "value-as-of" · "describe-field" · "definitions" · "raw-content" · "search" | Yes | Which read operation to perform — pass its matching params object below (e.g. action: "find" pairs with find: &#123;...&#125;).  |
+| `action` | "get" · "find" · "search-semantic" · "search-external-crm-deals" · "related-activity" · "timeline" · "field-evolution" · "value-as-of" · "describe-field" · "definitions" · "raw-content" · "search" | Yes | Which read operation to perform — pass its matching params object below (e.g. action: "find" pairs with find: &#123;...&#125;).  |
 | `get` | object | No |   |
 | `find` | object | No |   |
 | `searchSemantic` | object | No |   |
 | `searchExternalCrmDeals` | object | No | Operates on the user's connected EXTERNAL CRM (Salesforce/HubSpot/Attio/Copper) — NOT Cedar's own conversation records (that's `find`). If it's unclear whether the user means "search Cedar's deals" or "search our Salesforce/HubSpot", ask before calling either.  |
+| `relatedActivity` | object | No | Deal ID and optional pagination. |
 | `timeline` | object | No | Read one time-ordered stream across events + both taxonomy planes for one or more deals, filtered by any combination of the cube. Masks: raw spine = kinds:&#91;"event"&#93;; one field = fieldIds:&#91;"…"&#93;; cross-deal = N conversationIds. Large results → the doc sink.  |
 | `fieldEvolution` | object | No | One field's change/occurrence series over time, grouped by deal (the "how did X evolve" curve).  |
 | `valueAsOf` | object | No | A versioned field's value + scores at a given instant (latest change ≤ the resolved cutoff).  |
@@ -176,6 +178,16 @@ Operates on the user's connected EXTERNAL CRM (Salesforce/HubSpot/Attio/Copper) 
 | --- | --- | --- | --- |
 | `providerId` | "hubspot" · "attio" · "salesforce" · "copper" | Yes | The CRM connection's providerId — get this from `config`'s `read-settings` action (sections: &#91;"connections"&#93;).  |
 | `keyword` | string | Yes | Search text — deal/opportunity name, company name, etc. maxLength: 200 |
+
+### relatedActivity
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `conversationId` | UUID | Yes | Cedar deal to read. |
+| `limit` | integer | No | 1–50 events, default 20. |
+| `cursor` | object | No | Pass the previous page’s `nextCursor` with its `occurredAt` and `id` unchanged. |
+
+Each event shows its title, time, custom event type, payload, and matching account or contact reasons. `availableLinks` reports which links this workspace can read. See [shared deal activity](/crm/field-history#read-shared-account-and-contact-activity).
 
 ### timeline
 
@@ -377,6 +389,7 @@ See [reading CRM definitions](/configuration/fields#read-definitions-through-mcp
         "find",
         "search-semantic",
         "search-external-crm-deals",
+        "related-activity",
         "timeline",
         "field-evolution",
         "value-as-of",
@@ -766,6 +779,41 @@ See [reading CRM definitions](/configuration/fields#read-definitions-through-mcp
       "additionalProperties": false,
       "description": "External CRM; clarify ambiguity."
     },
+    "relatedActivity": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "cursor": {
+          "type": "object",
+          "properties": {
+            "occurredAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "id": {
+              "$ref": "#/properties/relatedActivity/properties/conversationId"
+            }
+          },
+          "required": [
+            "occurredAt",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      },
+      "required": [
+        "conversationId"
+      ],
+      "additionalProperties": false
+    },
     "timeline": {
       "type": "object",
       "properties": {
@@ -896,14 +944,14 @@ See [reading CRM definitions](/configuration/fields#read-definitions-through-mcp
         "maxInline": {
           "type": "integer",
           "minimum": 1,
-          "description": "Return inline only up to this many entries; above it the full timeline is written to the doc sink and a handle is returned. Default 200."
+          "description": "Inline limit (default 200); larger results return a document handle."
         }
       },
       "required": [
         "conversationIds"
       ],
       "additionalProperties": false,
-      "description": "Read one time-ordered stream across events + both taxonomy planes for one or more deals, filtered by any combination of the cube. Masks: raw spine = kinds:[\"event\"]; one field = fieldIds:[\"…\"]; cross-deal = N conversationIds. Large results → the doc sink."
+      "description": "Time-ordered events and taxonomy entries for conversationIds. Use kinds:[\"event\"] for events or fieldIds for one field."
     },
     "fieldEvolution": {
       "type": "object",
@@ -964,7 +1012,7 @@ See [reading CRM definitions](/configuration/fields#read-definitions-through-mcp
         },
         "fieldId": {
           "type": "string",
-          "description": "The single field whose change/occurrence series to trace over time."
+          "description": "Field ID to trace."
         },
         "maxInline": {
           "type": "integer",
@@ -976,18 +1024,18 @@ See [reading CRM definitions](/configuration/fields#read-definitions-through-mcp
         "fieldId"
       ],
       "additionalProperties": false,
-      "description": "One field's change/occurrence series over time, grouped by deal (the \"how did X evolve\" curve)."
+      "description": "One field's change/occurrence series over time, grouped by deal."
     },
     "valueAsOf": {
       "type": "object",
       "properties": {
         "conversationId": {
           "type": "string",
-          "description": "The deal to read."
+          "description": "Deal ID."
         },
         "fieldId": {
           "type": "string",
-          "description": "The versioned field to resolve."
+          "description": "Versioned field ID."
         },
         "at": {
           "type": "object",
@@ -1006,7 +1054,7 @@ See [reading CRM definitions](/configuration/fields#read-definitions-through-mcp
             }
           },
           "additionalProperties": false,
-          "description": "Exactly one of stage | date | eventId — the point in time to resolve the value at."
+          "description": "Exactly one cutoff: stage, date, or eventId."
         }
       },
       "required": [
@@ -1187,7 +1235,7 @@ See [reading CRM definitions](/configuration/fields#read-definitions-through-mcp
     "user_request_summary",
     "is_new_request"
   ],
-  "additionalProperties": true,
+  "additionalProperties": false,
   "$schema": "http://json-schema.org/draft-07/schema#"
 }
 ```
@@ -1206,6 +1254,7 @@ Inspect `isError` on the MCP result and `success` / `errorMessage` in the action
 | `find` | object or object | No |   |
 | `searchSemantic` | object | No |   |
 | `searchExternalCrmDeals` | object | No |   |
+| `relatedActivity` | object | No | Shared events, available links and next cursor. |
 | `timeline` | object | No |   |
 | `fieldEvolution` | object | No |   |
 | `valueAsOf` | object | No |   |
@@ -1790,6 +1839,103 @@ Inspect `isError` on the MCP result and `success` / `errorMessage` in the action
       },
       "additionalProperties": false
     },
+    "relatedActivity": {
+      "type": "object",
+      "properties": {
+        "availableLinks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "account",
+              "contact"
+            ]
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "occurredAt": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "summary": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "customEventType": {
+                "type": "string"
+              },
+              "customFields": {
+                "type": "object",
+                "additionalProperties": {}
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "account",
+                    "contact"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "id",
+              "occurredAt",
+              "title",
+              "summary",
+              "customEventType",
+              "customFields",
+              "reasons"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "occurredAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "occurredAt",
+                "id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "availableLinks",
+        "events",
+        "nextCursor"
+      ],
+      "additionalProperties": false
+    },
     "timeline": {
       "type": "object",
       "properties": {
@@ -1845,7 +1991,8 @@ Inspect `isError` on the MCP result and `success` / `errorMessage` in the action
               "series": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/properties/timeline/properties/entries/items"
+                  "type": "object",
+                  "additionalProperties": {}
                 }
               }
             },
@@ -1857,7 +2004,26 @@ Inspect `isError` on the MCP result and `success` / `errorMessage` in the action
           }
         },
         "buffer": {
-          "$ref": "#/properties/timeline/properties/buffer"
+          "type": "object",
+          "properties": {
+            "buffered": {
+              "type": "boolean",
+              "const": true
+            },
+            "path": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string"
+            },
+            "word_count": {
+              "type": "number"
+            },
+            "access_instructions": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -2006,7 +2172,26 @@ Inspect `isError` on the MCP result and `success` / `errorMessage` in the action
           }
         },
         "buffer": {
-          "$ref": "#/properties/timeline/properties/buffer"
+          "type": "object",
+          "properties": {
+            "buffered": {
+              "type": "boolean",
+              "const": true
+            },
+            "path": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string"
+            },
+            "word_count": {
+              "type": "number"
+            },
+            "access_instructions": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -2025,7 +2210,26 @@ Inspect `isError` on the MCP result and `success` / `errorMessage` in the action
           }
         },
         "buffer": {
-          "$ref": "#/properties/timeline/properties/buffer"
+          "type": "object",
+          "properties": {
+            "buffered": {
+              "type": "boolean",
+              "const": true
+            },
+            "path": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string"
+            },
+            "word_count": {
+              "type": "number"
+            },
+            "access_instructions": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
