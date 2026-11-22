@@ -44,6 +44,12 @@ Follow `nextCursor` with the same filters to retrieve subsequent pages. The resp
 | `#crm-approvals` | Open CRM approvals user-wide. |
 | Explicit `conversationId`, no scope | Inventory for a particular deal. Use `dealList` for the shared deal view and assignment context. |
 
+## Review a CRM change in Cedar
+
+In the **CRM approvals** Task View, choose **Review proposal** to inspect a pending field change and its proposed value before deciding whether to apply it. Opening the reviewer leaves the CRM untouched.
+
+Some older tasks describe a suggested change only in their notes. Choose **View recommendation** to read the saved reasoning. Applying a CRM change requires a saved field proposal.
+
 ## Human work and agent work
 
 A task can record a commitment, hold a recommendation, carry a proposed CRM change, or organize an agent-assisted follow-up. A due date states when work is due. Agent execution configuration controls whether and when Cedar prepares work automatically. Personal reminders do not become automatic agent runs merely because they have a future due date; automatic drafting requires a real deal and supported execution settings.
