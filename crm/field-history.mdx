@@ -34,3 +34,19 @@ Provide exactly one historical cutoff in `value-as-of`. A current strong qualifi
 Strength and completeness are separate dimensions where supported. Unknown/null is not equivalent to a poor score. A payload filter must use keys the field actually defines. Use canonical option values, preserving labels for display.
 
 For custom aggregations, load `run-sql` as well as `field-query`; use the allowed joins and required organization predicates. Raw SQL here remains read-only. [Metrics](/crm/metrics) are preferable when the dedicated tool already defines the calculation.
+
+
+## Read shared account and contact activity
+
+Ask Cedar which shared events are relevant to a deal. The `conversation-read` tool can match workspace custom events through the deal's primary account and participating contacts. The same website visit can appear on two open deals. A result includes the account or contact match that explains why it appears.
+
+```json
+{
+  "action": "related-activity",
+  "relatedActivity": { "conversationId": "<Cedar deal UUID>", "limit": 20 },
+  "user_request_summary": "Find shared account and contact activity for this deal",
+  "is_new_request": true
+}
+```
+
+Pass the returned `nextCursor` as `relatedActivity.cursor` to read the next page. `availableLinks` lists the account and contact links Cedar can read during migration. A workspace needs populated links on both the event and the deal for a match. You need permission to read the deal. [Tool reference](/reference/conversation-read#relatedactivity)

@@ -1626,6 +1626,15 @@
   {
     "tool": "conversation-read",
     "selector": "action",
+    "value": "related-activity",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:read",
+    "reference": "/reference/conversation-read"
+  },
+  {
+    "tool": "conversation-read",
+    "selector": "action",
     "value": "timeline",
     "branch": "",
     "surface": "external",
@@ -1654,6 +1663,15 @@
     "tool": "conversation-read",
     "selector": "action",
     "value": "describe-field",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:read",
+    "reference": "/reference/conversation-read"
+  },
+  {
+    "tool": "conversation-read",
+    "selector": "action",
+    "value": "definitions",
     "branch": "",
     "surface": "external",
     "scope": "crm:read",

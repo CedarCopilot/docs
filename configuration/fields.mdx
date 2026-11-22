@@ -11,6 +11,51 @@ Load `cedar-configuration` with `fields-and-values` before changing fields. Read
 
 The field system also supports configured internal-signal definitions/lifecycle and signal-enabled fields. These configure what is extracted and displayed; signal activation and record lifecycle use the separate signals tools.
 
+## Preview an account or contact field
+
+As an organization administrator, open **Admin → Configurations → CRM custom fields**. Choose **Account** or **Contact**, then select a published field. To define one, choose **New field**, enter its name and stable key, select its type, and choose **Create field**. Creating the definition saves it for the organization.
+
+To try a mapping, paste one JSON source record that contains the Cedar ID of a real account or contact in your organization. For example, replace the placeholder below with the Cedar account ID you want to preview.
+
+```json
+{
+  "cedar_id": "<your Cedar account ID>",
+  "tier": "Tier 1"
+}
+```
+
+Choose `cedar_id` for **Cedar account ID field** and `tier` for the value. Select **Preview mapping**. Check the matched record, the selected definition version, and the proposed value. If a saved value has source and observation details, use them to judge its freshness. For a current field, compare the proposed value with the saved value. For a list field, compare the proposed entry with the most recent saved observation.
+
+Previewing leaves the CRM record unchanged. If the record cannot be resolved, check the record type, Cedar ID, and organization.
+
+## Read definitions through MCP
+
+Use `conversation-read` with the `crm:read` permission to discover your organization’s published definitions. Choose `account` or `contact` for attributes and `event` for event contracts. This action needs no conversation ID.
+
+To list contact fields, call the tool with these arguments:
+
+```json
+{
+  "action": "definitions",
+  "definitions": { "kind": "contact", "limit": 25 },
+  "user_request_summary": "List our published contact field definitions",
+  "is_new_request": true
+}
+```
+
+Each item contains its stable key and version. Continue with the returned `nextAfter` as `after` until it is null. To inspect an event’s payload and entity links at the version that was in effect, pass its saved key and version:
+
+```json
+{
+  "action": "definitions",
+  "definitions": { "kind": "event", "key": "website_visit", "version": 1 },
+  "user_request_summary": "Inspect version one of our website visit event definition",
+  "is_new_request": true
+}
+```
+
+Replace `website_visit` with a key your organization has published. See the [complete tool reference](/reference/conversation-read#definitions) for options and response details.
+
 ## Options and external CRM mappings
 
 Use `sourceFromCrm` when creating a field backed by a CRM picklist/multi-select. `link-mapping` associates and reconciles a Cedar field with an external field; `unlink-mapping` removes that association. Read the result back to confirm canonical options are present.

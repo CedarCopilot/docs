@@ -19,6 +19,10 @@ Cedar's data layer gives agents a shared context while retaining the access rule
 
 An agent's file grants, a document's human audience, and a task group's agent visibility are separate settings. Changing one does not automatically change the others. [Agent permissions](/agent-platform/permissions), [task visibility](/tasks/visibility) and [document sharing](/documents/sharing) describe these controls in detail.
 
+## Organization-owned CRM events
+
+Active workspace members, including viewers, can read organization-owned events in the CRM timeline and recent activity. The event can exist before a deal. Removing the importing user preserves the event. An attached private deal, its participants, and its stage remain visible only to people with deal access. Raw mailbox content, meeting attachments, and private Slack content retain their own access rules. Reading shared activity grants no permission to edit or delete it.
+
 ## Show the boundary of a result
 
 A search or report reflects the accessible, selected records and the data available at read time. Keep its organization/owner scope, filters, dates, source and pagination state. Missing access, unsynced evidence and a genuinely empty result have different meanings.
