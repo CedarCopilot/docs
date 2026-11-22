@@ -5,6 +5,16 @@ description: "Deliver actionable pings without confusing alerts with customer ou
 
 `notify send` delivers a real notification. The default follows the user's configured channel; supported choices include Slack, email, iMessage, and WhatsApp. Use an explicit `channel` only when the user requested that destination or the workflow requires it.
 
+## Read a Task View card
+
+The first line identifies the kind of notification, the task and its company. **New task** announces newly created work. **Task reminder** brings an existing task back to your attention. The smaller text underneath gives timing such as when the task was created or when it is due. The Task View preview uses the same labels.
+
+Cedar normally places a task in one category based on its purpose. For example, replying to a customer question and sending a post-meeting recap have different destinations. A view organized by a separate criterion, such as tasks assigned by your manager, can show the same task.
+
+- **CRM review.** Scan the changed fields on the card. Choose **Show full changes** to inspect the recorded field changes before taking action.
+- **Why / change this.** Open the private explanation to see why Cedar created the task and why the view notified you. When Cedar recorded a matching playbook rule, the explanation can show its wording. Older tasks may have only the source event or a creation reason.
+- **Meeting recap.** For a saved email recap, use the Gmail link when available to open the draft, or use the card's draft review action. Review the recipients and copy before sending. Slack recaps use their Slack draft action.
+
 ## Send to a selected Slack channel
 
 First call `notify` with `action: "list-slack-channels"`. Then:
