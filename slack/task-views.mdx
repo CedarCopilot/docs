@@ -16,9 +16,10 @@ Configured Task Views can deliver task cards to Slack so reps can manage work wh
 | Complete a task | Mark the underlying task done and update its card to Completed when confirmed |
 | Cancel or ignore a task | Cancel the underlying work and update the card to Cancelled when confirmed |
 | Snooze eligible work | Choose when to revisit it through the supported task controls |
+| Run a saved prompt | The task owner clicks the configured prompt. Cedar starts the task chat and posts an **Open this action in Cedar chat** link in the source thread. |
 | Open or prepare work | Use the configured action or follow the Cedar link when a workflow requires Cedar chat |
 
-The visible actions depend on the view, task state, output type and access. Some preparation and revision actions hand off to Cedar rather than running entirely inside Slack.
+The visible actions depend on the view, task state, output type and access. Use the chat link to inspect what Cedar prepared. Starting the chat leaves delivery for review. If the card changed before the action started, use the refreshed card.
 
 ## Task state is managed automatically
 
