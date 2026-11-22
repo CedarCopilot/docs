@@ -11,6 +11,23 @@ Load `cedar-configuration` with `fields-and-values` before changing fields. Read
 
 The field system also supports configured internal-signal definitions/lifecycle and signal-enabled fields. These configure what is extracted and displayed; signal activation and record lifecycle use the separate signals tools.
 
+## Preview an account or contact field
+
+As an organization administrator, open **Admin → Configurations → CRM custom fields**. Choose **Account** or **Contact**, then select a published field. To define one, choose **New field**, enter its name and stable key, select its type, and choose **Create field**. Creating the definition saves it for the organization.
+
+To try a mapping, paste one JSON source record that contains the Cedar ID of a real account or contact in your organization. For example, replace the placeholder below with the Cedar account ID you want to preview.
+
+```json
+{
+  "cedar_id": "<your Cedar account ID>",
+  "tier": "Tier 1"
+}
+```
+
+Choose `cedar_id` for **Cedar account ID field** and `tier` for the value. Select **Preview mapping**. Check the matched record, the selected definition version, and the proposed value. If a saved value has source and observation details, use them to judge its freshness. For a current field, compare the proposed value with the saved value. For a list field, compare the proposed entry with the most recent saved observation.
+
+Previewing leaves the CRM record unchanged. If the record cannot be resolved, check the record type, Cedar ID, and organization.
+
 ## Options and external CRM mappings
 
 Use `sourceFromCrm` when creating a field backed by a CRM picklist/multi-select. `link-mapping` associates and reconciles a Cedar field with an external field; `unlink-mapping` removes that association. Read the result back to confirm canonical options are present.
