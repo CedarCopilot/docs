@@ -13948,6 +13948,219 @@
       }
     },
     {
+      "name": "crm-data-write",
+      "title": "Write custom CRM data",
+      "description": "Write organization CRM data with a published contract. Use conversation-read definitions for the key, version and named links. write-attribute updates an agent-maintained account/contact field with supporting evidence. record-event records a custom occurrence for authorized publishers. Supply the matching params object. Keep observationId or externalEventId stable when retrying.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "write-attribute",
+              "record-event"
+            ]
+          },
+          "writeAttribute": {
+            "type": "object",
+            "properties": {
+              "ownerKind": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "contact"
+                ]
+              },
+              "fieldKey": {
+                "type": "string",
+                "maxLength": 120,
+                "pattern": "^custom\\.[a-z][a-z0-9_]*$"
+              },
+              "version": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 2147483647
+              },
+              "ownerId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "value": {},
+              "observationId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 250
+              },
+              "occurredAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "evidence": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "ownerKind",
+              "fieldKey",
+              "version",
+              "ownerId",
+              "observationId",
+              "occurredAt",
+              "evidence"
+            ],
+            "additionalProperties": false
+          },
+          "recordEvent": {
+            "type": "object",
+            "properties": {
+              "eventKey": {
+                "type": "string",
+                "maxLength": 120,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "version": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 2147483647
+              },
+              "externalEventId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "occurredAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "payload": {
+                "type": "object",
+                "additionalProperties": {}
+              },
+              "entityLinks": {
+                "type": "object",
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/properties/recordEvent/properties/entityLinks/additionalProperties/anyOf/0"
+                      },
+                      "maxItems": 100
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "eventKey",
+              "version",
+              "externalEventId",
+              "occurredAt",
+              "payload",
+              "entityLinks"
+            ],
+            "additionalProperties": false
+          },
+          "user_request_summary": {
+            "type": "string",
+            "description": "One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does."
+          },
+          "is_new_request": {
+            "type": "boolean",
+            "description": "true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread."
+          }
+        },
+        "required": [
+          "action",
+          "user_request_summary",
+          "is_new_request"
+        ],
+        "additionalProperties": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "errorMessage": {
+            "type": "string"
+          },
+          "writeAttribute": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "applied",
+                  "duplicate",
+                  "superseded"
+                ]
+              },
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "recordEvent": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "created",
+                  "replayed"
+                ]
+              },
+              "eventId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "eventId"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Write custom CRM data",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      },
+      "surface": "external",
+      "kind": "family",
+      "metadata": {
+        "title": "Write custom CRM data",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "openWorldHint": false
+        }
+      },
+      "actionScopes": {
+        "write-attribute": "crm:write",
+        "record-event": "crm:write"
+      }
+    },
+    {
       "name": "slack-read",
       "title": "Read live Slack",
       "description": "Read the connected user's LIVE Slack (not Cedar's synced store). ACTIONS: (1) search-live — search Slack messages by text (search.messages); returns matches (channelId + ts/threadTs + permalink + snippet) to inspect or pass to slack-write's sync-thread. (2) read-thread — read a specific thread (conversations.replies) or a channel's recent messages; if that channel is ALREADY linked to one of your deals the messages are also stored on that deal's timeline automatically (idempotent, returned as syncedTo + ingested), so no follow-up sync-thread call is needed; each message lists its uploaded files (id, name, type). (3) read-file: external MCP clients only: look at the image(s) on one message (channelId + messageTs [+ threadTs] from read-thread, optionally one fileId); images come back as image content. Inside Cedar's own chat it returns the file list only. search-live and read-file never persist, and an UNLINKED channel is never attributed on its own: use slack-write's sync-thread to pick a deal for one. Requires the Slack \"search:read\" grant; a user who connected Slack before it existed gets a reconnect-required error. Each action takes its params in a same-named object (action: \"search-live\" pairs with searchLive: {...}) — omit every params object except the one matching your chosen action.",
@@ -32660,6 +32873,7 @@
         }
       ],
       "toolDependencies": [
+        "crm-data-write",
         "signals-read",
         "signals-write",
         "conversation-analytics",

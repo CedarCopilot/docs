@@ -1,0 +1,59 @@
+---
+title: "crm-data-write"
+description: "Write custom account or contact attributes and publish organization events."
+---
+
+## Operations and permissions
+
+| Action | Who can call it | Definition |
+| --- | --- | --- |
+| `write-attribute` | An active organization member, admin or owner | Account or contact field with an agent writer |
+| `record-event` | An active organization admin or owner | Event with a published payload and named entity links |
+
+## Examples
+
+Request the `crm:write` OAuth scope to call these two `crm-data-write` actions. A connection with only `crm:read` can discover definitions. Use the key and version from discovery and pass the exact Cedar IDs returned by an authorized lookup.
+
+For an account or contact field with `writer: "agent"`, cite the supporting observation and keep its ID stable when retrying. An authorized owner, admin or member can submit the value.
+
+```json
+{
+  "action": "write-attribute",
+  "user_request_summary": "Record the buyer intent observed on call 472",
+  "is_new_request": true,
+  "writeAttribute": {
+    "ownerKind": "contact",
+    "ownerId": "20000000-0000-4000-8000-000000000001",
+    "fieldKey": "custom.buyer_intent",
+    "version": 2,
+    "value": "high",
+    "occurredAt": "2026-11-22T10:00:00Z",
+    "observationId": "call-472-intent",
+    "evidence": "The contact requested pricing during call 472."
+  }
+}
+```
+
+For a published organization event, an authorized organization publisher can supply its payload and named links. The definition determines the type and cardinality of each link. Use a stable external event ID for retries under the same actor.
+
+```json
+{
+  "action": "record-event",
+  "user_request_summary": "Record the pricing page visit",
+  "is_new_request": true,
+  "recordEvent": {
+    "eventKey": "website_visit",
+    "version": 1,
+    "externalEventId": "visit-203",
+    "occurredAt": "2026-11-22T10:00:00Z",
+    "payload": {"page": "/pricing"},
+    "entityLinks": {"visitor": "20000000-0000-4000-8000-000000000001"}
+  }
+}
+```
+
+Attribute receipts report `applied`, `duplicate` or `superseded`. Event receipts report `created` or `replayed` and include the event ID. Cedar supplies the organization, writer identity and source namespace from the authenticated request.
+
+## Wire schemas
+
+[Input schema](/reference/schemas/crm-data-write.input.json) · [Output schema](/reference/schemas/crm-data-write.output.json).

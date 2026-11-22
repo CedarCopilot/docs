@@ -2785,5 +2785,16 @@
   "switch-chat-thread": [],
   "load-skill": [],
   "load-brain-skills": [],
-  "cedar-staff-debug": []
+  "cedar-staff-debug": [],
+  "crm-data-write": [
+    {
+      "path": "writeAttribute.ownerKind",
+      "branch": "",
+      "values": [
+        "account",
+        "contact"
+      ],
+      "description": ""
+    }
+  ]
 }

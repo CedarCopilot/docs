@@ -1879,6 +1879,24 @@
     "reference": "/reference/conversation-write"
   },
   {
+    "tool": "crm-data-write",
+    "selector": "action",
+    "value": "write-attribute",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:write",
+    "reference": "/reference/crm-data-write"
+  },
+  {
+    "tool": "crm-data-write",
+    "selector": "action",
+    "value": "record-event",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:write",
+    "reference": "/reference/crm-data-write"
+  },
+  {
     "tool": "slack-read",
     "selector": "action",
     "value": "search-live",

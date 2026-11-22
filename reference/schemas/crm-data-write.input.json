@@ -1,0 +1,132 @@
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "write-attribute",
+        "record-event"
+      ]
+    },
+    "writeAttribute": {
+      "type": "object",
+      "properties": {
+        "ownerKind": {
+          "type": "string",
+          "enum": [
+            "account",
+            "contact"
+          ]
+        },
+        "fieldKey": {
+          "type": "string",
+          "maxLength": 120,
+          "pattern": "^custom\\.[a-z][a-z0-9_]*$"
+        },
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 2147483647
+        },
+        "ownerId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "value": {},
+        "observationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 250
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "ownerKind",
+        "fieldKey",
+        "version",
+        "ownerId",
+        "observationId",
+        "occurredAt",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "recordEvent": {
+      "type": "object",
+      "properties": {
+        "eventKey": {
+          "type": "string",
+          "maxLength": 120,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 2147483647
+        },
+        "externalEventId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": {}
+        },
+        "entityLinks": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/properties/recordEvent/properties/entityLinks/additionalProperties/anyOf/0"
+                },
+                "maxItems": 100
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "eventKey",
+        "version",
+        "externalEventId",
+        "occurredAt",
+        "payload",
+        "entityLinks"
+      ],
+      "additionalProperties": false
+    },
+    "user_request_summary": {
+      "type": "string",
+      "description": "One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does."
+    },
+    "is_new_request": {
+      "type": "boolean",
+      "description": "true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread."
+    }
+  },
+  "required": [
+    "action",
+    "user_request_summary",
+    "is_new_request"
+  ],
+  "additionalProperties": true
+}
