@@ -12,10 +12,11 @@
         "field-evolution",
         "value-as-of",
         "describe-field",
+        "definitions",
         "raw-content",
         "search"
       ],
-      "description": "Which read operation to perform — pass its matching params object below (e.g. action: \"find\" pairs with find: {...})."
+      "description": "Read action. Pass the matching params object."
     },
     "get": {
       "type": "object",
@@ -201,7 +202,7 @@
             },
             "date": {
               "type": "string",
-              "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-10-30 - compute from this."
+              "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-11-22 - compute from this."
             },
             "dateTo": {
               "type": "string",
@@ -249,7 +250,7 @@
             }
           },
           "additionalProperties": false,
-          "description": "Optional event filter — filter by event types (include/exclude) or by event count (e.g. conversations with more than 5 emails via count)."
+          "description": "Filter by included/excluded event types or event counts."
         },
         "orderBy": {
           "type": "object",
@@ -270,13 +271,13 @@
             "direction"
           ],
           "additionalProperties": false,
-          "description": "Optional sorting. Defaults to lastContactedAt desc."
+          "description": "Default: lastContactedAt desc."
         },
         "limit": {
           "type": "number",
           "minimum": 1,
           "maximum": 50,
-          "description": "Maximum number of results to return. Default 20, max 50."
+          "description": "Default 20, max 50."
         },
         "extraFields": {
           "type": "array",
@@ -386,7 +387,7 @@
         "keyword": {
           "type": "string",
           "maxLength": 200,
-          "description": "Search text — deal/opportunity name, company name, etc."
+          "description": "Deal or company keyword."
         }
       },
       "required": [
@@ -394,7 +395,7 @@
         "keyword"
       ],
       "additionalProperties": false,
-      "description": "Operates on the user's connected EXTERNAL CRM (Salesforce/HubSpot/Attio/Copper) — NOT Cedar's own conversation records (that's `find`). If it's unclear whether the user means \"search Cedar's deals\" or \"search our Salesforce/HubSpot\", ask before calling either."
+      "description": "External CRM; clarify ambiguity."
     },
     "timeline": {
       "type": "object",
@@ -660,6 +661,43 @@
       ],
       "additionalProperties": false,
       "description": "Learn a field's filterable surface (plane, whether it carries strength/completeness, its vocab, and payload keys + observed values) before building a precise mask."
+    },
+    "definitions": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "account",
+            "contact",
+            "event"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 2147483647
+        },
+        "after": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
     },
     "rawContent": {
       "type": "object",

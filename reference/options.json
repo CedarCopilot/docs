@@ -1228,6 +1228,16 @@
         "judgment"
       ],
       "description": ""
+    },
+    {
+      "path": "definitions.kind",
+      "branch": "",
+      "values": [
+        "account",
+        "contact",
+        "event"
+      ],
+      "description": ""
     }
   ],
   "conversation-write": [

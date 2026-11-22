@@ -109,7 +109,11 @@
             ],
             "additionalProperties": false
           },
-          "description": "Unified list of all conversation fields with edit permissions"
+          "description": "Core fields and stored custom-field values with edit permissions; not a complete field-definition catalog"
+        },
+        "fieldGuidance": {
+          "type": "string",
+          "description": "How to discover defined fields that have no stored value on this conversation"
         },
         "domainGuidance": {
           "type": "string",
@@ -715,6 +719,29 @@
           }
         }
       },
+      "additionalProperties": false
+    },
+    "definitions": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        },
+        "nextAfter": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "nextAfter"
+      ],
       "additionalProperties": false
     },
     "rawContent": {

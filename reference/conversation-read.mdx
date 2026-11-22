@@ -11,7 +11,7 @@ Generated from Cedar's actual registration and Zod schemas. Your connection's `t
 
 <Accordion title="Full tool behavior and constraints">
 
-CRM conversation read/query over Cedar's OWN records (NOT the connected external CRM — that's action 4; ask if unclear). ACTIONS: (1) get — fetch a conversation by ID (brief timeline default; write_to_file for full content; expandEventId to inline one event); email entries include observed open/click tracking summaries when available. (2) find — locate Cedar conversations via `filters` (field/operator/value, ANDed): standard columns, computed booleans, or custom fields as "wm_&lt;fieldKey&gt;"; add extraFields for more columns. Call load-skill("conversation") for the full field reference. (3) search-semantic — vector/FTS search over conversation content (Turbopuffer); best for finding WHICH events matter. For ONE named call/email, do not answer from hits (a top-k slice, not the full transcript) — resolve its eventId here or via get's timeline, then re-read it whole via (1) get with expandEventId. (4) search-external-crm-deals — search the connected EXTERNAL CRM for a deal by keyword (get providerId from config read-settings first). DEAL-INTELLIGENCE (over extracted sub-event taxonomy atoms): (5) timeline — one time-ordered stream across events + both taxonomy planes for 1+ deals, filtered by fieldIds/kinds/stages/reps/scores/payload/time. (6) field-evolution — one field's series over time, grouped by deal. (7) value-as-of — a versioned field's value+scores at a stage/date/event. (8) describe-field — a field's plane/scores/vocab/payload keys (learn before filtering). (9) raw-content — resolve a deal's RAW verbatim events to a doc-sink buffer (stage-marked); read via read-document (#lines/#words) + search-documents (regex). (10) search — semantic search over the atoms (same cube); hits point back. Large results → the doc sink. Pass each action's params in a same-named object; omit the others.
+CRM conversation read/query over Cedar's OWN records (NOT the connected external CRM — that's action 4; ask if unclear). ACTIONS: (1) get — fetch a conversation by ID (brief timeline default; write_to_file for full content; expandEventId to inline one event); email entries include observed open/click tracking summaries when available. (2) find — locate Cedar conversations via `filters` (field/operator/value, ANDed): standard columns, computed booleans, or custom fields as "wm_&lt;fieldKey&gt;"; add extraFields for more columns. Call load-skill("conversation") for the full field reference. (3) search-semantic — vector/FTS search over conversation content (Turbopuffer); best for finding WHICH events matter. For ONE named call/email, do not answer from hits (a top-k slice, not the full transcript) — resolve its eventId here or via get's timeline, then re-read it whole via (1) get with expandEventId. (4) search-external-crm-deals — search the connected EXTERNAL CRM for a deal by keyword (get providerId from config read-settings first). DEAL-INTELLIGENCE (over extracted sub-event taxonomy atoms): (5) timeline — one time-ordered stream across events + both taxonomy planes for 1+ deals, filtered by fieldIds/kinds/stages/reps/scores/payload/time. (6) field-evolution — one field's series over time, grouped by deal. (7) value-as-of — a versioned field's value+scores at a stage/date/event. (8) describe-field — a field's plane/scores/vocab/payload keys (learn before filtering). (9) raw-content — resolve a deal's RAW verbatim events to a doc-sink buffer (stage-marked); read via read-document (#lines/#words) + search-documents (regex). (10) search — semantic search over the atoms (same cube); hits point back. Large results → the doc sink. (11) definitions — discover organization-owned account/contact fields or event contracts. Pass each action's params in a same-named object; omit the others.
 
 </Accordion>
 
@@ -27,6 +27,7 @@ CRM conversation read/query over Cedar's OWN records (NOT the connected external
 | `field-evolution` | Inspect one field's change or occurrence series over time, grouped by deal. | `crm:read` |
 | `value-as-of` | Read a versioned field's value and scores at the resolved historical cutoff. | `crm:read` |
 | `describe-field` | Discover a field's plane, score support, vocabulary and observed payload values. | `crm:read` |
+| `definitions` | List current account, contact or event definitions, or read an exact saved version. | `crm:read` |
 | `raw-content` | Resolve full source transcripts, email and Slack evidence into a readable/searchable document buffer. | `crm:read` |
 | `search` | Search extracted taxonomy evidence and retain source IDs for timeline and verbatim follow-up. | `crm:read` |
 
@@ -38,6 +39,7 @@ Every finite input choice is listed here, including array values and nested vari
 
 | Input | Choices | Variant / meaning |
 | --- | --- | --- |
+| `definitions.kind` | `account`, `contact`, `event` | Registry to read |
 | `get.eventTypes[]` | `email`, `slack_message`, `meeting`, `external_crm` |  |
 | `find.filters[].field` | `id`, `name`, `status`, `priority`, `dealValue`, `nextSteps`, `lastContactedAt`, `lastInboundAt`, `lastOutboundEmailAt`, `lastMeetingAt`, `nextStepDate`, `createdAt`, `updatedAt`, `aopId`, `important`, `ownerId`, `aopName`, `primaryCompanyName`, `primaryCompanyDomain`, `crmSynced`, `hasFutureCalendar` |  |
 | `find.filters[].operator` | `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `in`, `notIn`, `isNull`, `isNotNull` | The comparison operator |
@@ -56,7 +58,7 @@ Every finite input choice is listed here, including array values and nested vari
 
 | Parameter | Type | Required | Details |
 | --- | --- | --- | --- |
-| `action` | "get" · "find" · "search-semantic" · "search-external-crm-deals" · "timeline" · "field-evolution" · "value-as-of" · "describe-field" · "raw-content" · "search" | Yes | Which read operation to perform — pass its matching params object below (e.g. action: "find" pairs with find: &#123;...&#125;).  |
+| `action` | "get" · "find" · "search-semantic" · "search-external-crm-deals" · "timeline" · "field-evolution" · "value-as-of" · "describe-field" · "definitions" · "raw-content" · "search" | Yes | Which read operation to perform — pass its matching params object below (e.g. action: "find" pairs with find: &#123;...&#125;).  |
 | `get` | object | No |   |
 | `find` | object | No |   |
 | `searchSemantic` | object | No |   |
@@ -65,6 +67,7 @@ Every finite input choice is listed here, including array values and nested vari
 | `fieldEvolution` | object | No | One field's change/occurrence series over time, grouped by deal (the "how did X evolve" curve).  |
 | `valueAsOf` | object | No | A versioned field's value + scores at a given instant (latest change ≤ the resolved cutoff).  |
 | `describeField` | object | No | Learn a field's filterable surface (plane, whether it carries strength/completeness, its vocab, and payload keys + observed values) before building a precise mask.  |
+| `definitions` | object | No | Pinned definition or current page. |
 | `rawContent` | object | No | Resolve a deal's RAW verbatim events (full transcripts / email bodies / Slack) into a doc-sink buffer with greppable "=== STAGE: &lt;stage&gt; (evt_&lt;id&gt; @ &lt;ISO&gt;) &#91;word_base: N&#93; ===" section markers, then return only a handle + access instructions. Word offsets in the buffer are global; each marker's word_base + an atom's `position` gives the atom's global offset for a #words read. Read it via read-document (supports #lines/&#123;a&#125;-&#123;b&#125; and #words/&#123;a&#125;-&#123;b&#125; windowed reads) and search-documents (regex).  |
 | `search` | object | No | Semantic search over the extracted taxonomy atoms — discover relevant moments/deals. Hits point back (fieldValueId / conversationId / sourceEventId) so you can hop to `timeline` (shape) and raw-content (prove). Large sets → the doc sink.  |
 | `user_request_summary` | string | Yes | One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does.  |
@@ -345,6 +348,18 @@ The SAME filter cube as `timeline`, applied to the semantic candidates. Only the
 | `min` | number | No |   |
 | `max` | number | No |   |
 
+### definitions
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `kind` | string | Yes | Account fields, contact fields, or events. |
+| `key` | string | For exact lookup | Supply the stable definition key and its version together. |
+| `version` | integer | For exact lookup | Positive version number returned by discovery. |
+| `limit` | integer | No | Page size from 1 to 100. Default 25. |
+| `after` | string | No | Use the previous page’s nextAfter with the same kind. |
+
+See [reading CRM definitions](/configuration/fields#read-definitions-through-mcp) for examples.
+
 ## Full input schema
 
 [Download the input schema](/reference/schemas/conversation-read.input.json). Nested objects, variants, and constraints are preserved in full. Runtime refinements and ownership checks still apply.
@@ -366,10 +381,11 @@ The SAME filter cube as `timeline`, applied to the semantic candidates. Only the
         "field-evolution",
         "value-as-of",
         "describe-field",
+        "definitions",
         "raw-content",
         "search"
       ],
-      "description": "Which read operation to perform — pass its matching params object below (e.g. action: \"find\" pairs with find: {...})."
+      "description": "Read action. Pass the matching params object."
     },
     "get": {
       "type": "object",
@@ -555,7 +571,7 @@ The SAME filter cube as `timeline`, applied to the semantic candidates. Only the
             },
             "date": {
               "type": "string",
-              "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-10-30 - compute from this."
+              "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-11-22 - compute from this."
             },
             "dateTo": {
               "type": "string",
@@ -603,7 +619,7 @@ The SAME filter cube as `timeline`, applied to the semantic candidates. Only the
             }
           },
           "additionalProperties": false,
-          "description": "Optional event filter — filter by event types (include/exclude) or by event count (e.g. conversations with more than 5 emails via count)."
+          "description": "Filter by included/excluded event types or event counts."
         },
         "orderBy": {
           "type": "object",
@@ -624,13 +640,13 @@ The SAME filter cube as `timeline`, applied to the semantic candidates. Only the
             "direction"
           ],
           "additionalProperties": false,
-          "description": "Optional sorting. Defaults to lastContactedAt desc."
+          "description": "Default: lastContactedAt desc."
         },
         "limit": {
           "type": "number",
           "minimum": 1,
           "maximum": 50,
-          "description": "Maximum number of results to return. Default 20, max 50."
+          "description": "Default 20, max 50."
         },
         "extraFields": {
           "type": "array",
@@ -740,7 +756,7 @@ The SAME filter cube as `timeline`, applied to the semantic candidates. Only the
         "keyword": {
           "type": "string",
           "maxLength": 200,
-          "description": "Search text — deal/opportunity name, company name, etc."
+          "description": "Deal or company keyword."
         }
       },
       "required": [
@@ -748,7 +764,7 @@ The SAME filter cube as `timeline`, applied to the semantic candidates. Only the
         "keyword"
       ],
       "additionalProperties": false,
-      "description": "Operates on the user's connected EXTERNAL CRM (Salesforce/HubSpot/Attio/Copper) — NOT Cedar's own conversation records (that's `find`). If it's unclear whether the user means \"search Cedar's deals\" or \"search our Salesforce/HubSpot\", ask before calling either."
+      "description": "External CRM; clarify ambiguity."
     },
     "timeline": {
       "type": "object",
@@ -1015,6 +1031,43 @@ The SAME filter cube as `timeline`, applied to the semantic candidates. Only the
       "additionalProperties": false,
       "description": "Learn a field's filterable surface (plane, whether it carries strength/completeness, its vocab, and payload keys + observed values) before building a precise mask."
     },
+    "definitions": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "account",
+            "contact",
+            "event"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 2147483647
+        },
+        "after": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
     "rawContent": {
       "type": "object",
       "properties": {
@@ -1159,6 +1212,7 @@ Inspect `isError` on the MCP result and `success` / `errorMessage` in the action
 | `describeField` | object | No |   |
 | `rawContent` | object | No |   |
 | `search` | object | No |   |
+| `definitions` | object | No | Definition items and nextAfter, or null on the last page. |
 
 <Accordion title="Output JSON Schema">
 
@@ -1274,7 +1328,11 @@ Inspect `isError` on the MCP result and `success` / `errorMessage` in the action
             ],
             "additionalProperties": false
           },
-          "description": "Unified list of all conversation fields with edit permissions"
+          "description": "Core fields and stored custom-field values with edit permissions; not a complete field-definition catalog"
+        },
+        "fieldGuidance": {
+          "type": "string",
+          "description": "How to discover defined fields that have no stored value on this conversation"
         },
         "domainGuidance": {
           "type": "string",
@@ -1880,6 +1938,29 @@ Inspect `isError` on the MCP result and `success` / `errorMessage` in the action
           }
         }
       },
+      "additionalProperties": false
+    },
+    "definitions": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        },
+        "nextAfter": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "nextAfter"
+      ],
       "additionalProperties": false
     },
     "rawContent": {

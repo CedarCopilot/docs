@@ -28,6 +28,34 @@ Choose `cedar_id` for **Cedar account ID field** and `tier` for the value. Selec
 
 Previewing leaves the CRM record unchanged. If the record cannot be resolved, check the record type, Cedar ID, and organization.
 
+## Read definitions through MCP
+
+Use `conversation-read` with the `crm:read` permission to discover your organization’s published definitions. Choose `account` or `contact` for attributes and `event` for event contracts. This action needs no conversation ID.
+
+To list contact fields, call the tool with these arguments:
+
+```json
+{
+  "action": "definitions",
+  "definitions": { "kind": "contact", "limit": 25 },
+  "user_request_summary": "List our published contact field definitions",
+  "is_new_request": true
+}
+```
+
+Each item contains its stable key and version. Continue with the returned `nextAfter` as `after` until it is null. To inspect an event’s payload and entity links at the version that was in effect, pass its saved key and version:
+
+```json
+{
+  "action": "definitions",
+  "definitions": { "kind": "event", "key": "website_visit", "version": 1 },
+  "user_request_summary": "Inspect version one of our website visit event definition",
+  "is_new_request": true
+}
+```
+
+Replace `website_visit` with a key your organization has published. See the [complete tool reference](/reference/conversation-read#definitions) for options and response details.
+
 ## Options and external CRM mappings
 
 Use `sourceFromCrm` when creating a field backed by a CRM picklist/multi-select. `link-mapping` associates and reconciles a Cedar field with an external field; `unlink-mapping` removes that association. Read the result back to confirm canonical options are present.
