@@ -12310,12 +12310,17 @@
                       "items": {
                         "type": "object",
                         "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
                           "value": {},
                           "occurredAt": {
                             "type": "string"
                           }
                         },
                         "required": [
+                          "id",
                           "occurredAt"
                         ],
                         "additionalProperties": false
