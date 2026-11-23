@@ -679,6 +679,17 @@
         },
         "indexed": {
           "type": "boolean"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "created",
+            "replayed"
+          ]
+        },
+        "queuedRuns": {
+          "type": "integer",
+          "minimum": 0
         }
       },
       "additionalProperties": false

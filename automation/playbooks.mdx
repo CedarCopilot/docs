@@ -22,7 +22,7 @@ Document paths and templates come from the loaded skill/account context. Do not 
 
 | Trigger | Fires on |
 | --- | --- |
-| `any` | Supported deal events. Calendar changes and signals require explicit opt-in |
+| `any` | Supported deal events. Calendar changes, signals, calls, texts and custom events require their own trigger |
 | `email` | Inbound or outbound email |
 | `meeting` | A meeting after its transcript lands |
 | `calendar` | Creation, update or cancellation of a linked calendar event |
@@ -30,6 +30,9 @@ Document paths and templates come from the loaded skill/account context. Do not 
 | `linkedin` | Counterpart LinkedIn messages; the user's own sends alone do not fire it |
 | `linkedin_connection` | Someone accepting a connection request the user sent |
 | `external_crm` | A change pulled from the connected CRM |
+| `call` | A logged deal call submitted with playbook processing enabled |
+| `text` | A logged deal text submitted with playbook processing enabled |
+| `custom` | A published organization event matching the selected key or **Any custom event** |
 | `signal` | Actionable watcher or qualified native signal evidence |
 | `field-change` | A Cedar field taking the configured value |
 | `cron` | A schedule with an explicit timezone |
