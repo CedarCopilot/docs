@@ -22,9 +22,19 @@ Attaching context does not copy its permissions to the user or agent. The underl
 
 In **Cedar (fast)**, **GPT-6 Luna** and **GPT-6.1 Sol (low reasoning)**, approving a supported action card checks your current permissions and applies the approved action. After the action succeeds, Cedar continues the original request. Declining the card lets Cedar continue without performing that action. Approving one card does not approve any later proposal.
 
+When Cedar continues after approval, it keeps the original request’s selected items. Opening a different document or person while you review a card does not redirect that unfinished request. Cedar checks current access again before continuing.
+
 If the action completed but the following response failed, use **Retry** to continue from the saved result. Cedar does not need to apply that completed action again.
 
 <Note>Claude modes with low, medium or high reasoning keep their current approval flow. External MCP clients manage their own chat state and approvals.</Note>
+
+## Reconnect or stop an interrupted reply
+
+In **Cedar (fast)**, **GPT-6 Luna** and **GPT-6.1 Sol (low reasoning)**, if your connection drops, reopen the same chat. Cedar can reconnect to the saved reply and continue when it has enough information to do so safely. Closing a chat is different from choosing **Stop**.
+
+If Cedar cannot safely continue, it shows an error with **Retry**. Check any actions that may already have completed before retrying an interrupted request. A retry is not permission to repeat an action whose outcome is uncertain. If the saved reply was waiting for your answer to a question, answer that question before continuing.
+
+For a task marked **Working in the background**, use the **Stop** beside that task to stop its remaining work. Its progress and saved result stay in the original chat. See [Follow work running in the background](/agent-platform/delegation#follow-work-running-in-the-background).
 
 ## Search, load and navigate
 
