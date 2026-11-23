@@ -11,7 +11,9 @@ Load `cedar-configuration` with `fields-and-values` before changing fields. Read
 
 The field system also supports configured internal-signal definitions/lifecycle and signal-enabled fields. These configure what is extracted and displayed; signal activation and record lifecycle use the separate signals tools.
 
-## Preview an account or contact field
+## Preview and save an account or contact field
+
+These workspace field and event features become available after your Cedar workspace receives the custom CRM data release.
 
 As an organization administrator, open **Admin → Configurations → CRM custom fields**. Choose **Account** or **Contact**, then select a published field. To define one, choose **New field**, enter its name and stable key, select its type, and choose **Create field**. Creating the definition saves it for the organization.
 
@@ -27,6 +29,51 @@ To try a mapping, paste one JSON source record that contains the Cedar ID of a r
 Choose `cedar_id` for **Cedar account ID field** and `tier` for the value. Select **Preview mapping**. Check the matched record, the selected definition version, and the proposed value. If a saved value has source and observation details, use them to judge its freshness. For a current field, compare the proposed value with the saved value. For a list field, compare the proposed entry with the most recent saved observation.
 
 Previewing leaves the CRM record unchanged. If the record cannot be resolved, check the record type, Cedar ID, and organization.
+
+For a manual **list** field, select **Save value** to append the matched observation. Preview again to read back the latest entry. Manual saves use the same observation ID when you retry after an interrupted request.
+
+**Current-value account and contact fields are read-only for this release.** You can define and preview these fields and read values already stored. New account/contact scalar saves are on hold while Cedar finalizes how a source should replay an older update. Deal-field saves keep their existing behavior.
+
+## Send data from a connected source
+
+An organization administrator must authorize a Cedar OAuth client with the `crm:write` scope. Send one JSON document per HTTP POST to `/webhooks/custom-data/<organization-id>` on your Cedar API host. Include `Authorization: Bearer <access-token>` and `Content-Type: application/json`. Use the Cedar organization ID for this feed. It must match the workspace authorized by the credential.
+
+For example, to keep a history of Vooma’s ABM tier observations, publish a **list** account field named `custom.abm_tier_history` with **Connected source** as its writer. Substitute your published version and the target account’s Cedar ID.
+
+```json
+{
+  "kind": "attribute",
+  "data": {
+    "ownerKind": "account",
+    "ownerId": "57c708db-b9c5-41f8-ba3d-569c49961af1",
+    "fieldKey": "custom.abm_tier_history",
+    "version": 1,
+    "value": "Tier 1",
+    "observationId": "vooma-abm-875",
+    "occurredAt": "2026-11-20T18:30:00Z"
+  }
+}
+```
+
+A successful list write returns the row ID and either `applied` or `duplicate`. Reuse the same observation ID, timestamp and value when retrying. A changed observation with the same ID returns a conflict. Contact lists use `ownerKind: "contact"` and a Cedar contact ID. A current-value write returns HTTP 412.
+
+To import a Mastra website visit, publish a `website_visit` event definition with a string field called `path` and a single account link called `visitor_account`. Substitute an accessible Cedar account ID and send:
+
+```json
+{
+  "kind": "event",
+  "data": {
+    "eventKey": "website_visit",
+    "version": 1,
+    "externalEventId": "mastra-visit-7043",
+    "occurredAt": "2026-11-20T19:10:00Z",
+    "payload": { "path": "/pricing" },
+    "entityLinks": { "visitor_account": "57c708db-b9c5-41f8-ba3d-569c49961af1" }
+  }
+}
+```
+
+A successful event response returns its Cedar event ID and `created` or `replayed`. Retry a delivery with the same source occurrence ID and body. A conflict means that ID was reused for different data. For a job change, your definition can require separate links to the person, former employer and new employer. All supplied links must resolve in the authorized workspace for the event to be stored. Related deals can retrieve account and contact activity. A deal-specific event uses the existing single-deal action. **Coming soon:** triggering a custom outbound webhook when Cedar receives a custom event. Today the inbound receiver stores the event and makes it available for authorized reads.
 
 ## Read definitions through MCP
 
@@ -71,3 +118,19 @@ Removing an option with stored values can require an explicit `remap-to` or `kee
 The supported deal-brief/buyer-journey configuration includes stage-specific visibility and rubric rows. Where strength is used, preserve fixed rubric meaning and represent unknown values as null. Editing presentation does not itself backfill historical evidence.
 
 [Every config-write parameter](/reference/config-write) · [Field history](/crm/field-history) · [Organization propagation](/configuration/team)
+
+For runnable event publication and delivery examples, see [Send custom CRM events](/integrations/custom-crm-data).
+
+
+## Company and contact profiles
+
+In a deal’s Company tab or contact overview, Cedar looks up the linked organization record. Your organization’s value takes precedence for these reserved enrichment fields. If it is empty, Cedar uses the shared profile value.
+
+| Owner | Reserved fields | Definition type |
+| --- | --- | --- |
+| Account | `company.industry`, `company.description`, `company.employeeCountRange`, `company.hqFull` | text |
+| Account | `company.employeeCount` | number |
+| Account | `company.lastFundingDate` | date |
+| Contact | `person.title` | text |
+
+Use `custom.` keys for other organization-specific facts. Deal context can automatically include up to twelve fields whose effective definitions enable the agent summary. Each list contributes its latest observation, and each value is limited to 200 characters. [Read a record, its field history and organization events](/reference/conversation-read#record-profile).

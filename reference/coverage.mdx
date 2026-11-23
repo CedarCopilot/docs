@@ -3,7 +3,7 @@ title: "Complete capability coverage"
 description: "Every action, operation, change type, mode, and channel in the registered schemas."
 ---
 
-This index is generated from the same schemas as the reference, including nested change unions. It contains **526 selector choices** across **52 tools**. Choices include operation modes and document types; they are not a count of independent APIs. Tools without a selector appear as single-call capabilities.
+This index is generated from the same schemas as the reference, including nested change unions. It contains **534 selector choices** across **53 tools**. Choices include operation modes and document types; they are not a count of independent APIs. Tools without a selector appear as single-call capabilities.
 
 Staff, feature-gated, and app-only entries are labeled. An action requiring `in-app` remains unavailable externally even when its parent family is listed. Additional path, role, and provider checks still apply.
 
@@ -747,8 +747,23 @@ Single call, baseline scope: `brain:read`.
 | `action` | `value-as-of` | crm:read |
 | `action` | `describe-field` | crm:read |
 | `action` | `definitions` | crm:read |
+| `action` | `record-profile` | crm:read |
 | `action` | `raw-content` | crm:read |
 | `action` | `search` | crm:read |
+
+#### crm-write
+
+[Full parameters and responses](/reference/crm-write) · Availability: **external**.
+
+| Selector | Value | Variant / scope |
+| --- | --- | --- |
+| `action` | `update-fields` | crm:write |
+| `action` | `create-event` | crm:write |
+| `updateFields.fields[].mode` | `replace` | crm:write + crm:read |
+| `updateFields.fields[].mode` | `patch` | crm:write + crm:read |
+| `updateFields.fields[].mode` | `upsert` | crm:write + crm:read |
+| `updateFields.fields[].mode` | `append` | crm:write + crm:read |
+| `updateFields.fields[].mode` | `update` | crm:write + crm:read |
 
 #### conversation-write
 

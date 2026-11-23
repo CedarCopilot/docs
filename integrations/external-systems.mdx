@@ -31,3 +31,5 @@ Cedar's internal `external-mcp` family dispatches to connected MCP servers. It i
 Creating a CRM task, note, opportunity or Slack channel may require an external provider connector rather than a Cedar conversation mutation. Load `cedar-configuration` with `external-writes`, verify which API owns the object, and read back the provider result. Linking an existing external deal to Cedar remains a supported `conversation-write` action.
 
 [System configuration](/reference/systems-write) · [Connected-systems skill](/skills/connected-systems) · [App-only bridge](/reference/external-mcp)
+
+For product activity, job changes, website visits and intent observations, use the [custom CRM event receiver](/integrations/custom-crm-data).

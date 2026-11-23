@@ -131,6 +131,15 @@ Every finite input choice is listed here, including array values and nested vari
 
 </Accordion>
 
+## crm-write
+
+| Action | Purpose | Scope |
+| --- | --- | --- |
+| `update-fields` | Update deal fields or an agent-maintained account or contact list with evidence. | `crm:write` |
+| `create-event` | Log deal activity or publish an organization event with named links to Cedar records. | `crm:write` |
+
+See the [parameters, examples, and receipts](/reference/crm-write).
+
 ## Access and results
 
 Use your authenticated connection's `tools/list` to discover what is available. Role, feature, target, and resource checks apply in addition to the baseline scopes. Inspect the returned operation result before reporting success; a queued or proposed action is not a completed external action. See [permissions](/getting-started/permissions) and [calling tools](/getting-started/calling-tools).

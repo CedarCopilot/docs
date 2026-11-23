@@ -229,6 +229,7 @@
                 "group": "Connected systems",
                 "pages": [
                   "integrations/external-systems",
+                  "integrations/custom-crm-data",
                   "capabilities/systems",
                   "agent-platform/connected-tools",
                   {
@@ -723,6 +724,7 @@
                     "group": "Tool reference",
                     "pages": [
                       "reference/conversation-read",
+                      "reference/crm-write",
                       "reference/conversation-write"
                     ]
                   }

@@ -838,6 +838,189 @@
       },
       "additionalProperties": false
     },
+    "recordProfile": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "account",
+            "contact"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "profile": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string"
+              },
+              "value": {},
+              "source": {
+                "type": "string",
+                "enum": [
+                  "organization",
+                  "shared",
+                  "missing"
+                ]
+              }
+            },
+            "required": [
+              "field",
+              "source"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "list": {
+                "type": "boolean"
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {},
+                    "occurredAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "occurredAt"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "hasEarlier": {
+                "type": "boolean"
+              },
+              "earlierCursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "label",
+              "list",
+              "values",
+              "hasEarlier",
+              "earlierCursor"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "activity": {
+          "type": "object",
+          "properties": {
+            "events": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "at": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "number"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "payload": {
+                    "type": "object",
+                    "additionalProperties": {}
+                  }
+                },
+                "required": [
+                  "id",
+                  "at",
+                  "key",
+                  "version",
+                  "title",
+                  "payload"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "next": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  },
+                  "required": [
+                    "at",
+                    "id"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "events",
+            "next"
+          ],
+          "additionalProperties": false
+        },
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "label",
+        "profile",
+        "attributes",
+        "next"
+      ],
+      "additionalProperties": false
+    },
     "definitions": {
       "type": "object",
       "properties": {
@@ -970,6 +1153,5 @@
   "required": [
     "success"
   ],
-  "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#"
+  "additionalProperties": false
 }

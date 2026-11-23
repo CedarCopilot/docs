@@ -1,0 +1,126 @@
+---
+title: "Send custom CRM events"
+description: "Publish an event contract, send a typed occurrence, verify its receipt, and retry safely."
+---
+
+Use this guide once your workspace has the custom CRM data release. An organization owner or admin publishes a versioned contract in Cedar. A customer connection can then send occurrences to that workspace. Each occurrence has an external ID, timestamp, typed payload and named links to Cedar account or contact IDs. Store these IDs in your sender before delivery. A domain, email address, Salesforce ID or warehouse row ID cannot stand in for a Cedar record ID.
+
+### Choose an event
+
+These examples use synthetic data. Choose the event key and replace the sample values with values from your source. The payload field names below are illustrative Cedar contract names. Your sender translates its source columns into that contract.
+
+| Source observation | Event key | Payload example | Named links |
+| --- | --- | --- | --- |
+| An integration was connected in the product | `product_activity` | `{"activity":"integration_connected"}` | Required account `customer_account` |
+| A champion changed employers | `job_change` | `{"position":"VP Operations"}` | Required account `new_employer` and contact `champion` |
+| A visitor opened the pricing page | `website_visit` | `{"path":"/pricing"}` | Required account `visitor_account`, optional contact `visitor` |
+| An account showed intent for a topic | `intent_observed` | `{"topic":"fleet software","score":84}` | Required account `interested_account` |
+
+### Publish the definition
+
+Use an authenticated administrator session for the tRPC mutation `POST /api/trpc/crm.eventDefinitions.publish`. The inbound OAuth token is for submitting occurrences. To publish without exporting your session cookie, open Cedar while signed in as an organization owner or admin, open the browser developer console, and run this example. Set `apiOrigin` to the origin Cedar uses for its own `/api/trpc` requests, visible in the Network panel. Choose one event key per run.
+
+```js
+const apiOrigin = "https://YOUR-CEDAR-API-HOST";
+const eventKey = "website_visit";
+const examples = {
+  product_activity: {
+    label: "Product activity", fields: {activity: "string"},
+    account: "customer_account",
+  },
+  job_change: {
+    label: "Job change", fields: {position: "string"},
+    account: "new_employer", contact: "champion", requireContact: true,
+  },
+  website_visit: {
+    label: "Website visit", fields: {path: "string"},
+    account: "visitor_account", contact: "visitor", requireContact: false,
+  },
+  intent_observed: {
+    label: "Intent observed", fields: {topic: "string", score: "number"},
+    account: "interested_account",
+  },
+};
+const spec = examples[eventKey];
+const definition = {
+  eventKey, label: spec.label, expectedPreviousVersion: 0,
+  description: "",
+  payloadSchema: Object.entries(spec.fields).map(([name, type]) => ({
+    name, type, required: true,
+  })),
+  entityLinks: [
+    {name: spec.account, kind: "account", required: true, cardinality: "one"},
+    ...(spec.contact ? [{
+      name: spec.contact, kind: "contact",
+      required: spec.requireContact, cardinality: "one",
+    }] : []),
+  ],
+};
+const response = await fetch(apiOrigin + "/api/trpc/crm.eventDefinitions.publish", {
+  method: "POST", credentials: "include",
+  headers: {"Content-Type": "application/json"},
+  body: JSON.stringify({json: definition}),
+});
+const result = await response.json();
+if (!response.ok) throw new Error(result.error?.json?.message || "Publish failed");
+console.log(result.result.data.json);
+```
+
+Use `expectedPreviousVersion: 0` for a new event. A successful publish returns the definition and its version. If the key already exists, read it with the MCP `conversation-read` action `definitions`. To publish a revision, supply the version you reviewed as `expectedPreviousVersion`. [Definition discovery](/reference/conversation-read).
+
+### Send a test occurrence
+
+Use a connection with an explicit `crm:write` OAuth grant belonging to an authorized owner or admin. Set `CEDAR_API_ORIGIN`, `CEDAR_ORG_ID`, `CEDAR_ACCOUNT_ID` and `CEDAR_EVENT_KEY` in your shell. Provide `CEDAR_ACCESS_TOKEN` through your development environment’s secret manager. For `job_change`, also set `CEDAR_CONTACT_ID` to the champion’s Cedar contact ID. For `website_visit`, set it only when the source identifies a person. Set `CEDAR_EVENT_VERSION` to the version returned by publication.
+
+The Python example uses only the standard library. Save it as `send_event.py` and run `python3 send_event.py`. Change the ID and timestamp when sending a distinct occurrence.
+
+```python
+import json
+import os
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
+
+env = os.environ
+key = env["CEDAR_EVENT_KEY"]
+account_link, contact_link, payload = {
+    "product_activity": ("customer_account", None, {"activity": "integration_connected"}),
+    "job_change": ("new_employer", "champion", {"position": "VP Operations"}),
+    "website_visit": ("visitor_account", "visitor", {"path": "/pricing"}),
+    "intent_observed": ("interested_account", None, {"topic": "fleet software", "score": 84}),
+}[key]
+links = {account_link: env["CEDAR_ACCOUNT_ID"]}
+if key == "job_change":
+    links[contact_link] = env["CEDAR_CONTACT_ID"]
+elif contact_link and env.get("CEDAR_CONTACT_ID"):
+    links[contact_link] = env["CEDAR_CONTACT_ID"]
+body = {
+    "kind": "event",
+    "data": {
+        "eventKey": key,
+        "version": int(env["CEDAR_EVENT_VERSION"]),
+        "externalEventId": f"example-{key}-001",
+        "occurredAt": "2026-11-21T12:00:00Z",
+        "payload": payload,
+        "entityLinks": links,
+    },
+}
+url = env["CEDAR_API_ORIGIN"].rstrip("/") + "/webhooks/custom-data/" + env["CEDAR_ORG_ID"]
+request = Request(url, method="POST", data=json.dumps(body).encode(), headers={
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + env["CEDAR_ACCESS_TOKEN"],
+})
+try:
+    with urlopen(request) as response:
+        print(response.status, response.read().decode())
+except HTTPError as error:
+    print(error.code, error.read().decode())
+    raise SystemExit(1)
+```
+
+The first successful call returns `201`, `created`, and a Cedar event ID. Repeat the same body under the same connector and user. Expect `200`, `replayed`, and the same ID. Keep `externalEventId` unique across all event types for that source. Cedar returns `409` when a retry changes the occurrence, `400` for undeclared payload fields and `412` for a required native record it cannot resolve. Check the error before retrying.
+
+When an accessible deal already links to the same account or contact, read its `related-activity` through `conversation-read` and look for the returned event ID. That occurrence stays organization-owned and can surface on multiple related deals. [Deal activity lookup](/reference/conversation-read).
+
+### Release scope
+
+The receiver accepts the Cedar contract directly. The source setup flow, automatic workflows triggered by these events, and outbound custom webhooks are deferred. Source-maintained **list** attributes support appending observations. Scalar attribute writes are held for this release. [Custom fields and list values](/configuration/fields).
