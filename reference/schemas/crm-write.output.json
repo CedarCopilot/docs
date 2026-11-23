@@ -770,26 +770,6 @@
         {
           "type": "object",
           "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "created",
-                "replayed"
-              ]
-            },
-            "eventId": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "status",
-            "eventId"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
             "eventId": {
               "type": "string"
             },
@@ -801,8 +781,43 @@
             },
             "indexed": {
               "type": "boolean"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "created",
+                "replayed"
+              ]
+            },
+            "queuedRuns": {
+              "type": "integer",
+              "minimum": 0
             }
           },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "created",
+                "replayed"
+              ]
+            },
+            "eventId": {
+              "type": "string"
+            },
+            "queuedRuns": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "status",
+            "eventId"
+          ],
           "additionalProperties": false
         }
       ]

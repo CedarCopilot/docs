@@ -153,6 +153,12 @@ The first successful call returns `201`, `created`, and a Cedar event ID. Repeat
 
 When an accessible deal already links to the same account or contact, read its `related-activity` through `conversation-read` and look for the returned event ID. That occurrence stays organization-owned and can surface on multiple related deals. [Deal activity lookup](/reference/conversation-read).
 
+### Run a playbook when an event arrives
+
+In the attached deal playbook, add **On event → Custom** and select the published event key. Choose **Any custom event** to match all published keys. Add the agents and optional conditions to that block. The custom-data endpoint requests background processing by default. To store an event without running a playbook, add `"triggerPlaybook": false` beside `"kind": "event"` in the request body.
+
+Cedar checks conversations linked through the event’s accounts or contacts. Each eligible deal with a matching attached playbook can run once for this occurrence, even when several links lead to that deal. With no qualifying deal, the event is still saved. Repeating the same submission does not start another run. [Playbook triggers](/agent-platform/triggers).
+
 ### Release scope
 
 The receiver accepts the Cedar contract directly. Triggering a custom outbound webhook from an incoming event is coming soon. For this release, map source records to the published contract before sending them. Source-maintained **list** attributes support appending observations. Scalar attribute writes are held for this release. [Custom fields and list values](/configuration/fields).
