@@ -62,6 +62,14 @@ For external MCP clients, `start` returns a read-only `deal.handoff` containing 
 
 For `update`, claim completion only when the receipt has `outcome: "updated"`, `changed: true` and `taskStatus: "done"`. `blocked` and `unchanged` do not establish completion. Fulfillment evidence, when supplied, must refer to the linked task draft and actual sent-source evidence.
 
+## Prepare a sequence for one task
+
+On an account with task delivery enabled, ask Cedar to prepare a sequence for the contact. Pick the sender profile and specify each touch in order, with its channel, message and timing. For example, ask for an email on Monday morning and a second email two business days later. Cedar can prepare a one-off sequence or use an existing sequence template.
+
+Review the saved sender, recipients, copy and timing on the task. Preparation leaves the sequence paused. Approve the version you want to start. Manual touches still need their own action. When a LinkedIn invitation precedes a direct message in a one-off plan, the direct message waits for connection acceptance.
+
+To change the remaining touches while the sequence awaits review, ask Cedar to revise the current version. Check the updated plan before approving it. Completed touches retain their original copy and delivery history.
+
 ## Access and organization
 
 Most task actions use `crm:read`; `snooze` and `unsnooze` require `email:read`. Each action still enforces its ownership, assignment, target-user and approval rules. A scope name alone does not authorize arbitrary changes to another person's work. Your session's `tools/list` determines whether the family is available.

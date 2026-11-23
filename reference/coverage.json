@@ -38,6 +38,15 @@
   {
     "tool": "conversation-read",
     "selector": "action",
+    "value": "related-activity",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:read",
+    "reference": "/reference/conversation-read"
+  },
+  {
+    "tool": "conversation-read",
+    "selector": "action",
     "value": "timeline",
     "branch": "",
     "surface": "external",
@@ -66,6 +75,24 @@
     "tool": "conversation-read",
     "selector": "action",
     "value": "describe-field",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:read",
+    "reference": "/reference/conversation-read"
+  },
+  {
+    "tool": "conversation-read",
+    "selector": "action",
+    "value": "definitions",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:read",
+    "reference": "/reference/conversation-read"
+  },
+  {
+    "tool": "conversation-read",
+    "selector": "action",
+    "value": "record-profile",
     "branch": "",
     "surface": "external",
     "scope": "crm:read",
@@ -358,6 +385,132 @@
     "surface": "external",
     "scope": "",
     "reference": "/reference/conversation-write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "action",
+    "value": "publish-field-definition",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:manage + crm:write",
+    "reference": "/reference/crm-write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "action",
+    "value": "publish-event-definition",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:manage + crm:write",
+    "reference": "/reference/crm-write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "action",
+    "value": "ensure-record",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:manage + crm:write",
+    "reference": "/reference/crm-write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "action",
+    "value": "update-fields",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:write",
+    "reference": "/reference/crm-write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "action",
+    "value": "create-event",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:write",
+    "reference": "/reference/crm-write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "updateFields.fields[].mode",
+    "value": "replace",
+    "branch": "",
+    "surface": "external",
+    "reference": "/reference/crm-write",
+    "scope": "crm:write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "updateFields.fields[].mode",
+    "value": "patch",
+    "branch": "",
+    "surface": "external",
+    "reference": "/reference/crm-write",
+    "scope": "crm:write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "updateFields.fields[].mode",
+    "value": "upsert",
+    "branch": "",
+    "surface": "external",
+    "reference": "/reference/crm-write",
+    "scope": "crm:write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "updateFields.fields[].mode",
+    "value": "append",
+    "branch": "",
+    "surface": "external",
+    "reference": "/reference/crm-write",
+    "scope": "crm:write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "updateFields.fields[].mode",
+    "value": "update",
+    "branch": "",
+    "surface": "external",
+    "reference": "/reference/crm-write",
+    "scope": "crm:write"
+  },
+  {
+    "tool": "slack-read",
+    "selector": "action",
+    "value": "search-live",
+    "branch": "",
+    "surface": "external",
+    "scope": "slack:read",
+    "reference": "/reference/slack-read"
+  },
+  {
+    "tool": "slack-read",
+    "selector": "action",
+    "value": "read-thread",
+    "branch": "",
+    "surface": "external",
+    "scope": "slack:read",
+    "reference": "/reference/slack-read"
+  },
+  {
+    "tool": "slack-read",
+    "selector": "action",
+    "value": "read-file",
+    "branch": "",
+    "surface": "external",
+    "scope": "slack:read",
+    "reference": "/reference/slack-read"
+  },
+  {
+    "tool": "slack-write",
+    "selector": "action",
+    "value": "sync-thread",
+    "branch": "",
+    "surface": "external",
+    "scope": "slack:read",
+    "reference": "/reference/slack-write"
   },
   {
     "tool": "conversation-analytics",

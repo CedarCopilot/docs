@@ -11,7 +11,7 @@ Generated from Cedar's actual registration and Zod schemas. Your connection's `t
 
 <Accordion title="Full tool behavior and constraints">
 
-CRM conversation read/query over Cedar's OWN records (NOT the connected external CRM — that's action 4; ask if unclear). ACTIONS: (1) get — fetch a conversation by ID (brief timeline default; write_to_file for full content; expandEventId to inline one event); email entries include observed open/click tracking summaries when available. (2) find — locate Cedar conversations via `filters` (field/operator/value, ANDed): standard columns, computed booleans, or custom fields as "wm_&lt;fieldKey&gt;"; add extraFields for more columns. Call load-skill("conversation") for the full field reference. (3) search-semantic — vector/FTS search over conversation content (Turbopuffer); best for finding WHICH events matter. For ONE named call/email, do not answer from hits (a top-k slice, not the full transcript) — resolve its eventId here or via get's timeline, then re-read it whole via (1) get with expandEventId. (4) search-external-crm-deals — search the connected EXTERNAL CRM for a deal by keyword (get providerId from config read-settings first). DEAL-INTELLIGENCE (over extracted sub-event taxonomy atoms): (5) timeline — one time-ordered stream across events + both taxonomy planes for 1+ deals, filtered by fieldIds/kinds/stages/reps/scores/payload/time. (6) field-evolution — one field's series over time, grouped by deal. (7) value-as-of — a versioned field's value+scores at a stage/date/event. (8) describe-field — a field's plane/scores/vocab/payload keys (learn before filtering). (9) raw-content — resolve a deal's RAW verbatim events to a doc-sink buffer (stage-marked); read via read-document (#lines/#words) + search-documents (regex). (10) search — semantic search over the atoms (same cube); hits point back. Large results → the doc sink. Pass each action's params in a same-named object; omit the others.
+Read Cedar CRM records. For connected CRM deals use action 4. ACTIONS: (1) get — conversation by ID; brief timeline by default, write_to_file for full content, expandEventId for one event. Email entries show observed opens/clicks when available. (2) find — locate Cedar conversations via `filters` (field/operator/value, ANDed): standard columns, computed booleans, or custom fields as "wm_&lt;fieldKey&gt;"; add extraFields for more columns. Call load-skill("conversation") for the full field reference. (3) search-semantic — find relevant events by vector/full-text search. For a named call/email, get its eventId here or in the timeline, then use get with expandEventId for the full source. (4) search-external-crm-deals — search the connected EXTERNAL CRM for a deal by keyword (get providerId from config read-settings first). related-activity — retrieve shared custom events linked through the deal account or its contacts. DEAL-INTELLIGENCE (over extracted sub-event taxonomy atoms): (5) timeline — one time-ordered stream across events + both taxonomy planes for 1+ deals, filtered by fieldIds/kinds/stages/reps/scores/payload/time. (6) field-evolution — one field's series over time, grouped by deal. (7) value-as-of — a versioned field's value+scores at a stage/date/event. (8) describe-field — a field's plane/scores/vocab/payload keys (learn before filtering). (9) raw-content — resolve a deal's RAW verbatim events to a doc-sink buffer (stage-marked); read via read-document (#lines/#words) + search-documents (regex). (10) search — semantic search over the atoms (same cube); hits point back. Large results → the doc sink. (11) definitions — discover account/contact field or event definitions. Choose kind; page with after/limit, or read an exact key and version. Pass each action's params in a same-named object; omit the others.
 
 </Accordion>
 
@@ -23,10 +23,13 @@ CRM conversation read/query over Cedar's OWN records (NOT the connected external
 | `find` | Find Cedar conversations using the family’s supported filters. | `crm:read` |
 | `search-semantic` | Search meaning across already-synced conversation evidence. | `crm:read` |
 | `search-external-crm-deals` | Find deals in the connected external CRM, separately from Cedar conversations. | `crm:read` |
+| `record-profile` | Read an account or contact by Cedar ID, including enrichment, fields and linked organization events. | `crm:read` |
+| `related-activity` | Read shared custom events linked through the deal’s primary account or contacts. | `crm:read` |
 | `timeline` | Read a time-ordered stream across events and extracted fields for selected deals. | `crm:read` |
 | `field-evolution` | Inspect one field's change or occurrence series over time, grouped by deal. | `crm:read` |
 | `value-as-of` | Read a versioned field's value and scores at the resolved historical cutoff. | `crm:read` |
 | `describe-field` | Discover a field's plane, score support, vocabulary and observed payload values. | `crm:read` |
+| `definitions` | List current account, contact or event definitions, or read an exact saved version. | `crm:read` |
 | `raw-content` | Resolve full source transcripts, email and Slack evidence into a readable/searchable document buffer. | `crm:read` |
 | `search` | Search extracted taxonomy evidence and retain source IDs for timeline and verbatim follow-up. | `crm:read` |
 
@@ -36,9 +39,10 @@ Path, account role, feature gates, target ownership, and billing permissions can
 
 | Input | Choices | Variant |
 | --- | --- | --- |
-| `get.eventTypes&#91;&#93;` | `email`, `slack_message`, `meeting`, `external_crm` |  |
-| `find.filters&#91;&#93;.field` | `id`, `name`, `status`, `priority`, `dealValue`, `nextSteps`, `lastContactedAt`, `lastInboundAt`, `lastOutboundEmailAt`, `lastMeetingAt`, `nextStepDate`, `createdAt`, `updatedAt`, `aopId`, `important`, `ownerId`, `aopName`, `primaryCompanyName`, `primaryCompanyDomain`, `crmSynced`, `hasFutureCalendar` |  |
-| `find.filters&#91;&#93;.operator` | `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `in`, `notIn`, `isNull`, `isNotNull` |  |
+| `definitions.kind` | `account`, `contact`, `event` | Registry to read |
+| `get.eventTypes[]` | `email`, `slack_message`, `meeting`, `external_crm` |  |
+| `find.filters[].field` | `id`, `name`, `status`, `priority`, `dealValue`, `nextSteps`, `lastContactedAt`, `lastInboundAt`, `lastOutboundEmailAt`, `lastMeetingAt`, `nextStepDate`, `createdAt`, `updatedAt`, `aopId`, `important`, `ownerId`, `aopName`, `primaryCompanyName`, `primaryCompanyDomain`, `crmSynced`, `hasFutureCalendar` |  |
+| `find.filters[].operator` | `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `in`, `notIn`, `isNull`, `isNotNull` | The comparison operator |
 | `find.eventFilter.dateOperator` | `before`, `after`, `on`, `range` |  |
 | `find.eventFilter.count.operator` | `gt`, `gte`, `lt`, `lte`, `eq` |  |
 | `find.orderBy.field` | `id`, `name`, `status`, `priority`, `dealValue`, `nextSteps`, `lastContactedAt`, `lastInboundAt`, `lastOutboundEmailAt`, `lastMeetingAt`, `nextStepDate`, `createdAt`, `updatedAt`, `aopId`, `important`, `ownerId`, `aopName`, `primaryCompanyName`, `primaryCompanyDomain`, `crmSynced`, `hasFutureCalendar` |  |
@@ -54,19 +58,21 @@ Path, account role, feature gates, target ownership, and billing permissions can
 
 | Field | Type | Required | Details |
 | --- | --- | --- | --- |
-| `action` | `get` · `find` · `search-semantic` · `search-external-crm-deals` · `timeline` · `field-evolution` · `value-as-of` · `describe-field` · `raw-content` · `search` | Yes | Which read operation to perform — pass its matching params object below (e.g. action: "find" pairs with find: &#123;...&#125;). |
-| `get` | object | No |  |
-| `find` | object | No |  |
-| `searchSemantic` | object | No |  |
-| `searchExternalCrmDeals` | object | No | External CRM; clarify ambiguity. |
-| `timeline` | object | No | Read one time-ordered stream across events + both taxonomy planes for one or more deals, filtered by any combination of the cube. Masks: raw spine = kinds:&#91;"event"&#93;; one field = fieldIds:&#91;"…"&#93;; cross-deal = N conversationIds. Large results → the doc sink. |
-| `fieldEvolution` | object | No | One field's change/occurrence series over time, grouped by deal (the "how did X evolve" curve). |
-| `valueAsOf` | object | No | A versioned field's value + scores at a given instant (latest change ≤ the resolved cutoff). |
-| `describeField` | object | No | Learn a field's filterable surface (plane, whether it carries strength/completeness, its vocab, and payload keys + observed values) before building a precise mask. |
-| `rawContent` | object | No | Resolve a deal's RAW verbatim events (full transcripts / email bodies / Slack) into a doc-sink buffer with greppable "=== STAGE: &lt;stage&gt; (evt_&lt;id&gt; @ &lt;ISO&gt;) &#91;word_base: N&#93; ===" section markers, then return only a handle + access instructions. Word offsets in the buffer are global; each marker's word_base + an atom's &#96;position&#96; gives the atom's global offset for a #words read. Read it via read-document (supports #lines/&#123;a&#125;-&#123;b&#125; and #words/&#123;a&#125;-&#123;b&#125; windowed reads) and search-documents (regex). |
-| `search` | object | No | Semantic search over the extracted taxonomy atoms — discover relevant moments/deals. Hits point back (fieldValueId / conversationId / sourceEventId) so you can hop to &#96;timeline&#96; (shape) and raw-content (prove). Large sets → the doc sink. |
-| `user_request_summary` | string | Yes | One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does. |
-| `is_new_request` | boolean | Yes | true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread. |
+| `action` | "get" · "find" · "search-semantic" · "search-external-crm-deals" · "related-activity" · "timeline" · "field-evolution" · "value-as-of" · "describe-field" · "definitions" · "raw-content" · "search" | Yes | Which read operation to perform — pass its matching params object below (e.g. action: "find" pairs with find: &#123;...&#125;).  |
+| `get` | object | No |   |
+| `find` | object | No |   |
+| `searchSemantic` | object | No |   |
+| `searchExternalCrmDeals` | object | No | Operates on the user's connected EXTERNAL CRM (Salesforce/HubSpot/Attio/Copper) — NOT Cedar's own conversation records (that's `find`). If it's unclear whether the user means "search Cedar's deals" or "search our Salesforce/HubSpot", ask before calling either.  |
+| `relatedActivity` | object | No | Deal ID and optional pagination. |
+| `timeline` | object | No | Read one time-ordered stream across events + both taxonomy planes for one or more deals, filtered by any combination of the cube. Masks: raw spine = kinds:&#91;"event"&#93;; one field = fieldIds:&#91;"…"&#93;; cross-deal = N conversationIds. Large results → the doc sink.  |
+| `fieldEvolution` | object | No | One field's change/occurrence series over time, grouped by deal (the "how did X evolve" curve).  |
+| `valueAsOf` | object | No | A versioned field's value + scores at a given instant (latest change ≤ the resolved cutoff).  |
+| `describeField` | object | No | Learn a field's filterable surface (plane, whether it carries strength/completeness, its vocab, and payload keys + observed values) before building a precise mask.  |
+| `definitions` | object | No | Pinned definition or current page. |
+| `rawContent` | object | No | Resolve a deal's RAW verbatim events (full transcripts / email bodies / Slack) into a doc-sink buffer with greppable "=== STAGE: &lt;stage&gt; (evt_&lt;id&gt; @ &lt;ISO&gt;) &#91;word_base: N&#93; ===" section markers, then return only a handle + access instructions. Word offsets in the buffer are global; each marker's word_base + an atom's `position` gives the atom's global offset for a #words read. Read it via read-document (supports #lines/&#123;a&#125;-&#123;b&#125; and #words/&#123;a&#125;-&#123;b&#125; windowed reads) and search-documents (regex).  |
+| `search` | object | No | Semantic search over the extracted taxonomy atoms — discover relevant moments/deals. Hits point back (fieldValueId / conversationId / sourceEventId) so you can hop to `timeline` (shape) and raw-content (prove). Large sets → the doc sink.  |
+| `user_request_summary` | string | Yes | One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does.  |
+| `is_new_request` | boolean | Yes | true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread.  |
 
 ### get
 
@@ -106,6 +112,16 @@ Path, account role, feature gates, target ownership, and billing permissions can
 | --- | --- | --- | --- |
 | `providerId` | `hubspot` · `attio` · `salesforce` · `copper` | Yes | The CRM connection's providerId — get this from &#96;config&#96;'s &#96;read-settings&#96; action (sections: &#91;"connections"&#93;). |
 | `keyword` | string | Yes | Search text — deal/opportunity name, company name, etc. maxLength: 200 |
+
+### relatedActivity
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `conversationId` | UUID | Yes | Cedar deal to read. |
+| `limit` | integer | No | 1–50 events, default 20. |
+| `cursor` | object | No | Pass the previous page’s `nextCursor` with its `occurredAt` and `id` unchanged. |
+
+Each event shows its title, time, custom event type, payload, and matching account or contact reasons. `availableLinks` reports which links this workspace can read. See [shared deal activity](/crm/field-history#read-shared-account-and-contact-activity).
 
 ### timeline
 
@@ -187,6 +203,33 @@ Path, account role, feature gates, target ownership, and billing permissions can
 | `topK` | integer | No | Max candidates to return. Default 15. minimum: 1 maximum: 100 |
 | `maxInline` | integer | No | minimum: 1 |
 
+### record-profile
+
+Supply `recordProfile.kind` (account or contact) and `recordProfile.id` (the organization’s Cedar record ID). This works before a deal exists. Read the effective profile and each reserved field’s source, the current scalar values, and up to five newest observations per list. Each observation includes its stored UUID (`id`), value and timestamp. Pass `recordProfile.after` from `next` to continue field keys. To continue one list, pass `history: {key, before}` using that field’s `earlierCursor`.
+
+Add `activity: {}` to include ten organization events linked directly to the record. Repeat with `activity.before` set to the returned `activity.next` for another page. Deal-private and channel activity are outside this feed.
+
+```json
+{
+  "action": "record-profile",
+  "recordProfile": {"kind": "account", "id": "20000000-0000-4000-8000-000000000001", "activity": {}},
+  "user_request_summary": "Read this account’s ABM tier and recent events",
+  "is_new_request": true
+}
+```
+
+### definitions
+
+| Parameter | Type | Required | Details |
+| --- | --- | --- | --- |
+| `kind` | string | Yes | Account fields, contact fields, or events. |
+| `key` | string | For exact lookup | Supply the stable definition key and its version together. |
+| `version` | integer | For exact lookup | Positive version number returned by discovery. |
+| `limit` | integer | No | Page size from 1 to 100. Default 25. |
+| `after` | string | No | Use the previous page’s nextAfter with the same kind. |
+
+See [reading CRM definitions](/configuration/fields#read-definitions-through-mcp) for examples.
+
 ## Full input schema
 
 [Download the input schema](/reference/schemas/conversation-read.input.json). The schema includes nested properties and constraints. Cedar also validates permissions and action-specific requirements when you call the tool.
@@ -201,6 +244,9 @@ Path, account role, feature gates, target ownership, and billing permissions can
 | `find` | object | No |  |
 | `searchSemantic` | object | No |  |
 | `searchExternalCrmDeals` | object | No |  |
+| `relatedActivity` | object | No | Shared activity page. |
+| `recordProfile` | object | No | Account or contact profile. |
+| `definitions` | object | No | Published definitions. |
 | `timeline` | object | No |  |
 | `fieldEvolution` | object | No |  |
 | `valueAsOf` | object | No |  |

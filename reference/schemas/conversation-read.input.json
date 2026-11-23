@@ -8,14 +8,17 @@
         "find",
         "search-semantic",
         "search-external-crm-deals",
+        "related-activity",
         "timeline",
         "field-evolution",
         "value-as-of",
         "describe-field",
+        "definitions",
+        "record-profile",
         "raw-content",
         "search"
       ],
-      "description": "Which read operation to perform — pass its matching params object below (e.g. action: \"find\" pairs with find: {...})."
+      "description": "Read action. Pass the matching params object."
     },
     "get": {
       "type": "object",
@@ -30,7 +33,7 @@
             "string",
             "null"
           ],
-          "description": "Optional event ID to expand with full content. Use this when you need the complete content of a specific event in the timeline (e.g., full email body, meeting transcript). The event content will be returned in requestedEvent. NOTE: for external_crm events specifically, use mail.fetch-full-event-content instead — this path has no formatter for that event type."
+          "description": "Return full source content for a specific event ID from search or timeline. Supports meetings, calls, email and Slack; date filters still apply."
         },
         "startDate": {
           "type": [
@@ -71,7 +74,7 @@
         "includePlaybook": {
           "type": "boolean",
           "default": false,
-          "description": "Whether to inline the full rendered playbook in `agentOperatingProcedure`. Default false: the playbook is often 40KB+, so it's omitted and `agentOperatingProcedure` instead carries a short directive naming the deal's playbook (aopId) and the exact tool call to read it in full when you actually need to decide behavior. `domainGuidance` is returned either way. Set true only when you specifically want the whole playbook inlined up front."
+          "description": "Include the full playbook in agentOperatingProcedure only for playbook-specific questions. Defaults to false; the conversation overview includes current stage and playbook context."
         }
       },
       "required": [
@@ -176,7 +179,7 @@
             ],
             "additionalProperties": false
           },
-          "description": "Filter conditions, ANDed together. Filter ANY field: standard columns (name, status, priority, dealValue, nextStepDate, lastContactedAt, aopName, primaryCompanyName, ownerId, …), computed booleans (crmSynced, hasFutureCalendar), or custom fields as \"wm_<fieldKey>\" (the ids in <available_columns>). e.g. [{\"field\":\"status\",\"operator\":\"in\",\"value\":[\"pilot_planned\"]},{\"field\":\"crmSynced\",\"operator\":\"eq\",\"value\":true}]. For a name/company text search use an \"ilike\" filter (e.g. {\"field\":\"primaryCompanyName\",\"operator\":\"ilike\",\"value\":\"%example%\"}). For the \"ownerId\" field pass the literal \"self\" to scope to the calling user (resolved server-side). SCOPE: results are ORG-WIDE by default — every conversation in the caller's organization, including other members'. When the user asks about THEIR OWN deals (\"my pipeline\", \"deals I own\"), you MUST add {\"field\":\"ownerId\",\"operator\":\"eq\",\"value\":\"self\"} or the answer will silently include other people's deals. Each result carries ownerName / isOwnedByCurrentUser."
+          "description": "AND filters on standard columns, computed crmSynced/hasFutureCalendar or wm_<fieldKey> from <available_columns>. Use ilike with %name% for text search; in with arrays for enums. For “my deals” always filter ownerId eq self; otherwise results include other members. Load the conversation skill for operators and examples."
         },
         "eventFilter": {
           "type": "object",
@@ -201,7 +204,7 @@
             },
             "date": {
               "type": "string",
-              "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-11-21 - compute from this."
+              "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-11-23 - compute from this."
             },
             "dateTo": {
               "type": "string",
@@ -249,7 +252,7 @@
             }
           },
           "additionalProperties": false,
-          "description": "Optional event filter — filter by event types (include/exclude) or by event count (e.g. conversations with more than 5 emails via count)."
+          "description": "Filter by included/excluded event types or event counts."
         },
         "orderBy": {
           "type": "object",
@@ -270,20 +273,20 @@
             "direction"
           ],
           "additionalProperties": false,
-          "description": "Optional sorting. Defaults to lastContactedAt desc."
+          "description": "Default: lastContactedAt desc."
         },
         "limit": {
           "type": "number",
           "minimum": 1,
           "maximum": 50,
-          "description": "Maximum number of results to return. Default 20, max 50."
+          "description": "Default 20, max 50."
         },
         "extraFields": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "[flexible_query mode] Additional fields to include in each result beyond the defaults. Standard fields (camelCase columns from crmConversations): \"nextSteps\", \"statusOverview\", \"important\", \"lastEmailAt\", \"lastUpdatedAt\", \"updatedAt\", \"conversationScope\" — returned as top-level keys on each result. Custom fields: pass \"wm_<fieldKey>\" (the ids shown in <available_columns>) to get their current values, returned under each result's `customFields` object keyed by fieldKey. Unknown standard field names are silently ignored; list-type custom fields are not returned inline (they accumulate per-event)."
+          "description": "Flexible query extra columns: nextSteps, statusOverview, important, lastEmailAt, lastUpdatedAt, updatedAt, conversationScope. Standard values are top-level. wm_<fieldKey> adds scalar customFields[fieldKey]. Unknown columns and list fields are omitted."
         }
       },
       "additionalProperties": false
@@ -386,7 +389,7 @@
         "keyword": {
           "type": "string",
           "maxLength": 200,
-          "description": "Search text — deal/opportunity name, company name, etc."
+          "description": "Deal or company keyword."
         }
       },
       "required": [
@@ -395,6 +398,41 @@
       ],
       "additionalProperties": false,
       "description": "External CRM; clarify ambiguity."
+    },
+    "relatedActivity": {
+      "type": "object",
+      "properties": {
+        "conversationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "cursor": {
+          "type": "object",
+          "properties": {
+            "occurredAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "id": {
+              "$ref": "#/properties/relatedActivity/properties/conversationId"
+            }
+          },
+          "required": [
+            "occurredAt",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      },
+      "required": [
+        "conversationId"
+      ],
+      "additionalProperties": false
     },
     "timeline": {
       "type": "object",
@@ -526,14 +564,14 @@
         "maxInline": {
           "type": "integer",
           "minimum": 1,
-          "description": "Return inline only up to this many entries; above it the full timeline is written to the doc sink and a handle is returned. Default 200."
+          "description": "Inline limit (default 200); larger results return a document handle."
         }
       },
       "required": [
         "conversationIds"
       ],
       "additionalProperties": false,
-      "description": "Read one time-ordered stream across events + both taxonomy planes for one or more deals, filtered by any combination of the cube. Masks: raw spine = kinds:[\"event\"]; one field = fieldIds:[\"…\"]; cross-deal = N conversationIds. Large results → the doc sink."
+      "description": "Time-ordered events and taxonomy entries for conversationIds. Use kinds:[\"event\"] for events or fieldIds for one field."
     },
     "fieldEvolution": {
       "type": "object",
@@ -594,7 +632,7 @@
         },
         "fieldId": {
           "type": "string",
-          "description": "The single field whose change/occurrence series to trace over time."
+          "description": "Field ID to trace."
         },
         "maxInline": {
           "type": "integer",
@@ -606,18 +644,18 @@
         "fieldId"
       ],
       "additionalProperties": false,
-      "description": "One field's change/occurrence series over time, grouped by deal (the \"how did X evolve\" curve)."
+      "description": "One field's change/occurrence series over time, grouped by deal."
     },
     "valueAsOf": {
       "type": "object",
       "properties": {
         "conversationId": {
           "type": "string",
-          "description": "The deal to read."
+          "description": "Deal ID."
         },
         "fieldId": {
           "type": "string",
-          "description": "The versioned field to resolve."
+          "description": "Versioned field ID."
         },
         "at": {
           "type": "object",
@@ -636,7 +674,7 @@
             }
           },
           "additionalProperties": false,
-          "description": "Exactly one of stage | date | eventId — the point in time to resolve the value at."
+          "description": "Exactly one cutoff: stage, date, or eventId."
         }
       },
       "required": [
@@ -660,6 +698,116 @@
       ],
       "additionalProperties": false,
       "description": "Learn a field's filterable surface (plane, whether it carries strength/completeness, its vocab, and payload keys + observed values) before building a precise mask."
+    },
+    "recordProfile": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "account",
+            "contact"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "activity": {
+          "type": "object",
+          "properties": {
+            "before": {
+              "type": "object",
+              "properties": {
+                "at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "at",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "after": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "history": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "before": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "key"
+          ],
+          "additionalProperties": false
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 25,
+          "default": 12
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "definitions": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "account",
+            "contact",
+            "event"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 2147483647
+        },
+        "after": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
     },
     "rawContent": {
       "type": "object",
@@ -780,6 +928,5 @@
     "user_request_summary",
     "is_new_request"
   ],
-  "additionalProperties": true,
-  "$schema": "http://json-schema.org/draft-07/schema#"
+  "additionalProperties": true
 }

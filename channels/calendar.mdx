@@ -16,9 +16,11 @@ Before proposing a time, check availability and the intended timezone. Before mo
 
 ## Mutations and review
 
-Creation needs the event summary, start/end times and attendees. Updates and deletion require the actual event ID. Supported recurrence uses RFC 5545 rules from the contract.
+Creation needs the event summary and start/end times. Attendees are optional for a personal time block. Updates and deletion require the actual event ID. Supported recurrence uses RFC 5545 rules from the contract.
 
 In Cedar's interactive chat, modification produces a proposal for review. On external MCP and other non-chat surfaces it applies immediately and can notify attendees. The calling client must obtain the user's intended approval before calling.
+
+In the [chat modes that support approval continuation](/agent-platform/chat#review-proposed-actions), choose **Edit** on a supported calendar proposal to review its time, guests and conferencing. Saving applies your edited version before Cedar continues the original request. Choose **Cancel** to discard unsaved edits without creating or updating an event.
 
 A proposed slot, a dated task, an accepted calendar mutation and a recorded meeting are different artifacts. Report the actual result and retain the event ID for later changes.
 

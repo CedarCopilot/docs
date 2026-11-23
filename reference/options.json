@@ -177,6 +177,25 @@
         "judgment"
       ],
       "description": ""
+    },
+    {
+      "path": "definitions.kind",
+      "branch": "",
+      "values": [
+        "account",
+        "contact",
+        "event"
+      ],
+      "description": ""
+    },
+    {
+      "path": "recordProfile.kind",
+      "branch": "",
+      "values": [
+        "account",
+        "contact"
+      ],
+      "description": ""
     }
   ],
   "conversation-write": [
@@ -4301,5 +4320,189 @@
   "search-chat-history": [],
   "switch-chat-thread": [],
   "load-brain-skills": [],
-  "load-skill": []
+  "load-skill": [],
+  "crm-write": [
+    {
+      "path": "updateFields.fields[].mode",
+      "branch": "",
+      "values": [
+        "replace",
+        "patch",
+        "upsert",
+        "append",
+        "update"
+      ],
+      "description": "People: upsert value={people:[{id,...changes}]}; history: append complete new entries or update existing IDs in value={entries:[...]}. Omitted properties stay; arrays replace. New rows need all required data. replace=value only; patch=old_string+new_string only. Null/omitted never clears; \"\" clears."
+    },
+    {
+      "path": "updateFields.fields[].value.people[].engagement",
+      "branch": "",
+      "values": [
+        "mentioned",
+        "introduced",
+        "engaged",
+        "should_engage"
+      ],
+      "description": ""
+    },
+    {
+      "path": "updateFields.fields[].value.people[].support",
+      "branch": "",
+      "values": [
+        "strong_support",
+        "support",
+        "neutral",
+        "opposed",
+        "unknown"
+      ],
+      "description": ""
+    },
+    {
+      "path": "updateFields.fields[].value.entries[].kind",
+      "branch": "",
+      "values": [
+        "meeting",
+        "correspondence",
+        "email",
+        "milestone"
+      ],
+      "description": ""
+    },
+    {
+      "path": "updateFields.fields[].value.stage",
+      "branch": "",
+      "values": [
+        "discovery",
+        "demo",
+        "commercial",
+        "negotiation"
+      ],
+      "description": ""
+    },
+    {
+      "path": "updateFields.fields[].value.rows[].signal",
+      "branch": "",
+      "values": [
+        "green",
+        "yellow",
+        "red"
+      ],
+      "description": ""
+    },
+    {
+      "path": "updateFields.fields[].signal",
+      "branch": "",
+      "values": [
+        "red",
+        "yellow",
+        "green"
+      ],
+      "description": "Set only when the field description instructs a signal; follow its red/yellow/green rubric."
+    },
+    {
+      "path": "createEvent.eventType",
+      "branch": "",
+      "values": [
+        "meeting",
+        "call",
+        "text",
+        "custom"
+      ],
+      "description": "Type of event: \"meeting\" for in-person or video meetings, \"call\" for phone calls, \"text\" for text/chat messages, \"custom\" for any other interaction."
+    },
+    {
+      "path": "updateFields.target.type",
+      "branch": "",
+      "values": [
+        "conversation",
+        "account",
+        "contact"
+      ],
+      "description": ""
+    },
+    {
+      "path": "createEvent.target.type",
+      "branch": "",
+      "values": [
+        "conversation",
+        "organization"
+      ],
+      "description": ""
+    },
+    {
+      "path": "publishFieldDefinition.ownerKind",
+      "branch": "",
+      "values": [
+        "account",
+        "contact"
+      ],
+      "description": ""
+    },
+    {
+      "path": "publishFieldDefinition.fieldType",
+      "branch": "",
+      "values": [
+        "text",
+        "number",
+        "score",
+        "percent",
+        "date",
+        "boolean",
+        "select",
+        "currency",
+        "url",
+        "email",
+        "phone",
+        "list",
+        "fraction",
+        "json"
+      ],
+      "description": ""
+    },
+    {
+      "path": "publishFieldDefinition.writer",
+      "branch": "",
+      "values": [
+        "source",
+        "agent",
+        "manual"
+      ],
+      "description": ""
+    },
+    {
+      "path": "publishEventDefinition.payloadSchema[].type",
+      "branch": "",
+      "values": [
+        "string",
+        "number",
+        "boolean",
+        "date",
+        "datetime",
+        "object",
+        "string[]",
+        "number[]",
+        "boolean[]"
+      ],
+      "description": ""
+    },
+    {
+      "path": "publishEventDefinition.entityLinks[].kind",
+      "branch": "",
+      "values": [
+        "account",
+        "contact",
+        "conversation"
+      ],
+      "description": ""
+    },
+    {
+      "path": "publishEventDefinition.entityLinks[].cardinality",
+      "branch": "",
+      "values": [
+        "one",
+        "many"
+      ],
+      "description": ""
+    }
+  ]
 }

@@ -9944,7 +9944,7 @@
     {
       "name": "conversation-read",
       "title": "Read CRM conversations",
-      "description": "CRM conversation read/query over Cedar's OWN records (NOT the connected external CRM — that's action 4; ask if unclear). ACTIONS: (1) get — fetch a conversation by ID (brief timeline default; write_to_file for full content; expandEventId to inline one event); email entries include observed open/click tracking summaries when available. (2) find — locate Cedar conversations via `filters` (field/operator/value, ANDed): standard columns, computed booleans, or custom fields as \"wm_<fieldKey>\"; add extraFields for more columns. Call load-skill(\"conversation\") for the full field reference. (3) search-semantic — vector/FTS search over conversation content (Turbopuffer); best for finding WHICH events matter. For ONE named call/email, do not answer from hits (a top-k slice, not the full transcript) — resolve its eventId here or via get's timeline, then re-read it whole via (1) get with expandEventId. (4) search-external-crm-deals — search the connected EXTERNAL CRM for a deal by keyword (get providerId from config read-settings first). DEAL-INTELLIGENCE (over extracted sub-event taxonomy atoms): (5) timeline — one time-ordered stream across events + both taxonomy planes for 1+ deals, filtered by fieldIds/kinds/stages/reps/scores/payload/time. (6) field-evolution — one field's series over time, grouped by deal. (7) value-as-of — a versioned field's value+scores at a stage/date/event. (8) describe-field — a field's plane/scores/vocab/payload keys (learn before filtering). (9) raw-content — resolve a deal's RAW verbatim events to a doc-sink buffer (stage-marked); read via read-document (#lines/#words) + search-documents (regex). (10) search — semantic search over the atoms (same cube); hits point back. Large results → the doc sink. Pass each action's params in a same-named object; omit the others.",
+      "description": "Read Cedar CRM records. For connected CRM deals use action 4. ACTIONS: (1) get — conversation by ID; brief timeline by default, write_to_file for full content, expandEventId for one event. Email entries show observed opens/clicks when available. (2) find — locate Cedar conversations via `filters` (field/operator/value, ANDed): standard columns, computed booleans, or custom fields as \"wm_<fieldKey>\"; add extraFields for more columns. Call load-skill(\"conversation\") for the full field reference. (3) search-semantic — find relevant events by vector/full-text search. For a named call/email, get its eventId here or in the timeline, then use get with expandEventId for the full source. (4) search-external-crm-deals — search the connected EXTERNAL CRM for a deal by keyword (get providerId from config read-settings first). record-profile — account/contact fields and enrichment by Cedar ID. related-activity — shared events linked to the deal. DEAL-INTELLIGENCE (over extracted sub-event taxonomy atoms): (5) timeline — one time-ordered stream across events + both taxonomy planes for 1+ deals, filtered by fieldIds/kinds/stages/reps/scores/payload/time. (6) field-evolution — one field's series over time, grouped by deal. (7) value-as-of — a versioned field's value+scores at a stage/date/event. (8) describe-field — a field's plane/scores/vocab/payload keys (learn before filtering). (9) raw-content — resolve a deal's RAW verbatim events to a doc-sink buffer (stage-marked); read via read-document (#lines/#words) + search-documents (regex). (10) search — semantic search over the atoms (same cube); hits point back. Large results → the doc sink. (11) definitions — discover account/contact field or event definitions. Choose kind; page with after/limit, or read an exact key and version. Pass each action's params in a same-named object; omit the others.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -9955,14 +9955,17 @@
               "find",
               "search-semantic",
               "search-external-crm-deals",
+              "related-activity",
               "timeline",
               "field-evolution",
               "value-as-of",
               "describe-field",
+              "definitions",
+              "record-profile",
               "raw-content",
               "search"
             ],
-            "description": "Which read operation to perform — pass its matching params object below (e.g. action: \"find\" pairs with find: {...})."
+            "description": "Read action. Pass the matching params object."
           },
           "get": {
             "type": "object",
@@ -9977,7 +9980,7 @@
                   "string",
                   "null"
                 ],
-                "description": "Optional event ID to expand with full content. Use this when you need the complete content of a specific event in the timeline (e.g., full email body, meeting transcript). The event content will be returned in requestedEvent. NOTE: for external_crm events specifically, use mail.fetch-full-event-content instead — this path has no formatter for that event type."
+                "description": "Return full source content for a specific event ID from search or timeline. Supports meetings, calls, email and Slack; date filters still apply."
               },
               "startDate": {
                 "type": [
@@ -10018,7 +10021,7 @@
               "includePlaybook": {
                 "type": "boolean",
                 "default": false,
-                "description": "Whether to inline the full rendered playbook in `agentOperatingProcedure`. Default false: the playbook is often 40KB+, so it's omitted and `agentOperatingProcedure` instead carries a short directive naming the deal's playbook (aopId) and the exact tool call to read it in full when you actually need to decide behavior. `domainGuidance` is returned either way. Set true only when you specifically want the whole playbook inlined up front."
+                "description": "Include the full playbook in agentOperatingProcedure only for playbook-specific questions. Defaults to false; the conversation overview includes current stage and playbook context."
               }
             },
             "required": [
@@ -10123,7 +10126,7 @@
                   ],
                   "additionalProperties": false
                 },
-                "description": "Filter conditions, ANDed together. Filter ANY field: standard columns (name, status, priority, dealValue, nextStepDate, lastContactedAt, aopName, primaryCompanyName, ownerId, …), computed booleans (crmSynced, hasFutureCalendar), or custom fields as \"wm_<fieldKey>\" (the ids in <available_columns>). e.g. [{\"field\":\"status\",\"operator\":\"in\",\"value\":[\"pilot_planned\"]},{\"field\":\"crmSynced\",\"operator\":\"eq\",\"value\":true}]. For a name/company text search use an \"ilike\" filter (e.g. {\"field\":\"primaryCompanyName\",\"operator\":\"ilike\",\"value\":\"%example%\"}). For the \"ownerId\" field pass the literal \"self\" to scope to the calling user (resolved server-side). SCOPE: results are ORG-WIDE by default — every conversation in the caller's organization, including other members'. When the user asks about THEIR OWN deals (\"my pipeline\", \"deals I own\"), you MUST add {\"field\":\"ownerId\",\"operator\":\"eq\",\"value\":\"self\"} or the answer will silently include other people's deals. Each result carries ownerName / isOwnedByCurrentUser."
+                "description": "AND filters on standard columns, computed crmSynced/hasFutureCalendar or wm_<fieldKey> from <available_columns>. Use ilike with %name% for text search; in with arrays for enums. For “my deals” always filter ownerId eq self; otherwise results include other members. Load the conversation skill for operators and examples."
               },
               "eventFilter": {
                 "type": "object",
@@ -10148,7 +10151,7 @@
                   },
                   "date": {
                     "type": "string",
-                    "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-11-21 - compute from this."
+                    "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-11-23 - compute from this."
                   },
                   "dateTo": {
                     "type": "string",
@@ -10196,7 +10199,7 @@
                   }
                 },
                 "additionalProperties": false,
-                "description": "Optional event filter — filter by event types (include/exclude) or by event count (e.g. conversations with more than 5 emails via count)."
+                "description": "Filter by included/excluded event types or event counts."
               },
               "orderBy": {
                 "type": "object",
@@ -10217,20 +10220,20 @@
                   "direction"
                 ],
                 "additionalProperties": false,
-                "description": "Optional sorting. Defaults to lastContactedAt desc."
+                "description": "Default: lastContactedAt desc."
               },
               "limit": {
                 "type": "number",
                 "minimum": 1,
                 "maximum": 50,
-                "description": "Maximum number of results to return. Default 20, max 50."
+                "description": "Default 20, max 50."
               },
               "extraFields": {
                 "type": "array",
                 "items": {
                   "type": "string"
                 },
-                "description": "[flexible_query mode] Additional fields to include in each result beyond the defaults. Standard fields (camelCase columns from crmConversations): \"nextSteps\", \"statusOverview\", \"important\", \"lastEmailAt\", \"lastUpdatedAt\", \"updatedAt\", \"conversationScope\" — returned as top-level keys on each result. Custom fields: pass \"wm_<fieldKey>\" (the ids shown in <available_columns>) to get their current values, returned under each result's `customFields` object keyed by fieldKey. Unknown standard field names are silently ignored; list-type custom fields are not returned inline (they accumulate per-event)."
+                "description": "Flexible query extra columns: nextSteps, statusOverview, important, lastEmailAt, lastUpdatedAt, updatedAt, conversationScope. Standard values are top-level. wm_<fieldKey> adds scalar customFields[fieldKey]. Unknown columns and list fields are omitted."
               }
             },
             "additionalProperties": false
@@ -10333,7 +10336,7 @@
               "keyword": {
                 "type": "string",
                 "maxLength": 200,
-                "description": "Search text — deal/opportunity name, company name, etc."
+                "description": "Deal or company keyword."
               }
             },
             "required": [
@@ -10342,6 +10345,41 @@
             ],
             "additionalProperties": false,
             "description": "External CRM; clarify ambiguity."
+          },
+          "relatedActivity": {
+            "type": "object",
+            "properties": {
+              "conversationId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "cursor": {
+                "type": "object",
+                "properties": {
+                  "occurredAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "id": {
+                    "$ref": "#/properties/relatedActivity/properties/conversationId"
+                  }
+                },
+                "required": [
+                  "occurredAt",
+                  "id"
+                ],
+                "additionalProperties": false
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 50
+              }
+            },
+            "required": [
+              "conversationId"
+            ],
+            "additionalProperties": false
           },
           "timeline": {
             "type": "object",
@@ -10473,14 +10511,14 @@
               "maxInline": {
                 "type": "integer",
                 "minimum": 1,
-                "description": "Return inline only up to this many entries; above it the full timeline is written to the doc sink and a handle is returned. Default 200."
+                "description": "Inline limit (default 200); larger results return a document handle."
               }
             },
             "required": [
               "conversationIds"
             ],
             "additionalProperties": false,
-            "description": "Read one time-ordered stream across events + both taxonomy planes for one or more deals, filtered by any combination of the cube. Masks: raw spine = kinds:[\"event\"]; one field = fieldIds:[\"…\"]; cross-deal = N conversationIds. Large results → the doc sink."
+            "description": "Time-ordered events and taxonomy entries for conversationIds. Use kinds:[\"event\"] for events or fieldIds for one field."
           },
           "fieldEvolution": {
             "type": "object",
@@ -10541,7 +10579,7 @@
               },
               "fieldId": {
                 "type": "string",
-                "description": "The single field whose change/occurrence series to trace over time."
+                "description": "Field ID to trace."
               },
               "maxInline": {
                 "type": "integer",
@@ -10553,18 +10591,18 @@
               "fieldId"
             ],
             "additionalProperties": false,
-            "description": "One field's change/occurrence series over time, grouped by deal (the \"how did X evolve\" curve)."
+            "description": "One field's change/occurrence series over time, grouped by deal."
           },
           "valueAsOf": {
             "type": "object",
             "properties": {
               "conversationId": {
                 "type": "string",
-                "description": "The deal to read."
+                "description": "Deal ID."
               },
               "fieldId": {
                 "type": "string",
-                "description": "The versioned field to resolve."
+                "description": "Versioned field ID."
               },
               "at": {
                 "type": "object",
@@ -10583,7 +10621,7 @@
                   }
                 },
                 "additionalProperties": false,
-                "description": "Exactly one of stage | date | eventId — the point in time to resolve the value at."
+                "description": "Exactly one cutoff: stage, date, or eventId."
               }
             },
             "required": [
@@ -10607,6 +10645,116 @@
             ],
             "additionalProperties": false,
             "description": "Learn a field's filterable surface (plane, whether it carries strength/completeness, its vocab, and payload keys + observed values) before building a precise mask."
+          },
+          "recordProfile": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "contact"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "activity": {
+                "type": "object",
+                "properties": {
+                  "before": {
+                    "type": "object",
+                    "properties": {
+                      "at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "required": [
+                      "at",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "after": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "history": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "before": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "key"
+                ],
+                "additionalProperties": false
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 25,
+                "default": 12
+              }
+            },
+            "required": [
+              "kind",
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "definitions": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "contact",
+                  "event"
+                ]
+              },
+              "key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "version": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 2147483647
+              },
+              "after": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": false
           },
           "rawContent": {
             "type": "object",
@@ -10727,8 +10875,7 @@
           "user_request_summary",
           "is_new_request"
         ],
-        "additionalProperties": true,
-        "$schema": "http://json-schema.org/draft-07/schema#"
+        "additionalProperties": true
       },
       "outputSchema": {
         "type": "object",
@@ -11303,6 +11450,103 @@
             },
             "additionalProperties": false
           },
+          "relatedActivity": {
+            "type": "object",
+            "properties": {
+              "availableLinks": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "account",
+                    "contact"
+                  ]
+                }
+              },
+              "events": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "occurredAt": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "summary": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "customEventType": {
+                      "type": "string"
+                    },
+                    "customFields": {
+                      "type": "object",
+                      "additionalProperties": {}
+                    },
+                    "reasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "account",
+                          "contact"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "occurredAt",
+                    "title",
+                    "summary",
+                    "customEventType",
+                    "customFields",
+                    "reasons"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "nextCursor": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "occurredAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "required": [
+                      "occurredAt",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "availableLinks",
+              "events",
+              "nextCursor"
+            ],
+            "additionalProperties": false
+          },
           "timeline": {
             "type": "object",
             "properties": {
@@ -11358,7 +11602,8 @@
                     "series": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/properties/timeline/properties/entries/items"
+                        "type": "object",
+                        "additionalProperties": {}
                       }
                     }
                   },
@@ -11370,7 +11615,26 @@
                 }
               },
               "buffer": {
-                "$ref": "#/properties/timeline/properties/buffer"
+                "type": "object",
+                "properties": {
+                  "buffered": {
+                    "type": "boolean",
+                    "const": true
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  },
+                  "word_count": {
+                    "type": "number"
+                  },
+                  "access_instructions": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
               }
             },
             "additionalProperties": false
@@ -11453,6 +11717,217 @@
             },
             "additionalProperties": false
           },
+          "recordProfile": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "contact"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "profile": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "value": {},
+                    "source": {
+                      "type": "string",
+                      "enum": [
+                        "organization",
+                        "shared",
+                        "missing"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "source"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "attributes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "list": {
+                      "type": "boolean"
+                    },
+                    "values": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "value": {},
+                          "occurredAt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "occurredAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "hasEarlier": {
+                      "type": "boolean"
+                    },
+                    "earlierCursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "label",
+                    "list",
+                    "values",
+                    "hasEarlier",
+                    "earlierCursor"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "activity": {
+                "type": "object",
+                "properties": {
+                  "events": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "at": {
+                          "type": "string"
+                        },
+                        "key": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "number"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "payload": {
+                          "type": "object",
+                          "additionalProperties": {}
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "at",
+                        "key",
+                        "version",
+                        "title",
+                        "payload"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "next": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
+                        },
+                        "required": [
+                          "at",
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "events",
+                  "next"
+                ],
+                "additionalProperties": false
+              },
+              "next": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "id",
+              "label",
+              "profile",
+              "attributes",
+              "next"
+            ],
+            "additionalProperties": false
+          },
+          "definitions": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              },
+              "nextAfter": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "items",
+              "nextAfter"
+            ],
+            "additionalProperties": false
+          },
           "rawContent": {
             "type": "object",
             "properties": {
@@ -11496,7 +11971,26 @@
                 }
               },
               "buffer": {
-                "$ref": "#/properties/timeline/properties/buffer"
+                "type": "object",
+                "properties": {
+                  "buffered": {
+                    "type": "boolean",
+                    "const": true
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  },
+                  "word_count": {
+                    "type": "number"
+                  },
+                  "access_instructions": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
               }
             },
             "additionalProperties": false
@@ -11515,7 +12009,26 @@
                 }
               },
               "buffer": {
-                "$ref": "#/properties/timeline/properties/buffer"
+                "type": "object",
+                "properties": {
+                  "buffered": {
+                    "type": "boolean",
+                    "const": true
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  },
+                  "word_count": {
+                    "type": "number"
+                  },
+                  "access_instructions": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
               }
             },
             "additionalProperties": false
@@ -11524,8 +12037,7 @@
         "required": [
           "success"
         ],
-        "additionalProperties": false,
-        "$schema": "http://json-schema.org/draft-07/schema#"
+        "additionalProperties": false
       },
       "annotations": {
         "title": "Read CRM conversations",
@@ -11551,12 +12063,15 @@
         "find": "crm:read",
         "search-semantic": "crm:read",
         "search-external-crm-deals": "crm:read",
+        "related-activity": "crm:read",
         "timeline": "crm:read",
         "field-evolution": "crm:read",
         "value-as-of": "crm:read",
         "describe-field": "crm:read",
+        "definitions": "crm:read",
         "raw-content": "crm:read",
-        "search": "crm:read"
+        "search": "crm:read",
+        "record-profile": "crm:read"
       }
     },
     {
@@ -13638,6 +14153,1806 @@
         "create-opportunity": "crm:read",
         "handoff-crm-record": "crm:read",
         "log-email-activity": "crm:read"
+      }
+    },
+    {
+      "name": "crm-write",
+      "title": "Manage CRM records, fields and events",
+      "description": "Supply the matching camelCase parameters only. Administrators with crm:manage and crm:write can publish versioned event and field definitions and ensure account/contact records. Use expectedPreviousVersion 0 on first publish. A conversation target uses its existing CRM field/event contract and requires crm:read as well as crm:write. An account/contact field needs an agent-maintained definition and evidence. An organization event needs its published definition and named entityLinks. Discover definitions with conversation-read. Reuse the same observationId or externalEventId on retry.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "update-fields",
+              "create-event",
+              "publish-field-definition",
+              "publish-event-definition",
+              "ensure-record"
+            ]
+          },
+          "publishFieldDefinition": {
+            "type": "object",
+            "properties": {
+              "ownerKind": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "contact"
+                ]
+              },
+              "fieldKey": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "expectedPreviousVersion": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483646
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "default": ""
+              },
+              "fieldType": {
+                "type": "string",
+                "enum": [
+                  "text",
+                  "number",
+                  "score",
+                  "percent",
+                  "date",
+                  "boolean",
+                  "select",
+                  "currency",
+                  "url",
+                  "email",
+                  "phone",
+                  "list",
+                  "fraction",
+                  "json"
+                ]
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "enumOrder": {
+                      "type": "number"
+                    },
+                    "color": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "icon": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "enumOrder"
+                  ],
+                  "additionalProperties": false
+                },
+                "default": []
+              },
+              "writer": {
+                "type": "string",
+                "enum": [
+                  "source",
+                  "agent",
+                  "manual"
+                ]
+              },
+              "includeInAgentSummary": {
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "required": [
+              "ownerKind",
+              "fieldKey",
+              "expectedPreviousVersion",
+              "label",
+              "fieldType",
+              "writer"
+            ],
+            "additionalProperties": false
+          },
+          "publishEventDefinition": {
+            "type": "object",
+            "properties": {
+              "eventKey": {
+                "type": "string",
+                "maxLength": 120,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "expectedPreviousVersion": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483646
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "default": ""
+              },
+              "payloadSchema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120,
+                      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "string",
+                        "number",
+                        "boolean",
+                        "date",
+                        "datetime",
+                        "object",
+                        "string[]",
+                        "number[]",
+                        "boolean[]"
+                      ]
+                    },
+                    "required": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type",
+                    "required"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "entityLinks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "$ref": "#/properties/publishEventDefinition/properties/payloadSchema/items/properties/name"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "account",
+                        "contact",
+                        "conversation"
+                      ]
+                    },
+                    "required": {
+                      "type": "boolean"
+                    },
+                    "cardinality": {
+                      "type": "string",
+                      "enum": [
+                        "one",
+                        "many"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "kind",
+                    "required",
+                    "cardinality"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "eventKey",
+              "expectedPreviousVersion",
+              "label",
+              "payloadSchema",
+              "entityLinks"
+            ],
+            "additionalProperties": false
+          },
+          "ensureRecord": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "account"
+                  },
+                  "domain": {
+                    "type": "string",
+                    "maxLength": 253,
+                    "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "domain"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "contact"
+                  },
+                  "email": {
+                    "type": "string",
+                    "maxLength": 254,
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "email"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "updateFields": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Change title."
+                  },
+                  "reasoning": {
+                    "type": "string",
+                    "description": "Evidence per value; omit only for direct user requests."
+                  },
+                  "fields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Exact field name from get-conversation."
+                        },
+                        "changeSummary": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 180,
+                          "description": "Text delta; full value separate. No invented counts/resolutions or success. Omit for scalars."
+                        },
+                        "confidence": {
+                          "type": "string",
+                          "enum": [
+                            "low",
+                            "medium",
+                            "high"
+                          ],
+                          "description": "Opt-in only: high=direct; medium=review; low=ask."
+                        },
+                        "decision": {
+                          "type": "string",
+                          "enum": [
+                            "change",
+                            "keep"
+                          ],
+                          "description": "Default change; keep never writes; confident keep silent."
+                        },
+                        "uncertainty": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1000,
+                          "description": "Low/medium: missing fact."
+                        },
+                        "mode": {
+                          "type": "string",
+                          "enum": [
+                            "replace",
+                            "patch",
+                            "upsert",
+                            "append",
+                            "update"
+                          ],
+                          "description": "People upsert; history append/update. Keys merge; arrays replace. replace=value; patch=old_string/new_string."
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "people": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          },
+                                          "name": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          },
+                                          "title": {
+                                            "type": [
+                                              "string",
+                                              "null"
+                                            ]
+                                          },
+                                          "email": {
+                                            "anyOf": [
+                                              {
+                                                "type": "string",
+                                                "format": "email"
+                                              },
+                                              {
+                                                "type": "null"
+                                              }
+                                            ]
+                                          },
+                                          "contactId": {
+                                            "type": [
+                                              "string",
+                                              "null"
+                                            ]
+                                          },
+                                          "engagement": {
+                                            "type": "string",
+                                            "enum": [
+                                              "mentioned",
+                                              "introduced",
+                                              "engaged",
+                                              "should_engage",
+                                              "critical_to_engage"
+                                            ]
+                                          },
+                                          "engagementPriority": {
+                                            "type": "string",
+                                            "enum": [
+                                              "critical",
+                                              "recommended",
+                                              "none"
+                                            ]
+                                          },
+                                          "engagementReason": {
+                                            "type": "string"
+                                          },
+                                          "roles": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "string"
+                                            },
+                                            "maxItems": 3
+                                          },
+                                          "support": {
+                                            "type": "string",
+                                            "enum": [
+                                              "strong_support",
+                                              "support",
+                                              "neutral",
+                                              "opposed",
+                                              "unknown"
+                                            ]
+                                          },
+                                          "summary": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          },
+                                          "evidence": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "object",
+                                              "properties": {
+                                                "eventId": {
+                                                  "type": "string",
+                                                  "minLength": 1
+                                                },
+                                                "quote": {
+                                                  "type": "string",
+                                                  "minLength": 1
+                                                }
+                                              },
+                                              "required": [
+                                                "eventId",
+                                                "quote"
+                                              ],
+                                              "additionalProperties": false
+                                            }
+                                          }
+                                        },
+                                        "required": [
+                                          "id"
+                                        ],
+                                        "additionalProperties": false,
+                                        "description": "New ID: name, engagement, roles, support, summary, evidence required; existing ID: changed properties only."
+                                      },
+                                      "maxItems": 40
+                                    }
+                                  },
+                                  "required": [
+                                    "people"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "entries": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          },
+                                          "title": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 120
+                                          },
+                                          "occurredAt": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                          },
+                                          "kind": {
+                                            "type": "string",
+                                            "enum": [
+                                              "meeting",
+                                              "correspondence",
+                                              "email",
+                                              "milestone"
+                                            ]
+                                          },
+                                          "summary": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 600
+                                          },
+                                          "sourceEventIds": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "minItems": 1
+                                          }
+                                        },
+                                        "required": [
+                                          "id"
+                                        ],
+                                        "additionalProperties": false
+                                      }
+                                    }
+                                  },
+                                  "required": [
+                                    "entries"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "anyOf": [
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "stage": {
+                                          "type": "string",
+                                          "enum": [
+                                            "discovery",
+                                            "demo",
+                                            "commercial",
+                                            "negotiation"
+                                          ]
+                                        },
+                                        "rows": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "label": {
+                                                "type": "string",
+                                                "minLength": 1
+                                              },
+                                              "value": {
+                                                "type": "string"
+                                              },
+                                              "graded": {
+                                                "type": "boolean",
+                                                "default": true
+                                              },
+                                              "signal": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "green",
+                                                      "yellow",
+                                                      "red"
+                                                    ]
+                                                  },
+                                                  {
+                                                    "type": "null"
+                                                  }
+                                                ],
+                                                "default": null
+                                              },
+                                              "signalReasoning": {
+                                                "type": [
+                                                  "string",
+                                                  "null"
+                                                ]
+                                              },
+                                              "strength": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "maximum": 100
+                                                  },
+                                                  {
+                                                    "type": "null"
+                                                  }
+                                                ]
+                                              }
+                                            },
+                                            "required": [
+                                              "label",
+                                              "value"
+                                            ],
+                                            "additionalProperties": false
+                                          },
+                                          "maxItems": 3
+                                        },
+                                        "rubric": {
+                                          "type": "string"
+                                        },
+                                        "checklist": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "id": {
+                                                "type": "string",
+                                                "minLength": 1
+                                              },
+                                              "label": {
+                                                "type": "string",
+                                                "minLength": 1
+                                              },
+                                              "completed": {
+                                                "type": "boolean"
+                                              }
+                                            },
+                                            "required": [
+                                              "id",
+                                              "label",
+                                              "completed"
+                                            ],
+                                            "additionalProperties": false
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "stage"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "rows": {
+                                          "type": "array",
+                                          "items": {
+                                            "$ref": "#/properties/updateFields/anyOf/0/properties/fields/items/properties/value/anyOf/4/anyOf/2/anyOf/0/properties/rows/items"
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "rows"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "description": "Scalar/object/JSON; preserve IDs. Omit for patches."
+                        },
+                        "old_string": {
+                          "type": "string",
+                          "description": "Unique current-value substring from get-conversation."
+                        },
+                        "new_string": {
+                          "type": "string",
+                          "description": "Patch text; \"\" deletes old_string."
+                        },
+                        "signal": {
+                          "type": "string",
+                          "enum": [
+                            "red",
+                            "yellow",
+                            "green"
+                          ],
+                          "description": "Only if instructed; follow field red/yellow/green rubric."
+                        },
+                        "signalReasoning": {
+                          "type": "string",
+                          "description": "Brief explanation for the signal."
+                        },
+                        "reasoning": {
+                          "type": "string",
+                          "description": "Evidence: source/person/date; no Why/field/confidence prefix. Gaps in uncertainty. No raw IDs. Use plain language and descriptive verified links; never invent URLs."
+                        },
+                        "strength": {
+                          "type": "number",
+                          "description": "Owned type:list scorecard only: 1–100; value=verbatim evidence, reasoning=justification, together on one event atom, never persistent fields."
+                        },
+                        "contextQuote": {
+                          "type": "string",
+                          "description": "Scorecard triple only: verbatim lead-in; omit for bare quotes."
+                        },
+                        "reactionQuote": {
+                          "type": "string",
+                          "description": "Scorecard triple with contextQuote: verbatim reaction; omit if absent."
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "description": "get writable fields only; relay blockedReason; empty needs linkCrmDeal."
+                  },
+                  "targetDealId": {
+                    "type": "string",
+                    "description": "Deal ID if multiple."
+                  },
+                  "linkCrmDeal": {
+                    "type": "object",
+                    "properties": {
+                      "provider": {
+                        "type": "string",
+                        "description": "The CRM provider identifier (e.g. \"hubspot\", \"salesforce\", \"attio\")"
+                      },
+                      "dealId": {
+                        "type": "string",
+                        "description": "The opportunity/deal ID returned by the CRM after creation"
+                      },
+                      "instanceUrl": {
+                        "type": "string",
+                        "description": "For Salesforce: the org Lightning base URL. For HubSpot: the portal hub_id (e.g. \"245934213\") — required to generate deep-link URLs."
+                      }
+                    },
+                    "required": [
+                      "provider",
+                      "dealId"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Link dealId before sync; new: create-opportunity."
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "conversation"
+                      },
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "target"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "fieldKey": {
+                    "$ref": "#/properties/publishFieldDefinition/properties/fieldKey"
+                  },
+                  "version": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "value": {},
+                  "observationId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 250
+                  },
+                  "occurredAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "account",
+                          "contact"
+                        ]
+                      },
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "fieldKey",
+                  "version",
+                  "observationId",
+                  "occurredAt",
+                  "evidence",
+                  "target"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "createEvent": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "eventType": {
+                    "type": "string",
+                    "enum": [
+                      "meeting",
+                      "call",
+                      "text",
+                      "custom"
+                    ],
+                    "description": "Meeting, call, chat or custom."
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Short event title."
+                  },
+                  "occurredAt": {
+                    "type": "string",
+                    "description": "ISO datetime; default now."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Event summary."
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "Personal meeting/call.notes."
+                  },
+                  "transcript": {
+                    "type": "string",
+                    "description": "Verbatim; use requirePaste."
+                  },
+                  "participants": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "email": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "email",
+                        "name"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "description": "Meeting/call attendees."
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Body for eventType:text only."
+                  },
+                  "requirePaste": {
+                    "type": "boolean",
+                    "description": "True for transcripts; omit transcript."
+                  },
+                  "target": {
+                    "$ref": "#/properties/updateFields/anyOf/0/properties/target"
+                  }
+                },
+                "required": [
+                  "eventType",
+                  "title",
+                  "occurredAt",
+                  "target"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "eventKey": {
+                    "$ref": "#/properties/publishEventDefinition/properties/eventKey"
+                  },
+                  "version": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "externalEventId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  },
+                  "occurredAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "payload": {
+                    "type": "object",
+                    "additionalProperties": {}
+                  },
+                  "entityLinks": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/properties/createEvent/anyOf/1/properties/entityLinks/additionalProperties/anyOf/0"
+                          },
+                          "maxItems": 100
+                        }
+                      ]
+                    }
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "organization"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "eventKey",
+                  "version",
+                  "externalEventId",
+                  "occurredAt",
+                  "payload",
+                  "entityLinks",
+                  "target"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "user_request_summary": {
+            "type": "string",
+            "description": "One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does."
+          },
+          "is_new_request": {
+            "type": "boolean",
+            "description": "true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread."
+          }
+        },
+        "required": [
+          "action",
+          "user_request_summary",
+          "is_new_request"
+        ],
+        "additionalProperties": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "errorMessage": {
+            "type": "string"
+          },
+          "publishFieldDefinition": {
+            "type": "object",
+            "properties": {
+              "ownerKind": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "contact"
+                ]
+              },
+              "fieldKey": {
+                "type": "string"
+              },
+              "version": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "ownerKind",
+              "fieldKey",
+              "version"
+            ],
+            "additionalProperties": false
+          },
+          "publishEventDefinition": {
+            "type": "object",
+            "properties": {
+              "eventKey": {
+                "type": "string"
+              },
+              "version": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "eventKey",
+              "version"
+            ],
+            "additionalProperties": false
+          },
+          "ensureRecord": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "contact"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "created",
+                  "matched"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "id",
+              "status"
+            ],
+            "additionalProperties": false
+          },
+          "updateFields": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "applied",
+                      "duplicate",
+                      "superseded"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status",
+                  "id"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "conversationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "updatedFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "description": "List of fields that were updated"
+                  },
+                  "alreadyPresentFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "description": "Requested structured entries verified against freshly read Cedar values and already present. These are not new writes or confirmation of an external CRM push."
+                  },
+                  "blockedFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "blockedBy": {
+                          "type": "string",
+                          "enum": [
+                            "owner",
+                            "locked",
+                            "system",
+                            "background",
+                            "unknown_field",
+                            "approval_required",
+                            "out_of_scope",
+                            "gated_option"
+                          ]
+                        },
+                        "ownerAgentName": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string",
+                          "description": "The true reason and the way out. Tell the user this plainly."
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "blockedBy",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "description": "Requested fields that were NOT written, each with the reason. Present whenever anything you asked for was dropped, even when other fields were written. Tell the user which field and why; never guess a cause."
+                  },
+                  "approvalRequired": {
+                    "type": "boolean"
+                  },
+                  "noAction": {
+                    "type": "boolean"
+                  },
+                  "reviewTaskIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "description": "Existing review questions; these are not executable CRM changes."
+                  },
+                  "writeDisposition": {
+                    "type": "string",
+                    "const": "rejected_before_write"
+                  },
+                  "proposed": {
+                    "type": "boolean",
+                    "description": "True if this is a proposed update awaiting approval"
+                  },
+                  "proposedFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        },
+                        "affectsExternalCrm": {
+                          "type": "boolean",
+                          "description": "Whether this field syncs to external CRM"
+                        },
+                        "entryOperation": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "const": "people"
+                                },
+                                "mode": {
+                                  "type": "string",
+                                  "const": "upsert"
+                                },
+                                "value": {
+                                  "type": "object",
+                                  "properties": {
+                                    "people": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          },
+                                          "name": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          },
+                                          "title": {
+                                            "type": [
+                                              "string",
+                                              "null"
+                                            ]
+                                          },
+                                          "email": {
+                                            "anyOf": [
+                                              {
+                                                "type": "string",
+                                                "format": "email",
+                                                "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                                              },
+                                              {
+                                                "type": "null"
+                                              }
+                                            ]
+                                          },
+                                          "contactId": {
+                                            "type": [
+                                              "string",
+                                              "null"
+                                            ]
+                                          },
+                                          "engagement": {
+                                            "type": "string",
+                                            "enum": [
+                                              "mentioned",
+                                              "introduced",
+                                              "engaged",
+                                              "should_engage",
+                                              "critical_to_engage"
+                                            ]
+                                          },
+                                          "engagementPriority": {
+                                            "type": "string",
+                                            "enum": [
+                                              "critical",
+                                              "recommended",
+                                              "none"
+                                            ]
+                                          },
+                                          "engagementReason": {
+                                            "type": "string"
+                                          },
+                                          "roles": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "string"
+                                            },
+                                            "maxItems": 3
+                                          },
+                                          "support": {
+                                            "type": "string",
+                                            "enum": [
+                                              "strong_support",
+                                              "support",
+                                              "neutral",
+                                              "opposed",
+                                              "unknown"
+                                            ]
+                                          },
+                                          "summary": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          },
+                                          "evidence": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "object",
+                                              "properties": {
+                                                "eventId": {
+                                                  "type": "string",
+                                                  "minLength": 1
+                                                },
+                                                "quote": {
+                                                  "type": "string",
+                                                  "minLength": 1
+                                                }
+                                              },
+                                              "required": [
+                                                "eventId",
+                                                "quote"
+                                              ],
+                                              "additionalProperties": false
+                                            }
+                                          }
+                                        },
+                                        "required": [
+                                          "id"
+                                        ],
+                                        "additionalProperties": false,
+                                        "description": "New ID: name, engagement, roles, support, summary, evidence required; existing ID: changed properties only."
+                                      },
+                                      "minItems": 1,
+                                      "maxItems": 40
+                                    }
+                                  },
+                                  "required": [
+                                    "people"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": [
+                                "name",
+                                "mode",
+                                "value"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "const": "summarized_history"
+                                },
+                                "mode": {
+                                  "type": "string",
+                                  "const": "append"
+                                },
+                                "value": {
+                                  "type": "object",
+                                  "properties": {
+                                    "entries": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          },
+                                          "title": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 120
+                                          },
+                                          "occurredAt": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                          },
+                                          "kind": {
+                                            "type": "string",
+                                            "enum": [
+                                              "meeting",
+                                              "correspondence",
+                                              "email",
+                                              "milestone"
+                                            ]
+                                          },
+                                          "summary": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 600
+                                          },
+                                          "sourceEventIds": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "minItems": 1
+                                          }
+                                        },
+                                        "required": [
+                                          "id",
+                                          "title",
+                                          "occurredAt",
+                                          "kind",
+                                          "summary",
+                                          "sourceEventIds"
+                                        ],
+                                        "additionalProperties": false
+                                      },
+                                      "minItems": 1
+                                    }
+                                  },
+                                  "required": [
+                                    "entries"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": [
+                                "name",
+                                "mode",
+                                "value"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "const": "summarized_history"
+                                },
+                                "mode": {
+                                  "type": "string",
+                                  "const": "update"
+                                },
+                                "value": {
+                                  "type": "object",
+                                  "properties": {
+                                    "entries": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          },
+                                          "title": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 120
+                                          },
+                                          "occurredAt": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                          },
+                                          "kind": {
+                                            "type": "string",
+                                            "enum": [
+                                              "meeting",
+                                              "correspondence",
+                                              "email",
+                                              "milestone"
+                                            ]
+                                          },
+                                          "summary": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 600
+                                          },
+                                          "sourceEventIds": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "minItems": 1
+                                          }
+                                        },
+                                        "required": [
+                                          "id"
+                                        ],
+                                        "additionalProperties": false
+                                      },
+                                      "minItems": 1
+                                    }
+                                  },
+                                  "required": [
+                                    "entries"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": [
+                                "name",
+                                "mode",
+                                "value"
+                              ],
+                              "additionalProperties": false
+                            }
+                          ]
+                        },
+                        "entryBaseline": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "value",
+                        "affectsExternalCrm"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "description": "List of proposed field updates (chat mode only)"
+                  },
+                  "hasCrmIntegration": {
+                    "type": "boolean",
+                    "description": "Whether conversation has external CRM integration"
+                  },
+                  "userMessage": {
+                    "type": "string",
+                    "description": "UI instructions for the user"
+                  },
+                  "validationErrors": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "path": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "string",
+                              "number"
+                            ]
+                          }
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "entryId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "field",
+                        "path",
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "fieldOutcomes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "cedar": {
+                          "type": "string",
+                          "enum": [
+                            "saved",
+                            "not_saved"
+                          ]
+                        },
+                        "crm": {
+                          "type": "string",
+                          "enum": [
+                            "pushed",
+                            "failed",
+                            "skipped",
+                            "not_attempted",
+                            "unknown"
+                          ]
+                        },
+                        "retryable": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "cedar",
+                        "crm",
+                        "retryable"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "pushedButNotSavedFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "remainingFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "errorCode": {
+                    "type": "string"
+                  },
+                  "retryable": {
+                    "type": "boolean"
+                  },
+                  "skippedCrmFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Fields whose CRM push was skipped on an atomic write. They were NOT saved in Cedar; do not retry them, tell the user."
+                  },
+                  "savedButNotPushedFields": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Fields that WERE saved in Cedar but whose CRM push was skipped, so the CRM was NOT updated; do not retry them, tell the user the CRM was not updated."
+                  },
+                  "isRecoverable": {
+                    "type": "boolean"
+                  },
+                  "retryGuidance": {
+                    "type": "object",
+                    "properties": {
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "read_latest_and_rebuild",
+                          "repair_structured_fields"
+                        ]
+                      },
+                      "fields": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "maxAttempts": {
+                        "type": "number",
+                        "const": 2
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "fields",
+                      "maxAttempts"
+                    ],
+                    "additionalProperties": false,
+                    "description": "At most two corrected attempts in this execution. Re-read current fields and rebuild from evidence; never replay stale arguments. Stop on a hold, nonrecoverable failure, or exhausted budget. A rejected call wrote nothing; only report fields confirmed by a later successful tool result."
+                  },
+                  "isExpected": {
+                    "type": "boolean",
+                    "description": "True when the failure is an intentional, normal outcome (does not alert)."
+                  },
+                  "fieldDescriptions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "description"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "description": "The agent-facing description of each field in this call, including its unit, value rules, and — for enum fields such as status — its valid values. Returned because a caller can reach this tool without ever fetching the field definitions (e.g. chat does find → update-fields). Read these and correct the write if a value does not match the described unit, shape, or option set."
+                  },
+                  "notificationPosted": {
+                    "type": "boolean",
+                    "description": "True when Cedar told the user about this change in Slack. Do not notify them again."
+                  },
+                  "crmPushStatus": {
+                    "type": "string",
+                    "enum": [
+                      "pushed",
+                      "failed",
+                      "partial",
+                      "pending",
+                      "skipped",
+                      "not_applicable"
+                    ],
+                    "description": "Terminal external-CRM push status for this apply. On the chat/approval path the push is awaited, so a \"failed\"/\"partial\" here means the value was saved in Cedar but rejected by the CRM — the agent can reattempt or tell the user."
+                  },
+                  "linkedDeal": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "existingDeal": {
+                        "type": "object",
+                        "properties": {
+                          "provider": {
+                            "type": "string"
+                          },
+                          "dealId": {
+                            "type": "string"
+                          },
+                          "dealName": {
+                            "type": "string"
+                          },
+                          "dealStage": {
+                            "type": "string"
+                          },
+                          "instanceUrl": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "provider",
+                          "dealId"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "success",
+                      "message"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          },
+          "createEvent": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "created",
+                      "replayed"
+                    ]
+                  },
+                  "eventId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status",
+                  "eventId"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "eventId": {
+                    "type": "string"
+                  },
+                  "conversationId": {
+                    "type": "string"
+                  },
+                  "proposed": {
+                    "type": "boolean"
+                  },
+                  "indexed": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Manage CRM records, fields and events",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      },
+      "surface": "external",
+      "kind": "family",
+      "metadata": {
+        "title": "Manage CRM records, fields and events",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "openWorldHint": true
+        }
+      },
+      "actionScopes": {
+        "update-fields": "crm:write",
+        "create-event": "crm:write",
+        "publish-field-definition": "crm:manage",
+        "publish-event-definition": "crm:manage",
+        "ensure-record": "crm:manage"
       }
     },
     {
@@ -40230,7 +42545,7 @@
     },
     {
       "name": "conversation",
-      "description": "Find/filter CRM conversations, update conversation fields, create new conversations, log events, and reassign ownership. Filtering: analyzes natural language requests, suggests filter configurations, and executes queries to find matching conversations — streams filter suggestions to the frontend for user approval. Load when the user says ''show me'', ''find'', ''filter'', or asks about deals by status, date, priority, or company — e.g. ''show stalled deals'', ''find my Example Account conversation'', ''which deals are in negotiation''. Updating: extracts information from communications and updates CRM conversation fields with clean, digestible, high-confidence content that respects temporal context and AOP governance; also creates new deals/conversations, logs meetings/calls/events, and reassigns conversation ownership. For creating a new opportunity in the connected external CRM (not a new Cedar conversation), see this skill''s opportunity-creation resource. For finding and linking an EXISTING external-CRM deal to a conversation, see ''Two different things are called \"CRM\"'' below. Also covers pulling a message in from the user''s LIVE Gmail, Slack, or LinkedIn when they say it belongs to a deal but it isn''t on the timeline — ''there was an email for this conversation from X'', ''we discussed this in Slack'', ''that LinkedIn thread isn''t showing up here'' — finding it in the channel, disambiguating with the user, and attaching it to the conversation; see ''Pulling a missing message in from Gmail, Slack, or LinkedIn'' below.",
+      "description": "Manage deals, accounts and contacts, publish CRM definitions, and set up website visits. Filtering: analyzes natural language requests, suggests filter configurations, and executes queries to find matching conversations — streams filter suggestions to the frontend for user approval. Load when the user says ''show me'', ''find'', ''filter'', or asks about deals by status, date, priority, or company — e.g. ''show stalled deals'', ''find my Acme conversation'', ''which deals are in negotiation''. Updating: extracts information from communications and updates CRM conversation fields with clean, digestible, high-confidence content that respects temporal context and AOP governance; also creates new deals/conversations, logs meetings/calls/events, and reassigns conversation ownership. For creating a new opportunity in the connected external CRM (not a new Cedar conversation), see this skill''s opportunity-creation resource. For finding and linking an EXISTING external-CRM deal to a conversation, see ''Two different things are called \"CRM\"'' below. Also covers pulling a message in from the user''s LIVE Gmail, Slack, or LinkedIn when they say it belongs to a deal but it isn''t on the timeline — ''there was an email for this conversation from X'', ''we discussed this in Slack'', ''that LinkedIn thread isn''t showing up here'' — finding it in the channel, disambiguating with the user, and attaching it to the conversation; see ''Pulling a missing message in from Gmail, Slack, or LinkedIn'' below.",
       "loader": "load-skill",
       "resources": [
         {

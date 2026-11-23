@@ -1,0 +1,81 @@
+---
+title: "crm-write"
+description: "Update deal, account and contact fields or log deal and organization events."
+---
+
+Use `crm-write` to publish CRM definitions, find or create workspace records, append observations, and record deal or organization events. Choose an action and supply its matching object. Field updates and event writes use `target` to select the record type.
+
+| Action | Target type | What to send | External OAuth scopes |
+| --- | --- | --- | --- |
+| `publish-event-definition` | Organization | `publishEventDefinition` with the event key, label, expected previous version, typed payload fields and named entity links | `crm:manage` and `crm:write` |
+| `publish-field-definition` | Account or contact | `publishFieldDefinition` with the field contract and expected previous version | `crm:manage` and `crm:write` |
+| `ensure-record` | Account or contact | `ensureRecord` with an account domain or identified contact email | `crm:manage` and `crm:write` |
+| `update-fields` | `conversation` | Deal ID, field changes, approval title and supporting reasoning | `crm:write` and `crm:read` |
+| `update-fields` | `account` or `contact` | Cedar record ID, agent-maintained list key and version, observed value and evidence | `crm:write` |
+| `create-event` | `conversation` | Deal ID, meeting, call, text or custom activity details | `crm:write` and `crm:read` |
+| `create-event` | `organization` | Published event key and version, external event ID, payload and named entity links | `crm:write` |
+
+Deal actions use the existing conversation permissions and approval flow. An active organization member, admin or owner can append to an agent-maintained list. Organization events require an active admin or owner. To discover field and event definitions, use `conversation-read` with `crm:read`. Copy the returned key and version and resolve Cedar record IDs before writing.
+
+Interactive Cedar agents and OAuth clients with the required scopes can use these account, contact and organization actions. Scheduled automations and their subagents currently have no grant for appending custom field observations or creating organization events.
+
+Current-value account/contact fields remain readable. New scalar writes are on hold. Triggering outbound webhooks from arbitrary custom events is coming soon. The inbound source receiver and the existing deal-signal dispatcher keep their own delivery contracts.
+
+Publishing definitions and ensuring records require an active workspace owner or admin using an interactive connection. Read the existing contract with `conversation-read` before publishing. Start a new definition at `expectedPreviousVersion: 0`. If another writer published concurrently, read the latest version and compare it. [Website visit setup](/integrations/custom-crm-data#set-up-website-visits-with-a-coding-agent)
+
+## Examples
+
+For example, pass this `createEvent` object with `action: "create-event"` to log a call on one deal.
+
+```json
+{
+  "target": {"type": "conversation", "id": "30000000-0000-4000-8000-000000000001"},
+  "eventType": "call",
+  "title": "Pricing review",
+  "occurredAt": "2026-11-22T10:00:00Z"
+}
+```
+
+For an account or contact list with `writer: "agent"`, cite the supporting observation and keep its ID stable when retrying. An authorized owner, admin or member can submit the value.
+
+```json
+{
+  "action": "update-fields",
+  "user_request_summary": "Record the buyer intent observed on call 472",
+  "is_new_request": true,
+  "updateFields": {
+    "target": {"type": "contact", "id": "20000000-0000-4000-8000-000000000001"},
+    "fieldKey": "custom.buyer_intent_history",
+    "version": 2,
+    "value": "high",
+    "occurredAt": "2026-11-22T10:00:00Z",
+    "observationId": "call-472-intent",
+    "evidence": "The contact requested pricing during call 472."
+  }
+}
+```
+
+For a published organization event, an authorized organization publisher can supply its payload and named links. The definition determines the type and cardinality of each link. Use a stable external event ID for retries under the same actor.
+
+```json
+{
+  "action": "create-event",
+  "user_request_summary": "Record the pricing page visit",
+  "is_new_request": true,
+  "createEvent": {
+    "target": {"type": "organization"},
+    "eventKey": "website_visit",
+    "version": 1,
+    "externalEventId": "visit-203",
+    "occurredAt": "2026-11-22T10:00:00Z",
+    "payload": {"page": "/pricing"},
+    "entityLinks": {"visitor": "20000000-0000-4000-8000-000000000001"}
+  }
+}
+```
+
+List observations return `applied` or `duplicate`. Current-value account/contact writes are on hold. Event receipts report `created` or `replayed` and include the event ID. Cedar supplies the organization, writer identity and source namespace from the authenticated request.
+
+## Wire schemas
+
+[Input schema](/reference/schemas/crm-write.input.json) · [Output schema](/reference/schemas/crm-write.output.json).

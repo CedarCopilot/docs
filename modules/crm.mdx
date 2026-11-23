@@ -23,6 +23,10 @@ Structural mutations include moving an event, assigning an AOP, refreshing a con
 
 For a suggested new deal, open **Review deal** to inspect the proposed record. **Open in chat** lets you discuss the proposal with its task context. After approval, inspect the returned CRM link or verification result before treating the record as created. See [reviewing your pipeline](/recipes/pipeline-review).
 
+Workspace admins can [set up website visits through MCP](/integrations/custom-crm-data#set-up-website-visits-with-a-coding-agent) using `crm:read`, `crm:manage` and `crm:write`.
+
+Use `crm-write` to update deal fields, log deal activity or update an agent-maintained account or contact list with evidence. Organization owners and admins can also publish events against a saved definition. External callers need `crm:write`. Deal operations also require `crm:read`. [Custom data writes](/reference/crm-write).
+
 ## Historical and evidence-based analysis
 
 | Action | Use |

@@ -420,6 +420,7 @@
                 "group": "Connected data sources",
                 "pages": [
                   "integrations/external-systems",
+                  "integrations/custom-crm-data",
                   "capabilities/systems",
                   {
                     "group": "Connections",
@@ -589,6 +590,7 @@
             "group": "Brain",
             "pages": [
               "reference/conversation-read",
+              "reference/crm-write",
               "reference/conversation-write",
               "reference/taxonomy-fields",
               "reference/run-sql",

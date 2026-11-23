@@ -38,3 +38,19 @@ For custom aggregations, load `run-sql` as well as `field-query`; use the allowe
 ## Review a proposed field change
 
 Read the evidence behind each change. A dated email or meeting can support a new value; an unconfirmed suggestion should keep its uncertainty visible. For example, if a buyer mentions “next quarter” without agreeing a specific date, preserve the current date and ask for clarification. Approval cards can show a before/after value for scalar fields and a short change summary for longer text. A proposed value and a verified write to the connected CRM are separate points in the workflow.
+
+
+## Read shared account and contact activity
+
+Ask Cedar which shared events are relevant to a deal. The `conversation-read` tool can match workspace custom events through the deal's primary account and participating contacts. The same website visit can appear on two open deals. A result includes the account or contact match that explains why it appears.
+
+```json
+{
+  "action": "related-activity",
+  "relatedActivity": { "conversationId": "<Cedar deal UUID>", "limit": 20 },
+  "user_request_summary": "Find shared account and contact activity for this deal",
+  "is_new_request": true
+}
+```
+
+Pass the returned `nextCursor` as `relatedActivity.cursor` to read the next page. `availableLinks` lists the account and contact links Cedar can read during migration. A workspace needs populated links on both the event and the deal for a match. You need permission to read the deal. [Tool reference](/reference/conversation-read#relatedactivity)

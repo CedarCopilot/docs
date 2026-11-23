@@ -27,6 +27,12 @@ Some skill text still uses older granular tool names. Map the intent to the cano
 
 The server does not publish MCP resources or prompts. Skill loading is its intentional reference mechanism.
 
+### Design a workflow
+
+In Cedar chat, ask “Design a post-meeting workflow that puts an unsent recap in my review queue.” Cedar maps the trigger, agent, saved task, delivery channel and approval in a Cedar HTML document. Below the diagram, review the configuration changes by agent or Task View, any missing capabilities, and the handoffs that still need testing. Ask for revisions in the same chat to update the design. Activating the workflow is a separate step.
+
+From an authenticated MCP client, call `load-skill` with `name: "workflow-design"` and your usual request metadata. Add `resource: "html-template"` for the standalone HTML, `"react-flow-layout"` for its layout source, or `"examples"` for sample flows.
+
 ## load-brain-skills
 
 Registered only with `brain:read` and the Cedar Brain feature gate. It uses the same optional `name` and `resource` argument shape and serves the gated `deal-intelligence-analysis` and `analysis-decomposition` skills.

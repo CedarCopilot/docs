@@ -18,7 +18,7 @@ Find the Cedar record, confirm the external provider and record ID, then inspect
 
 | Baseline access | Operations |
 | --- | --- |
-| `crm:read` | `get`, `find`, `search-semantic`, `search-external-crm-deals`, `timeline`, `field-evolution`, `value-as-of`, `describe-field`, `raw-content`, `search` |
+| `crm:read` | `get`, `find`, `search-semantic`, `search-external-crm-deals`, `timeline`, `field-evolution`, `value-as-of`, `describe-field`, `related-activity`, `definitions`, `record-profile`, `raw-content`, `search` |
 
 ## conversation-write
 
@@ -28,5 +28,17 @@ Find the Cedar record, confirm the external provider and record ID, then inspect
 | --- | --- |
 | `crm:read` | `create`, `update-fields`, `create-event`, `mutate`, `reassign-ownership`, `link-external-crm-deal`, `convert-hubspot-lead`, `create-opportunity`, `handoff-crm-record`, `log-email-activity` |
 | `email:read` | `sync-gmail-thread` |
+
+## crm-write
+
+| Action | Purpose | Scope |
+| --- | --- | --- |
+| `publish-field-definition` | Publish a versioned account or contact field. | `crm:manage` + `crm:write` |
+| `publish-event-definition` | Publish a versioned organization event contract. | `crm:manage` + `crm:write` |
+| `ensure-record` | Find or create the workspace account or contact. | `crm:manage` + `crm:write` |
+| `update-fields` | Update deal fields or an agent-maintained account or contact list with evidence. | `crm:write` |
+| `create-event` | Log deal activity or publish an organization event with named links to Cedar records. | `crm:write` |
+
+See the [parameters, examples, and receipts](/reference/crm-write).
 
 For a specific request, check [permissions](/getting-started/permissions) and the schema returned by your connection. Account, resource and action checks still apply.

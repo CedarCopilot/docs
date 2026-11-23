@@ -571,6 +571,103 @@
       },
       "additionalProperties": false
     },
+    "relatedActivity": {
+      "type": "object",
+      "properties": {
+        "availableLinks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "account",
+              "contact"
+            ]
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "occurredAt": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "summary": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "customEventType": {
+                "type": "string"
+              },
+              "customFields": {
+                "type": "object",
+                "additionalProperties": {}
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "account",
+                    "contact"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "id",
+              "occurredAt",
+              "title",
+              "summary",
+              "customEventType",
+              "customFields",
+              "reasons"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "occurredAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "occurredAt",
+                "id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "availableLinks",
+        "events",
+        "nextCursor"
+      ],
+      "additionalProperties": false
+    },
     "timeline": {
       "type": "object",
       "properties": {
@@ -626,7 +723,8 @@
               "series": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/properties/timeline/properties/entries/items"
+                  "type": "object",
+                  "additionalProperties": {}
                 }
               }
             },
@@ -638,7 +736,26 @@
           }
         },
         "buffer": {
-          "$ref": "#/properties/timeline/properties/buffer"
+          "type": "object",
+          "properties": {
+            "buffered": {
+              "type": "boolean",
+              "const": true
+            },
+            "path": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string"
+            },
+            "word_count": {
+              "type": "number"
+            },
+            "access_instructions": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -721,6 +838,217 @@
       },
       "additionalProperties": false
     },
+    "recordProfile": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "account",
+            "contact"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "profile": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string"
+              },
+              "value": {},
+              "source": {
+                "type": "string",
+                "enum": [
+                  "organization",
+                  "shared",
+                  "missing"
+                ]
+              }
+            },
+            "required": [
+              "field",
+              "source"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "list": {
+                "type": "boolean"
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "value": {},
+                    "occurredAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "occurredAt"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "hasEarlier": {
+                "type": "boolean"
+              },
+              "earlierCursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "label",
+              "list",
+              "values",
+              "hasEarlier",
+              "earlierCursor"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "activity": {
+          "type": "object",
+          "properties": {
+            "events": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "at": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "number"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "payload": {
+                    "type": "object",
+                    "additionalProperties": {}
+                  }
+                },
+                "required": [
+                  "id",
+                  "at",
+                  "key",
+                  "version",
+                  "title",
+                  "payload"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "next": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  },
+                  "required": [
+                    "at",
+                    "id"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "events",
+            "next"
+          ],
+          "additionalProperties": false
+        },
+        "next": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "label",
+        "profile",
+        "attributes",
+        "next"
+      ],
+      "additionalProperties": false
+    },
+    "definitions": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        },
+        "nextAfter": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "nextAfter"
+      ],
+      "additionalProperties": false
+    },
     "rawContent": {
       "type": "object",
       "properties": {
@@ -764,7 +1092,26 @@
           }
         },
         "buffer": {
-          "$ref": "#/properties/timeline/properties/buffer"
+          "type": "object",
+          "properties": {
+            "buffered": {
+              "type": "boolean",
+              "const": true
+            },
+            "path": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string"
+            },
+            "word_count": {
+              "type": "number"
+            },
+            "access_instructions": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -783,7 +1130,26 @@
           }
         },
         "buffer": {
-          "$ref": "#/properties/timeline/properties/buffer"
+          "type": "object",
+          "properties": {
+            "buffered": {
+              "type": "boolean",
+              "const": true
+            },
+            "path": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string"
+            },
+            "word_count": {
+              "type": "number"
+            },
+            "access_instructions": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -792,6 +1158,5 @@
   "required": [
     "success"
   ],
-  "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#"
+  "additionalProperties": false
 }
