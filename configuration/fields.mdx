@@ -42,18 +42,18 @@ For a manual **list** field, select **Save value** to append the matched observa
 
 An organization administrator must authorize a Cedar OAuth client with the `crm:write` scope. Send one JSON document per HTTP POST to `/webhooks/custom-data/<organization-id>` on your Cedar API host. Include `Authorization: Bearer <access-token>` and `Content-Type: application/json`. Use the Cedar organization ID for this feed. It must match the workspace authorized by the credential.
 
-For example, to keep a history of Vooma’s ABM tier observations, publish a **list** account field named `custom.abm_tier_history` with **Connected source** as its writer. Substitute your published version and the target account’s Cedar ID.
+For example, to keep a history of account tier observations, publish a **list** account field named `custom.abm_tier_history` with **Connected source** as its writer. Substitute your published version and the target account’s Cedar ID.
 
 ```json
 {
   "kind": "attribute",
   "data": {
     "ownerKind": "account",
-    "ownerId": "57c708db-b9c5-41f8-ba3d-569c49961af1",
+    "ownerId": "10000000-0000-4000-8000-000000000001",
     "fieldKey": "custom.abm_tier_history",
     "version": 1,
     "value": "Tier 1",
-    "observationId": "vooma-abm-875",
+    "observationId": "example-tier-001",
     "occurredAt": "2026-11-20T18:30:00Z"
   }
 }
@@ -61,7 +61,7 @@ For example, to keep a history of Vooma’s ABM tier observations, publish a **l
 
 A successful list write returns the row ID and either `applied` or `duplicate`. Reuse the same observation ID, timestamp and value when retrying. A changed observation with the same ID returns a conflict. Contact lists use `ownerKind: "contact"` and a Cedar contact ID. A current-value write returns HTTP 412.
 
-To import a Mastra website visit, publish a `website_visit` event definition with a string field called `path` and a single account link called `visitor_account`. Substitute an accessible Cedar account ID and send:
+To import a website visit, publish a `website_visit` event definition with a string field called `path` and a single account link called `visitor_account`. Substitute an accessible Cedar account ID and send:
 
 ```json
 {
@@ -69,10 +69,10 @@ To import a Mastra website visit, publish a `website_visit` event definition wit
   "data": {
     "eventKey": "website_visit",
     "version": 1,
-    "externalEventId": "mastra-visit-7043",
+    "externalEventId": "example-visit-001",
     "occurredAt": "2026-11-20T19:10:00Z",
     "payload": { "path": "/pricing" },
-    "entityLinks": { "visitor_account": "57c708db-b9c5-41f8-ba3d-569c49961af1" }
+    "entityLinks": { "visitor_account": "10000000-0000-4000-8000-000000000001" }
   }
 }
 ```
