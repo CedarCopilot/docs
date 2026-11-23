@@ -16,6 +16,18 @@ description: "Match the child execution to native mutations, evidence analysis o
 
 Each call has one action and its matching parameter object. Supply the business task, relevant context and expected result. Reading a child execution's answer is part of completion; starting it is not proof the work succeeded.
 
+## Follow work running in the background
+
+In **Cedar (fast)**, **GPT-6 Luna** and **GPT-6.1 Sol (low reasoning)**, Cedar can accept a delegated task and let you continue chatting while it works. An accepted or running task is queued or in progress; it has not finished yet.
+
+The task’s status and results stay in the chat where you requested the work. Reopen that chat to check progress. Closing the page or switching chats does not cancel accepted work, and its saved results do not replace a newer reply.
+
+Use **Stop** beside the task to stop its remaining work. Stop does not undo actions already completed. If Cedar says it could not stop the task, try **Stop** again.
+
+Read the final result before treating the work as complete. A task can finish with partial results or a failure; check completed actions before trying again. Any action that still requires approval remains a separate decision.
+
+<Note>Research needed to finish the current answer and work that must stay in its review flow can remain in that chat turn. Code-execution tasks and Claude modes keep their existing flow.</Note>
+
 ## Persistent agents versus one-off delegation
 
 A maintained agent has a saved definition, identity, grants and possible trigger sources. A delegated task is an execution of a bounded piece of work. Reuse a maintained agent's behavior when appropriate instead of copying its instructions into a second prompt that can drift.
