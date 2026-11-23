@@ -23,6 +23,10 @@ Current-value account/contact fields remain readable. New scalar writes are on h
 
 Publishing definitions and ensuring records require an active workspace owner or admin using an interactive connection. Read the existing contract with `conversation-read` before publishing. Start a new definition at `expectedPreviousVersion: 0`. If another writer published concurrently, read the latest version and compare it. [Website visit setup](/integrations/custom-crm-data#set-up-website-visits-with-a-coding-agent)
 
+## Request playbook processing
+
+`create-event` saves activity by default. For a published organization event or a manually logged call or text, set `triggerPlaybook: true` inside `createEvent` to request a background run. Supply a stable `externalEventId` and reuse it when retrying the same occurrence. If the user asks to log activity and their intent about automation is unclear, ask before saving. Manually logged meetings and generic activity support saving only. The returned queue count describes background work accepted for evaluation. [Playbook triggers](/agent-platform/triggers).
+
 ## Examples
 
 For example, pass this `createEvent` object with `action: "create-event"` to log a call on one deal.

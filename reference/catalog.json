@@ -4,7 +4,7 @@
     {
       "name": "document-read",
       "title": "Read Cedar docs",
-      "description": "Cedar Docs — agent-curated persistent memory. Read-only. ACTIONS: (1) read — fetch a specific doc by virtual path, full markdown content. Read #playbook to inspect producer ref admission criteria/context; selected file context uses an accessible Cedar document ID, not a URL or local path. (2) list — what docs exist under a path prefix (metadata only, no content). Call this at the start of complex tasks before deciding what to read. (3) search — regex search across docs, returns excerpts with context lines, not full content. Use for a specific fact; use read for full context. Each action takes its params in a same-named object (action: \"read\" with read: {path}) — omit every params object except the one for your action. Personal chat instructions: #chat-agent → user/playbooks/CHAT_AGENT.md. Path shortcuts (#kb, #wiki, #playbook, #here, ...) and content shortcuts (#sections, #outline, #section/{Name}, #lines/{a}-{b}) are NOT listed here — you MUST call load-skill(\"documents\") for the full reference before constructing any non-trivial path or reading a doc you haven't sized up yet. Never modifies anything — use document-write to create, edit, delete, restore, move, or share a doc.",
+      "description": "Cedar Docs — agent-curated persistent memory. Read-only. ACTIONS: (1) read — fetch a specific doc by virtual path, full markdown content. Read #playbook to inspect trigger block criteria and context; selected file context uses an accessible Cedar document ID, not a URL or local path. (2) list — what docs exist under a path prefix (metadata only, no content). Call this at the start of complex tasks before deciding what to read. (3) search — regex search across docs, returns excerpts with context lines, not full content. Use for a specific fact; use read for full context. Each action takes its params in a same-named object (action: \"read\" with read: {path}) — omit every params object except the one for your action. Personal chat instructions: #chat-agent → user/playbooks/CHAT_AGENT.md. Path shortcuts (#kb, #wiki, #playbook, #here, ...) and content shortcuts (#sections, #outline, #section/{Name}, #lines/{a}-{b}) are NOT listed here — you MUST call load-skill(\"documents\") for the full reference before constructing any non-trivial path or reading a doc you haven't sized up yet. Never modifies anything — use document-write to create, edit, delete, restore, move, or share a doc.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -12077,7 +12077,7 @@
     {
       "name": "conversation-write",
       "title": "Update CRM conversations",
-      "description": "Creating/changing a CRM deal or conversation? FIRST read the effective crm-updater path from the agent directory (document-read), or use injected <crm_write_rules>, before searching email. Fallback only: #subagents/crm-updater.md. Cedar conversation actions. Create alone makes no external CRM record: (1) create — create a Cedar conversation. (2) update-fields — metadata/working memory; linkCrmDeal links first so fields sync to it. People: upsert value={people:[{id,...changes}]}. History: append complete new entries; update existing IDs with changed properties only. New people need all required properties (evidence=[] if no verified quote). Preserve IDs and unaffected entries; supplied arrays replace. Roles: one buying role except Economic buyer + Decision maker together, plus at most one relationship role. (3) create-event — log a meeting/call/text/custom event. (4) mutate — move/reassign/merge/rename/refresh conversations or clear working memory. (5) reassign-ownership — transfer to an org member, adding membership if needed. (6) link-external-crm-deal — link existing search-external-crm-deals result; update-fields syncs values. (7) sync-gmail-thread — import missing live Gmail by threadId/searchQuery into an existing deal for processing. (8) convert-hubspot-lead — create/reuse the linked Deal, qualify the Lead, and hand off using configured stages/AOP. Requires saved in-app approval and enabled writes. (9) handoff-crm-record — link an existing record to another AOP, preserving source history; no provider changes. Requires saved in-app approval. (10) create-opportunity — durably propose or create an external CRM opportunity with account-specific fields and associations. (11) log-email-activity — propose logging one email to its linked CRM deal. Pass only the matching params object (e.g. updateFields for update-fields).",
+      "description": "Creating/changing a CRM deal or conversation? FIRST read the effective crm-updater path from the agent directory (document-read), or use injected <crm_write_rules>, before searching email. Fallback only: #subagents/crm-updater.md. Cedar deals. Create is Cedar-only. (1) create a deal. (2) update-fields — metadata/working memory; linkCrmDeal links first so fields sync to it. People: upsert value={people:[{id,...changes}]}. History: append complete new entries; update existing IDs with changed properties only. New people need all required properties (evidence=[] if no verified quote). Preserve IDs and unaffected entries; supplied arrays replace. Roles: one buying role except Economic buyer + Decision maker together, plus at most one relationship role. (3) create-event — log a deal activity. Call/text: supply stable externalEventId; triggerPlaybook:true runs the attached playbook on first save. Default save only. Ask if unclear. Use crm-write for organization events. (4) mutate — move/reassign/merge/rename/refresh conversations or clear working memory. (5) reassign-ownership — transfer to org member; adds membership. (6) link-external-crm-deal — link existing search-external-crm-deals result; update-fields syncs values. (7) sync-gmail-thread — import missing Gmail by threadId/searchQuery. (8) convert-hubspot-lead — create/reuse Deal, qualify Lead, hand off via stages/AOP. Needs saved approval and enabled writes. (9) handoff-crm-record — link an existing record to another AOP, preserving source history; no provider changes. Requires saved in-app approval. (10) create-opportunity — propose/create external CRM opportunity with account fields and associations. (11) log-email-activity — propose logging one linked email. Pass only the matching params object (e.g. updateFields for update-fields).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -12635,16 +12635,26 @@
                   "text",
                   "custom"
                 ],
-                "description": "Meeting, call, chat or custom."
+                "description": "Activity kind."
               },
               "title": {
                 "type": "string",
                 "minLength": 1,
-                "description": "Short event title."
+                "description": "Title."
               },
               "occurredAt": {
                 "type": "string",
-                "description": "ISO datetime; default now."
+                "description": "ISO datetime."
+              },
+              "externalEventId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500,
+                "description": "Call/text retry ID."
+              },
+              "triggerPlaybook": {
+                "type": "boolean",
+                "description": "Call/text opt-in; ID required."
               },
               "description": {
                 "type": "string",
@@ -12652,11 +12662,11 @@
               },
               "notes": {
                 "type": "string",
-                "description": "Personal meeting/call.notes."
+                "description": "Meeting/call notes."
               },
               "transcript": {
                 "type": "string",
-                "description": "Verbatim; use requirePaste."
+                "description": "Use requirePaste."
               },
               "participants": {
                 "type": "array",
@@ -12676,15 +12686,15 @@
                   ],
                   "additionalProperties": false
                 },
-                "description": "Meeting/call attendees."
+                "description": "Attendees."
               },
               "content": {
                 "type": "string",
-                "description": "Body for eventType:text only."
+                "description": "Text body."
               },
               "requirePaste": {
                 "type": "boolean",
-                "description": "True for transcripts; omit transcript."
+                "description": "Paste via card."
               }
             },
             "required": [
@@ -13922,6 +13932,17 @@
               },
               "indexed": {
                 "type": "boolean"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "created",
+                  "replayed"
+                ]
+              },
+              "queuedRuns": {
+                "type": "integer",
+                "minimum": 0
               }
             },
             "additionalProperties": false
@@ -14158,7 +14179,7 @@
     {
       "name": "crm-write",
       "title": "Manage CRM records, fields and events",
-      "description": "Supply the matching camelCase parameters only. Administrators with crm:manage and crm:write can publish versioned event and field definitions and ensure account/contact records. Use expectedPreviousVersion 0 on first publish. A conversation target uses its existing CRM field/event contract and requires crm:read as well as crm:write. An account/contact field needs an agent-maintained definition and evidence. An organization event needs its published definition and named entityLinks. Discover definitions with conversation-read. Reuse the same observationId or externalEventId on retry.",
+      "description": "Supply the matching camelCase parameters only. Administrators with crm:manage and crm:write can publish versioned event and field definitions and ensure account/contact records. Use expectedPreviousVersion 0 on first publish. A conversation target uses its existing CRM field/event contract and requires crm:read as well as crm:write. An account/contact field needs an agent-maintained definition and evidence. An organization event needs its published definition and named entityLinks. For an organization event or a deal call/text with externalEventId, triggerPlaybook queues matching playbooks on first creation. Omit or pass false to save only. Ask before creation if intent is unclear. Discover definitions with conversation-read. Reuse the same observationId or externalEventId on retry.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -14968,16 +14989,26 @@
                       "text",
                       "custom"
                     ],
-                    "description": "Meeting, call, chat or custom."
+                    "description": "Activity kind."
                   },
                   "title": {
                     "type": "string",
                     "minLength": 1,
-                    "description": "Short event title."
+                    "description": "Title."
                   },
                   "occurredAt": {
                     "type": "string",
-                    "description": "ISO datetime; default now."
+                    "description": "ISO datetime."
+                  },
+                  "externalEventId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500,
+                    "description": "Call/text retry ID."
+                  },
+                  "triggerPlaybook": {
+                    "type": "boolean",
+                    "description": "Call/text opt-in; ID required."
                   },
                   "description": {
                     "type": "string",
@@ -14985,11 +15016,11 @@
                   },
                   "notes": {
                     "type": "string",
-                    "description": "Personal meeting/call.notes."
+                    "description": "Meeting/call notes."
                   },
                   "transcript": {
                     "type": "string",
-                    "description": "Verbatim; use requirePaste."
+                    "description": "Use requirePaste."
                   },
                   "participants": {
                     "type": "array",
@@ -15009,15 +15040,15 @@
                       ],
                       "additionalProperties": false
                     },
-                    "description": "Meeting/call attendees."
+                    "description": "Attendees."
                   },
                   "content": {
                     "type": "string",
-                    "description": "Body for eventType:text only."
+                    "description": "Text body."
                   },
                   "requirePaste": {
                     "type": "boolean",
-                    "description": "True for transcripts; omit transcript."
+                    "description": "Paste via card."
                   },
                   "target": {
                     "$ref": "#/properties/updateFields/anyOf/0/properties/target"
@@ -15085,6 +15116,10 @@
                       "type"
                     ],
                     "additionalProperties": false
+                  },
+                  "triggerPlaybook": {
+                    "type": "boolean",
+                    "description": "Default false saves only. True queues matching playbook work in the background for linked deals. If the user’s intent is unclear, ask before creating the event."
                   }
                 },
                 "required": [
@@ -15888,26 +15923,6 @@
               {
                 "type": "object",
                 "properties": {
-                  "status": {
-                    "type": "string",
-                    "enum": [
-                      "created",
-                      "replayed"
-                    ]
-                  },
-                  "eventId": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "status",
-                  "eventId"
-                ],
-                "additionalProperties": false
-              },
-              {
-                "type": "object",
-                "properties": {
                   "eventId": {
                     "type": "string"
                   },
@@ -15919,8 +15934,43 @@
                   },
                   "indexed": {
                     "type": "boolean"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "created",
+                      "replayed"
+                    ]
+                  },
+                  "queuedRuns": {
+                    "type": "integer",
+                    "minimum": 0
                   }
                 },
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "created",
+                      "replayed"
+                    ]
+                  },
+                  "eventId": {
+                    "type": "string"
+                  },
+                  "queuedRuns": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "status",
+                  "eventId"
+                ],
                 "additionalProperties": false
               }
             ]
@@ -42936,7 +42986,7 @@
     "note": "Static product metadata plus reviewed tool references. agent initialize is externally available for supported templates without adding triggers; other app workspace controls are not implied external MCP registrations.",
     "triggers": {
       "any": {
-        "fires": "every supported event — email, meeting, Slack message, LinkedIn message, accepted LinkedIn connection, external-CRM sync (calendar changes and signals require explicit opt-in)",
+        "fires": "every supported event — email, meeting, Slack message, LinkedIn message, accepted LinkedIn connection, external-CRM sync (calendar changes, signals, calls, texts and custom events require explicit opt-in)",
         "carries": [],
         "dispatch": "orchestrator"
       },
@@ -43007,6 +43057,23 @@
         "fires": "an external POST to the playbook webhook endpoint, or a registered Slack-channel source",
         "carries": [
           "id"
+        ],
+        "dispatch": "direct"
+      },
+      "call": {
+        "fires": "a recorded call linked to a deal",
+        "carries": [],
+        "dispatch": "direct"
+      },
+      "text": {
+        "fires": "a text message linked to a deal",
+        "carries": [],
+        "dispatch": "direct"
+      },
+      "custom": {
+        "fires": "an ingested custom event with the selected published key, or any custom event when eventKey is *",
+        "carries": [
+          "eventKey"
         ],
         "dispatch": "direct"
       }
