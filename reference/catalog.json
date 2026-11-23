@@ -34402,7 +34402,8 @@
         }
       ],
       "toolDependencies": [
-        "crm-write",
+        "update-crm-record-field",
+        "record-crm-org-event",
         "signals-read",
         "signals-write",
         "conversation-analytics",
