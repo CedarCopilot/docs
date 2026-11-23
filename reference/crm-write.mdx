@@ -3,10 +3,13 @@ title: "crm-write"
 description: "Update deal, account and contact fields or log deal and organization events."
 ---
 
-Use `crm-write` for deal field updates, account or contact observations, deal activity, and published organization events. Choose an action and supply its matching object. The object's `target` selects which parameters apply.
+Use `crm-write` to publish CRM definitions, find or create workspace records, append observations, and record deal or organization events. Choose an action and supply its matching object. Field updates and event writes use `target` to select the record type.
 
 | Action | Target type | What to send | External OAuth scopes |
 | --- | --- | --- | --- |
+| `publish-event-definition` | Organization | `publishEventDefinition` with the event key, label, expected previous version, typed payload fields and named entity links | `crm:manage` and `crm:write` |
+| `publish-field-definition` | Account or contact | `publishFieldDefinition` with the field contract and expected previous version | `crm:manage` and `crm:write` |
+| `ensure-record` | Account or contact | `ensureRecord` with an account domain or identified contact email | `crm:manage` and `crm:write` |
 | `update-fields` | `conversation` | Deal ID, field changes, approval title and supporting reasoning | `crm:write` and `crm:read` |
 | `update-fields` | `account` or `contact` | Cedar record ID, agent-maintained list key and version, observed value and evidence | `crm:write` |
 | `create-event` | `conversation` | Deal ID, meeting, call, text or custom activity details | `crm:write` and `crm:read` |
@@ -17,6 +20,8 @@ Deal actions use the existing conversation permissions and approval flow. An act
 Interactive Cedar agents and OAuth clients with the required scopes can use these account, contact and organization actions. Scheduled automations and their subagents currently have no grant for appending custom field observations or creating organization events.
 
 Current-value account/contact fields remain readable. New scalar writes are on hold. Triggering outbound webhooks from arbitrary custom events is coming soon. The inbound source receiver and the existing deal-signal dispatcher keep their own delivery contracts.
+
+Publishing definitions and ensuring records require an active workspace owner or admin using an interactive connection. Read the existing contract with `conversation-read` before publishing. Start a new definition at `expectedPreviousVersion: 0`. If another writer published concurrently, read the latest version and compare it. [Website visit setup](/integrations/custom-crm-data#set-up-website-visits-with-a-coding-agent)
 
 ## Examples
 
