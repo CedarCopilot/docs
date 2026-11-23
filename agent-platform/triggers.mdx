@@ -26,6 +26,14 @@ This table is generated from the runtime trigger vocabulary. It describes the XM
 
 ## How dispatch differs
 
-Orchestrator triggers pass relevant instructions and agent descriptions to the event orchestrator, which decides which referenced agents to run. Direct triggers dispatch the configured block's referenced agents through their supported execution path. A description is not an executable eligibility condition. On supported event blocks, configure a filter and optionally a Jev question. Each matching block checks its conditions once for the deal. A false filter skips the block. Missing evidence holds the block. Put agents that need different conditions in separate blocks for the same event. The orchestrator sees eligible agents in playbook order. That order does not schedule one agent after another.
+Orchestrator triggers pass relevant instructions and agent descriptions to the event orchestrator, which decides which referenced agents to run. Direct triggers dispatch the configured block's referenced agents through their supported execution path.
 
 A supported trigger still needs a saved agent document, a valid document reference, compatible scope and the required connection. Calendar changes and signals require explicit opt-in rather than being implied by `any`. A before-meeting trigger needs calendar data Cedar already holds. [Authoring and webhook setup](/automation/playbooks) · [Invocation sources](/agent-platform/invocations).
+
+## Conditions on a trigger
+
+Every playbook trigger can have a filter, a Jev question, or both. Add the condition to the trigger block in the editor, or use MCP to edit that block in the playbook. Cedar first matches the trigger as usual. It then checks the filter once for the block. If the filter passes, Jev evaluates the question using the context selected for that block. Each matching block makes its own decision.
+
+A false filter skips the block. Missing required evidence holds it. A scheduled or webhook run can have no deal, so only request deal context when the rule requires one. A condition on **Any** keeps its existing event coverage. A condition on **Signal** controls the agents that respond to an actionable signal. Cedar still records the signal when the block skips.
+
+Use **Custom** for events your own system sends to Cedar. Publish an event key, send the occurrence, and choose that key in the playbook. **Signal** is for actionable signals produced by Cedar’s watcher and native signal paths. [Custom event intake](/integrations/custom-crm-data#run-a-playbook-when-an-event-arrives).
