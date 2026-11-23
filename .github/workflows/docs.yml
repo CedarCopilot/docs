@@ -1,0 +1,24 @@
+name: Documentation
+on:
+  pull_request:
+    branches: [staging, main]
+  push:
+    branches: [staging, main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --prefix .github/docs-check --ignore-scripts
+      - run: node .github/docs-check/check.mjs

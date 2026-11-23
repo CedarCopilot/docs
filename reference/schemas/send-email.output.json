@@ -63,13 +63,21 @@
         },
         "approvalHash": {
           "type": "string"
+        },
+        "reviewToken": {
+          "type": "string"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
         "draftId",
         "senderAccountId",
         "sender",
-        "threadId",
         "to",
         "cc",
         "bcc",

@@ -1,10 +1,13 @@
 ---
-title: "Tables overview"
-sidebarTitle: "Overview"
+title: "Tables"
 description: "Work with persistent structured data using stable rows, schemas, views and imports."
 ---
 
 Cedar tables are row-addressed documents. Load `tables` before editing them. Use `table` for partial changes instead of replacing the whole document body.
+
+## Export a review copy
+
+Export CSV for a flat extract or XLSX for a workbook. Cedar attempts to refresh CRM-bound values before exporting. If the refresh fails, a download can still contain the last known values. Resolve questions about a stage or owner against the linked record before using the file for a decision.
 
 ## Every table operation
 
@@ -33,6 +36,6 @@ Import supports supported uploaded CSV/XLSX sources and column mappings. `update
 
 ## External row work
 
-External `fill` returns delegated row briefs (`mode: "delegate"`) for the calling agent to handle with its own tools. It does not grant access to Cedar's internal agent executor. Follow the returned confirmation and batching requirements, keep results tied to row IDs, and explicitly use Fiber for manual company/person enrichment.
+External `fill` returns delegated row briefs (`mode: "delegate"`) for the calling agent to handle with its own tools. It does not grant access to Cedar's internal agent executor. For more than 25 rows, obtain the required confirmation. Follow the returned batching requirements, keep results tied to row IDs, and explicitly use Fiber for manual company/person enrichment.
 
 [Complete table contract](/reference/table) · [Table skill](/skills/tables)

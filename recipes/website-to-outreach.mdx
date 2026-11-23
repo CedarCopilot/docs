@@ -1,41 +1,26 @@
 ---
-title: "Website signal \u2192 reviewed follow-up"
-description: "Connect first-party intent to CRM context while controlling duplicate work and outreach."
+title: "Turn a website signal into a reviewed follow-up"
+description: "Qualify an identified visitor or demo request, prepare one draft, and verify what happened before contacting the buyer."
 ---
 
-## Architecture
+A demo form names someone who asked to hear from you. A visit to your pricing page provides weaker evidence. Preserve that difference in the review record and in any proposed message.
 
-```mermaid
-flowchart LR
-  A[Visitor provider or website form] --> B[Cedar HTTP input or playbook webhook]
-  B --> C[Resolve identity and deduplicate]
-  C --> D[Check CRM and qualification]
-  D --> E[Table row and draft]
-  E --> F[User review]
-  F --> G[Scheduled message]
-  G --> H[Delivery status]
-```
+## 1. Receive an identified event
 
-The visitor/form producer and HTTP input setup are separate from MCP. The external MCP provides the context and review/action layer around them.
+Start with a provisioned Cedar Input for RB2B visitor records, or a registered HTTP playbook webhook for your own form. Configure the matching input or trigger before sending an event. For example, a fictional demo form might include an event ID, the form URL, submission time, the buyer's submitted work email and the question they asked. Keep provider credentials out of review records. [Website inputs and payloads](/signals/website)
 
-## Event contract
+## 2. Decide whether to follow up
 
-Include a stable event ID, source URL, event time, and only the identity fields you actually know. For RB2B, use its supported payload fields and the Cedar adapter mapping. For your own form, retain the submitted identity and explicit request rather than attempting to infer an anonymous visitor.
+Resolve the person and company using the identifiers actually supplied. Check existing CRM conversations, open tasks and prior outreach before creating work. If two people could match, leave the row for identity review. If this is already an active deal, direct the event to its owner with the source attached. Enrich only when you need information for a specific qualification decision and the provider use is authorized.
 
-Treat the provider's captured timestamp as event time. Cedar's ingestion time can differ. Deduplicate by a stable source/event key and track previous person-level decisions separately so multiple visits do not produce repeated drafts or messages.
+Use a stable source/event key and keep the last person-level decision with the working record. Configure the workflow so a retry or repeat visit updates the evidence and reuses the decision. The webhook itself does not deduplicate your business decisions.
 
-## Qualification rules
+## 3. Prepare the review
 
-Check company fit, role, existing customer/prospect status, active conversations, recent outreach, and whether the source conveys an explicit request or only passive activity. Preserve unknowns and avoid assigning a visit to a namesake.
+Save the source, timestamp, person, company, relationship, reason for follow-up and proposed next action in the task or table row. Draft against the current channel conversation. For a form submission, answer the buyer's stated question. For passive website activity, avoid claiming the person requested outreach. If the owner or recipient is unclear, leave an actionable review item instead of scheduling a send.
 
-Use Fiber for manual enrichment when authorized. If enrichment or billing is unavailable, retain an unresolved review row rather than silently switching providers or fabricating qualification.
+## 4. Check the outcome
 
-## Output policy
+Try one controlled event with fictional data and an internal review destination. Confirm that one review record appears, links to the right source and carries the expected owner and draft. Replay that event and verify the configured workflow reuses the record. HTTP acceptance confirms receipt; it cannot confirm completion of the playbook.
 
-A background playbook can prepare a row, task, draft, or internal alert. Configure one notification per meaningful new decision or a digest window; no universal cooldown is installed merely by registering a webhook.
-
-The external client can present the review set and schedule explicitly approved messages at distinct times. A repeat visit should update evidence on the existing review record, not create a fresh send authorization.
-
-## Verification
-
-Send one controlled event through the configured source. Confirm that it reaches the intended input/playbook, creates one expected review artifact, preserves the source link, and produces only the intended notification. A webhook acceptance response proves receipt/queueing, not the downstream result. Inspect execution and artifact state before enabling a broader source.
+When the rep wants to contact the buyer, have them review the exact recipient, sender, copy and timing. Use the appropriate [reviewed send](/email/drafts-and-delivery) or [scheduled delivery](/channels/scheduling) flow. Keep a queued item recorded as queued until the channel reports a delivery outcome.

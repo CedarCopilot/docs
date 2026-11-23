@@ -1,8 +1,23 @@
 ---
-title: "Execution and queues overview"
-sidebarTitle: "Overview"
+title: "Cedar’s agent harness"
 description: "How interactive requests, events, scheduled rules and child runs produce durable results."
 ---
+
+## How the harness runs an agent
+
+The harness runs an agent configured in Cedar using its saved instructions, the context of the request or event, and its allowed tools. You can start a run on demand. For automatic runs, choose what should start the work in the agent’s playbook.
+
+| When should the agent run? | Example |
+| --- | --- |
+| When something changes | Inspect a new Slack message in a linked channel or respond to a qualifying deal signal. |
+| At a particular time | Prepare follow-ups on weekday mornings, or brief a rep before a meeting on their calendar. |
+| When another system signals Cedar | Accept an event at a configured playbook webhook. |
+
+Some events go through an orchestrator that selects agents. Other triggers dispatch the agents named in the rule. See [all trigger types](/agent-platform/triggers) for the exact conditions and [the agent library](/agent-platform/library) for available starting points.
+
+If you host your own agent, your runtime decides when it runs. It can [prepare a follow-up through MCP](/agent-platform/your-runtime) to read context and call authorized tools.
+
+For setup, start with the [agent library](/agent-platform/library) and [authoring guide](/automation/agent-authoring). Check [permissions](/agent-platform/permissions) and [sharing](/agent-platform/sharing) before running the agent. Inspect [run history](/agent-platform/observability) or [diagnostics](/modules/diagnostics) to trace a result.
 
 ## Execution paths
 

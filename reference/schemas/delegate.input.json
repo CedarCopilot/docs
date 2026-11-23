@@ -30,7 +30,16 @@
         },
         "conversationId": {
           "type": "string",
-          "description": "Optional conversationId to associate reasoning with (enables per-row reasoning display in canvas). For analyzer type, this scopes the analysis to a specific conversation."
+          "description": "Optional conversationId to associate reasoning with (enables per-row reasoning display in canvas). For analyzer type, this scopes the analysis to a specific conversation. For the same task on several conversations, use conversationIds instead."
+        },
+        "conversationIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 30,
+          "description": "Run the SAME task once per conversation in ONE call. Cedar starts an isolated subagent per conversation (up to 10 at a time) and returns every result together, with a progress row per conversation. Prefer this over spawning one subagent per conversation. When set, conversationId is ignored and streamToMainChat is false."
         },
         "originalQuestion": {
           "type": "string",
@@ -39,10 +48,13 @@
         "skillToLoad": {
           "type": "string",
           "enum": [
+            "agent-setup",
             "drafting",
             "knowledge-base",
             "calendar",
             "conversation",
+            "task-views",
+            "task-view-analytics",
             "tasks",
             "multi-conversation-operations",
             "customer-support",
@@ -54,8 +66,7 @@
             "notifications",
             "cedar-configuration",
             "collateral",
-            "wiki-extraction",
-            "coaching",
+                "coaching",
             "run-sql",
             "field-query",
             "deal-intelligence-analysis",

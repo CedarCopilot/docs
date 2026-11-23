@@ -1,8 +1,11 @@
 ---
-title: "Slack overview"
-sidebarTitle: "Overview"
+title: "Slack"
 description: "Read live conversations, attach evidence to deals, and configure channel-based workflows."
 ---
+
+The [drafting skill](/skills/drafting) helps prepare a Slack reply. Check the channel and the agent’s granted Slack actions before delivery.
+
+To pick up activity from Slack, [watch a channel](/slack/watch-channels) or use live search to read a relevant thread. To review a task Cedar has already prepared, open [Review tasks in Slack](/slack/task-views).
 
 Cedar separates live Slack access, CRM ingestion, trigger registration, and notifications. These operations solve different parts of “watch this channel and ping me.”
 
@@ -12,10 +15,17 @@ Cedar separates live Slack access, CRM ingestion, trigger registration, and noti
 | Read a thread or recent channel messages | `slack-read read-thread` |
 | Inspect images attached to a message | `slack-read read-file` |
 | Attach a thread to an existing deal | `slack-write sync-thread` |
+| Create a channel on explicit request | `slack-write create-channel` |
+| Invite existing workspace members | `slack-write invite-members` |
+| Send one Slack Connect email invitation | `slack-write invite-external` |
 | Select channels for ongoing CRM sync | `connection-write update_slack_sync_config` |
 | Run an agent when a specific channel gets a matching message | `connection-write manage_playbook_webhook` with `sourceType: "slack_channel"` |
 | Discover notification destinations | `notify list-slack-channels` |
 | Deliver an alert | `notify send` |
+
+Channel creation and invitations require `slack:write` plus the connected Slack app's provider grants. External invitations remain pending acceptance/admin approval; see [Slack write parameters](/reference/slack-write).
+
+For rep-facing review, sends and synchronized task lifecycle, see [Manage Task View work from Slack](/slack/task-views).
 
 ## Live search
 

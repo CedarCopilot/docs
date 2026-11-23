@@ -199,6 +199,10 @@
               },
               "displayName": {
                 "type": "string"
+              },
+              "optional": {
+                "type": "boolean",
+                "description": "True for an optional guest; false for a required guest. Omit to preserve the existing role on update; defaults to required on create."
               }
             },
             "required": [

@@ -23,6 +23,26 @@
         "aopId": {
           "type": "string"
         },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "aop",
+            "deal"
+          ],
+          "description": "aop changes every deal on the AOP; deal changes only conversationId"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "read",
+            "patch"
+          ],
+          "description": "Read current items before patching; defaults to patch"
+        },
+        "conversationId": {
+          "type": "string",
+          "format": "uuid"
+        },
         "ops": {
           "type": "array",
           "items": {
@@ -211,11 +231,147 @@
             ]
           },
           "minItems": 1
+        },
+        "overrideOps": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "add"
+                  },
+                  "item": {
+                    "$ref": "#/properties/configureOverview/properties/ops/items/anyOf/0/properties/item"
+                  }
+                },
+                "required": [
+                  "op",
+                  "item"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "remove"
+                  },
+                  "key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "op",
+                  "key"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "hide"
+                  },
+                  "key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "op",
+                  "key"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "show"
+                  },
+                  "key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "op",
+                  "key"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "reset"
+                  },
+                  "key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "op",
+                  "key"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "reorder"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "displayOrder": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "op",
+                  "key",
+                  "displayOrder"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "const": "setRender"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "render": {
+                    "type": "string",
+                    "enum": [
+                      "scalar",
+                      "markdown"
+                    ]
+                  }
+                },
+                "required": [
+                  "op",
+                  "key",
+                  "render"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "minItems": 1
         }
       },
-      "required": [
-        "ops"
-      ],
       "additionalProperties": false
     },
     "createCanvas": {
@@ -253,7 +409,8 @@
         },
         "viewConfig": {
           "type": "object",
-          "additionalProperties": {}
+          "additionalProperties": {},
+          "description": "Native saved UI configuration. Pipelines use selectedAopIds (IDs, not names) and filterSortConfiguration: { columnId: { filter: {...}, sort: {...} } }. Discover the actual fieldKey from the account field definitions; custom-field column IDs are wm_<fieldKey>. A boolean checkbox uses { filter: { binaryChoice: \"false\" } } for unchecked or \"true\" for checked, NEVER selected:[false] or selected:[\"false\"]. Example filterSortConfiguration: { status: { filter: { selected: [\"closedwon\"] } }, wm_payment_received: { filter: { binaryChoice: \"false\" } } }. Never pass list-canvases query fields selectedAopNames, columnFilters or sorts."
         },
         "data": {
           "type": "object",
@@ -315,7 +472,7 @@
         "viewConfig": {
           "type": "object",
           "additionalProperties": {},
-          "description": "Replaces viewConfig in full."
+          "description": "Replaces viewConfig in full: preserve existing settings. Pipelines require selectedAopIds and filterSortConfiguration keyed by column ID, never the list-canvases query object. Discover the actual fieldKey from account definitions. Custom-field keys must be wm_<fieldKey>; checkbox filters must use binaryChoice: \"false\" (unchecked, including unset) or \"true\", NEVER selected:[false] or selected:[\"false\"]. Example: filterSortConfiguration: { status: { filter: { selected: [\"closedwon\"] } }, wm_payment_received: { filter: { binaryChoice: \"false\" } } }."
         },
         "homeViewOrder": {
           "anyOf": [

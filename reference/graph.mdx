@@ -1,0 +1,59 @@
+---
+title: "graph"
+description: "Import and update a deal org chart."
+---
+
+Use the graph family to read or update an authorized deal's org chart. External access requires an enabled account, the deal's conversation ID and the exact path `conversation/{id}/org-chart`. For creation, select the `org-chart` template. Use `read` to inspect the chart and its people before editing. Select a known node to change its fields, or connect two known nodes to record a relationship.
+
+Graph writes return lint findings. Re-read the chart after an edit and check the node or relationship you intended to change. Viewer permissions restrict writes even when the family is discoverable. Other graph operations available inside Cedar are outside this external contract.
+
+## Operations and scopes
+
+| Action | Accepted scope |
+| --- | --- |
+| `list_templates` | `docs:read` |
+| `read` | `docs:read` |
+| `get_schema` | `docs:read` |
+| `create_graph` | `docs:read` |
+| `add_node` | `docs:read` |
+| `set_node` | `docs:read` |
+| `move_node` | `docs:read` |
+| `connect` | `docs:read` |
+| `set_edge` | `docs:read` |
+| `connections` | `docs:read` |
+| `find_nodes` | `docs:read` |
+| `field_values` | `docs:read` |
+| `lint` | `docs:read` |
+
+## Parameters
+
+| Field | Type | Required | Details |
+| --- | --- | --- | --- |
+| `action` | `list_templates` · `read` · `get_schema` · `create_graph` · `add_node` · `set_node` · `move_node` · `connect` · `set_edge` · `connections` · `find_nodes` · `field_values` · `lint` | Yes |  |
+| `conversationId` | string | No | External MCP import: the authorized deal id. Every graph address must be conversation/&#123;id&#125;/org-chart. Internal subagents use their existing run scope instead. format: "uuid" |
+| `graph` | string | No | Graph name, path or id. Required for everything except list_graphs/list_templates. |
+| `node` | string | No | A node id, the documentId it points at, OR its title — all three work. You do not need to remember the graph-local node id after add_node. |
+| `create_graph` | object | No |  |
+| `add_node` | object | No |  |
+| `set_node` | object | No |  |
+| `move_node` | object | No |  |
+| `connect` | object | No |  |
+| `set_edge` | object | No |  |
+| `find_nodes` | object | No |  |
+| `field_values` | object | No |  |
+| `user_request_summary` | string | Yes | One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does. |
+| `is_new_request` | boolean | Yes | true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread. |
+
+[Download the input schema](/reference/schemas/graph.input.json)
+
+## Response
+
+| Field | Type | Required | Details |
+| --- | --- | --- | --- |
+| `success` | boolean | Yes |  |
+| `action` | string | Yes |  |
+| `errorMessage` | string | No |  |
+| `lint` | array of object | No |  |
+| `result` | any | No |  |
+
+[Download the output schema](/reference/schemas/graph.output.json)

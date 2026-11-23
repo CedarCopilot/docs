@@ -1,10 +1,17 @@
 ---
-title: "Enrichment and research tools overview"
-sidebarTitle: "Overview"
+title: "Research & enrich accounts"
 description: "Discover supported data before dispatching a paid lookup."
 ---
 
-`research` exposes a schema catalog, question-driven enrichment selection, and company/person enrichment. Manual examples here explicitly select **Fiber**. The code's default provider and an account's configured policy may differ, so do not omit the provider and assume the same behavior.
+Cedar also provides [`website`](/reference/website) for public page retrieval and [`research-job`](/reference/research-job) for durable Autumn research. Both are **Cedar app only**; they are not externally grantable MCP tools.
+
+`research` exposes a schema catalog, question-driven enrichment selection, and company/person enrichment. Rich research defaults to **Crustdata** unless a supported account setting or explicit provider selection applies. Meeting preparation uses Crustdata. The manual examples below select Fiber for a workspace that has enabled it.
+
+## Basic company identity and usage
+
+For a requested basic Crustdata lookup, call `research` with `action: "identify-company"` and `identifyCompany` containing the domain and optional idempotency key. It returns zero-credit ranked matches with available basic company metadata. Rich profiles still use paid enrichment.
+
+Inside Cedar, `research chat-usage` reads usage counts, cache hits, pending outcomes and charges for the chat and its delegates for free. This action is app-only; an external MCP client cannot call it.
 
 ## Discover before spending
 
@@ -55,7 +62,7 @@ These are potentially paid operations. Use stable idempotency keys for retries a
 
 The external MCP does not authorize `web-search` or `web-fetch`, even though they are in the shared research schema. Use the calling client's own web tools. Ongoing watchers use `signals-write`; enrichment is a point-in-time lookup, not a subscription.
 
-Provider catalogs may include Crustdata, Apollo, or Moltsets. Their presence is not permission to use them under a Fiber-only manual-enrichment policy. Capability selection and provider dispatch are separate steps.
+Check the organization’s allowed providers before selecting a paid operation. Catalog discovery shows what Cedar supports. It does not dispatch a lookup.
 
 ## Data-service defaults and organization policy
 
@@ -68,7 +75,7 @@ Provider catalogs may include Crustdata, Apollo, or Moltsets. Their presence is 
 | `cacheMaxAgeDays` | Supported freshness policy, 1–365 days |
 | `watchDefaults` | Provider-specific defaults for future watcher setup |
 
-The `watchDefaults` branch in this schema is specifically the Crustdata watch configuration: cadence of 1–168 hours, person refresh of 1/3/7/14/30 days, result budget and selected signal types. It is not a generic setting for Fiber trackers. Fiber tracker configuration belongs in `signals-write update` and the capability response. Describing this branch does not authorize provider work or change the manual-enrichment policy above.
+The `watchDefaults` branch in this schema is specifically the Crustdata watch configuration: cadence of 1–168 hours, person refresh of 1/3/7/14/30 days, result budget and selected signal types. It is not a generic setting for Fiber trackers. Fiber tracker configuration belongs in `signals-write update` and the capability response. Describing this branch does not authorize provider work.
 
 The selectable watch signals include person title/job/headline/location changes, education/skills/certifications/honors, connection counts, and company headcount, funding rounds/milestones, investors, acquisitions, hiring, name, followers, industry, location and news. Actual provider records and runtime capabilities determine which evidence exists.
 
@@ -80,7 +87,7 @@ Changing defaults does not activate a watcher, rewrite existing watches, buy cre
 
 ## Enrichment operations and field coverage
 
-The discovery catalog exposes **11 enrichment operations** across **5 providers**. These operation IDs are catalog entries selected through `choose-enrichment`, not additional top-level MCP tools. Catalog presence does not check credentials or authorize paid execution. For manual person/company enrichment, explicitly select **Fiber**; the shipped default is recorded separately in the tool contract. There is no automatic provider fallback.
+The discovery catalog exposes **11 enrichment operations** across **5 providers**. These operation IDs are catalog entries selected through `choose-enrichment`, not additional top-level MCP tools. Catalog presence does not check credentials or authorize paid execution. For a provider-specific lookup, select the provider explicitly and check the supported input identity. There is no automatic provider fallback.
 
 ### fiber
 
@@ -90,7 +97,6 @@ The discovery catalog exposes **11 enrichment operations** across **5 providers*
 | `fiber.profilePosts` | `person.linkedinUrl` | `person.recentPosts` | 7 days |
 | `fiber.kitchenSinkCompany` | `company.domain` **or** `company.linkedinId` | `company.domain`, `company.name`, `company.linkedinUrl`, `company.logoUrl`, `company.description`, `company.industry`, `company.website`, `company.foundedYear`, `company.hqCity`, `company.hqCountry`, `company.hqFull`, `company.employeeCount` | 30 days |
 
-Adapter boundaries: Logo-only companyLogo/bulkCompanyLogos is a documented next optimization, not implemented in this catalog. Current base enrichment keeps Kitchen Sink for the full company profile. The vendor supports name plus company resolution, richer history, live refresh, contact reveal and company insights; Cedar exposes only the inputs and fields listed for each operation below. Contact reveal is separate from profile enrichment.
 
 ### crustdata
 
@@ -100,7 +106,6 @@ Adapter boundaries: Logo-only companyLogo/bulkCompanyLogos is a documented next 
 | `crustdata.companyEnrich` | `company.domain` **or** `company.linkedinId` | `company.domain`, `company.name`, `company.website`, `company.industry`, `company.foundedYear`, `company.twitterHandle`, `company.employeeCount`, `company.description`, `company.linkedinUrl`, `company.linkedinId`, `company.logoUrl`, `company.hqCity`, `company.hqCountry`, `company.employeeCountRange`, `company.totalFundingUsd`, `company.lastFundingStage`, `company.lastFundingAmountUsd`, `company.lastFundingDate`, `company.headcountByRole`, `company.salesHeadcount`, `company.headcountGrowth`, `company.jobOpeningsCount`, `company.recentJobOpenings` | 30 days |
 | `linkedin.deobfuscate` | `person.linkedinMemberUrn` | `person.linkedinUrl`, `person.fullName`, `person.title`, `person.currentCompanyDomain`, `company.linkedinId` | 30 days |
 
-Adapter boundaries: Vendor fields outside Cedar’s supported signal list and saved-search datasets are not configurable through Cedar. Realtime, semantic and geographic discovery require a separate adapter.
 
 ### moltsets
 
@@ -109,7 +114,6 @@ Adapter boundaries: Vendor fields outside Cedar’s supported signal list and sa
 | `moltsets.businessProfile` | `person.workEmail` **or** `person.linkedinUrl` | `person.workEmail`, `person.fullName`, `person.title`, `person.headline`, `person.linkedinUrl`, `person.currentCompanyDomain` | 30 days |
 | `moltsets.companyByDomain` | `company.domain` | `company.domain`, `company.name`, `company.linkedinUrl`, `company.logoUrl`, `company.description`, `company.industry`, `company.hqCity`, `company.hqCountry`, `company.employeeCount` | 30 days |
 
-Adapter boundaries: Broad people/company discovery, name-to-email, mobile phones, personal-email lookup, advertising identifiers and IP-to-company are not exposed by this adapter. Mobile phone tokens are billed separately by the vendor.
 
 ### apollo
 

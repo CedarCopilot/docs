@@ -1,0 +1,46 @@
+---
+title: "Review tasks in Slack"
+description: "Review supported drafts, send deliberately, and keep task state in sync from Slack."
+---
+
+Configured Task Views can deliver task cards to Slack so reps can manage work where they already collaborate. These cards represent Cedar tasks, rather than a separate checklist that must be updated by hand.
+
+<Note>This requires configured Slack delivery, an authorized destination and the rep's access to the underlying work. It does not make every Cedar task available in every Slack channel.</Note>
+
+## What reps can do
+
+| Action | What happens |
+| --- | --- |
+| Review a ready draft | Open a private review of the supported current email, LinkedIn or Slack draft |
+| Send after review | Confirm the reviewed supported draft; Cedar uses the corresponding send path and reports the observed result |
+| Complete a task | Mark the underlying task done and update its card to Completed when confirmed |
+| Cancel or ignore a task | Cancel the underlying work and update the card to Cancelled when confirmed |
+| Snooze eligible work | Choose when to revisit it through the supported task controls |
+| Run a saved prompt | The task owner clicks the configured prompt. Cedar starts the task chat and posts an **Open this action in Cedar chat** link in the source thread. |
+| Open or prepare work | Use the configured action or follow the Cedar link when a workflow requires Cedar chat |
+
+The visible actions depend on the view, task state, output type and access. Use the chat link to inspect what Cedar prepared. Starting the chat leaves delivery for review. If the card changed before the action started, use the refreshed card.
+
+## Task state is managed automatically
+
+Cedar reconciles the Slack card with the saved task and output state. A completed card can identify who sent a message, who marked the task complete, or that completion details are unavailable. A wording match against a sent message is weaker evidence than a confirmed draft send. For a superseded task, follow the replacement card when a link is present. A cancelled card is no longer actionable. Reps do not need to maintain a duplicate Slack status manually. Updates can require reconciliation or recovery; a failure is not proof the task changed.
+
+Completing or cancelling work can require confirmation to clean up its saved draft and pending preparation schedule. Read the confirmation before proceeding. Clicking Done does not send a message.
+
+## Review and send from Slack
+
+For eligible email, LinkedIn and Slack drafts, the card can open a private review flow. Sending requires an explicit confirmation of the current draft; the provider action uses the appropriate channel and permissions. A changed draft can require a fresh review.
+
+A successful send is established by its delivery receipt, not by opening a review, saving an edit or clicking a task-completion button. If delivery is unknown, inspect the conversation before trying again. Supported send flows reconcile the task and Task View after the result; recovery can be needed if a later update fails.
+
+## Choose the destination
+
+Task View Slack delivery validates the audience and current Cedar access. Externally shared channels and unknown audiences are restricted. Use a suitable internal channel, and check which information appears on the shared card versus in the private review.
+
+[Task Views](/tasks/task-views) · [Slack connection and tools](/slack/overview) · [Outbound permissions](/getting-started/permissions#outbound-authorization)
+
+## Find the review in its configured channel
+
+Live delivery can group tasks from a single pipeline review under one parent with threaded cards. Ordinary single-item saves can still appear as separate cards. Scheduled digests and silent views follow their own delivery rules. When working from a configured Slack destination, use the current card and its authorized actions. If a draft has been replaced or its save is uncertain, open the underlying task to inspect the latest record before choosing **Send**. [Pipeline review walkthrough](/recipes/pipeline-review)
+
+For a sequence task, inspect the timing, recipient and full copy of each step. Editing returns the changed plan to review. [Prepare a sequence](/recipes/person-outreach-sequence)

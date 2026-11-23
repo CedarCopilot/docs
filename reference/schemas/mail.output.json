@@ -281,8 +281,18 @@
         "subject": {
           "type": "string"
         },
+        "connectionId": {
+          "type": "string"
+        },
+        "conversationId": {
+          "type": "string"
+        },
         "messageCount": {
           "type": "number"
+        },
+        "nextOffset": {
+          "type": "number",
+          "description": "Pass as offset to read the next older page."
         },
         "messages": {
           "type": "array",
@@ -294,6 +304,12 @@
                 "description": "Gmail message id — pass to fetch-email-attachments."
               },
               "from": {
+                "type": "string"
+              },
+              "eventId": {
+                "type": "string"
+              },
+              "conversationId": {
                 "type": "string"
               },
               "to": {
@@ -316,6 +332,13 @@
                 "type": "string"
               },
               "unread": {
+                "type": "boolean"
+              },
+              "body": {
+                "type": "string",
+                "description": "Actual email body as plain text/Markdown, not the snippet."
+              },
+              "bodyTruncated": {
                 "type": "boolean"
               },
               "tracking": {
@@ -624,8 +647,7 @@
                       "clickCount",
                       "firstOpenedAt",
                       "lastOpenedAt",
-                      "firstClickedAt",
-                      "events"
+                      "firstClickedAt"
                     ],
                     "additionalProperties": false,
                     "description": "Observed tracking activity, not verified human read receipts. Disabled tracking is distinct from zero activity."
@@ -645,6 +667,139 @@
             ],
             "additionalProperties": false
           }
+        }
+      },
+      "additionalProperties": false
+    },
+    "draftLearning": {
+      "type": "object",
+      "properties": {
+        "report": {
+          "type": "object",
+          "properties": {
+            "totalDrafts": {
+              "type": "number"
+            },
+            "groups": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string"
+                  },
+                  "outcome": {
+                    "type": "string"
+                  },
+                  "count": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "category",
+                  "outcome",
+                  "count"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "examples": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "draftId": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "outcome": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string"
+                  },
+                  "threadId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "sentAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "attributionMethod": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "subject": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "draftedExcerpt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "sentExcerpt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "semanticSimilarity": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "wordCountSimilarity": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "draftId",
+                  "category",
+                  "outcome",
+                  "createdAt",
+                  "threadId",
+                  "sentAt",
+                  "attributionMethod",
+                  "subject",
+                  "draftedExcerpt",
+                  "sentExcerpt",
+                  "semanticSimilarity",
+                  "wordCountSimilarity"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "nextCursor": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "totalDrafts",
+            "groups",
+            "examples",
+            "nextCursor"
+          ],
+          "additionalProperties": false
         }
       },
       "additionalProperties": false

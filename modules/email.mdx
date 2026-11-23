@@ -1,8 +1,9 @@
 ---
-title: "Email overview"
-sidebarTitle: "Overview"
+title: "Email"
 description: "Read mail, prepare drafts, and send through the reviewed draft lifecycle."
 ---
+
+Use the [drafting skill](/skills/drafting) to prepare a reply in the rep’s voice. Draft preparation and approved delivery use separate actions.
 
 ## Mail reads
 
@@ -18,25 +19,19 @@ description: "Read mail, prepare drafts, and send through the reviewed draft lif
 
 `send-email` exposes a three-step lifecycle:
 
-1. Read the saved draft and verify sender, recipients, content, and the user's explicit send request.
-2. Call `prepare` with the real `draftId` to obtain the review snapshot and `approvalHash`.
-3. Call `send` with that draft and hash. If copy, sender, recipients, or live-thread state changed, delivery is held for fresh review.
+1. Open the real saved draft and confirm the sender, recipients, subject, body and attachments. Obtain the user's explicit send decision for that message.
+2. Call `prepare` with the saved `draftId`. Review the returned snapshot. It includes an approval hash and can include a signed review token.
+3. For an authorized send, pass the same draft ID and the returned review token unchanged. The contract also supports the reviewed approval hash. If the draft or thread changes, prepare it again and review the new snapshot.
 
 ```json
 { "action": "prepare", "draftId": "saved_provider_draft_id" }
 ```
 
-```json
-{
-  "action": "send",
-  "draftId": "saved_provider_draft_id",
-  "approvalHash": "0000000000000000000000000000000000000000000000000000000000000000"
-}
-```
-
-The zero-filled hash above is a placeholder; use the actual hash returned by `prepare`.
-
 `status` reads the send journal for the same draft. Unknown or in-progress outcomes need reconciliation, not a newly created draft or blind resend. Cedar applies mailbox ownership checks and its duplicate-send lock. The tool requires `email:send` even for this family's review/status operations.
+
+## Email in a sequence
+
+An email step in a [person-specific sequence](/recipes/person-outreach-sequence) is a draft instruction. Saving the sequence or attaching it to a task does not send the email. Review the selected person, sender, subject and body when preparing delivery.
 
 ## Schedule email
 

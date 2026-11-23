@@ -11,7 +11,7 @@ Generated from Cedar's actual registration and Zod schemas. Your connection's `t
 
 <Accordion title="Full tool behavior and constraints">
 
-Save a problem or question for the Cedar team and attempt a Slack notification with your account attached. If notificationDelivered is false, the report was saved but Slack delivery failed. Call it when a Cedar tool fails in a way you cannot work around, a Cedar agent or run does something that contradicts its instructions, or the user is stuck or frustrated. You may report without being asked, but tell the user you did. Say what you tried, what happened, and what you expected, and pass runId / conversationId / agentId when you have them so the team can trace it. Never include credentials, tokens or email bodies; ids and exact error text are enough. Also used by the customer-support skill for the reserved "flag this" phrase (a full debug snapshot of the session) and when no gallery content answers a question.
+Save user-requested feedback for the Cedar team and attempt a Slack notification linked to the user account. Call only when the user explicitly asks to report feedback (including "flag this") or confirms a proposed report. Tool failures, inferred frustration, and missing gallery content alone do not authorize sending a report. Include only the information needed for the requested support action: what was attempted, what happened, and what was expected. Pass runId/conversationId/agentId only when relevant. Never include credentials, tokens, email bodies, or unrelated conversation content. Tell the user what was shared. If notificationDelivered is false, the report was saved but Slack delivery failed.
 
 </Accordion>
 

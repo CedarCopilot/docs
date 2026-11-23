@@ -576,8 +576,7 @@
         "scope": {
           "type": "string",
           "enum": [
-            "user",
-            "org"
+            "user"
           ]
         },
         "userId": {
@@ -979,55 +978,6 @@
             "issues"
           ],
           "additionalProperties": false
-        },
-        "orgUsers": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "userId": {
-                "type": "string"
-              },
-              "name": {
-                "type": "string"
-              },
-              "email": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string",
-                "enum": [
-                  "red",
-                  "yellow",
-                  "green"
-                ]
-              },
-              "issueCount": {
-                "type": "number"
-              },
-              "warningCount": {
-                "type": "number"
-              }
-            },
-            "required": [
-              "userId",
-              "name",
-              "email",
-              "status",
-              "issueCount",
-              "warningCount"
-            ],
-            "additionalProperties": false
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "createMonitor": {
-      "type": "object",
-      "properties": {
-        "monitorId": {
-          "type": "string"
         }
       },
       "additionalProperties": false

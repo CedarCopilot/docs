@@ -1,0 +1,1272 @@
+{
+  "type": "object",
+  "properties": {
+    "success": {
+      "type": "boolean"
+    },
+    "errorMessage": {
+      "type": "string"
+    },
+    "sequence": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "active",
+                "paused",
+                "archived"
+              ]
+            },
+            "version": {
+              "type": "number"
+            },
+            "canEdit": {
+              "type": "boolean"
+            },
+            "config": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "draft",
+                    "active",
+                    "paused",
+                    "archived"
+                  ]
+                },
+                "channels": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "object",
+                      "properties": {
+                        "send": {
+                          "type": "string",
+                          "enum": [
+                            "cedar_native",
+                            "smartlead",
+                            "instantly"
+                          ]
+                        },
+                        "mailboxPool": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "linkedin": {
+                      "type": "object",
+                      "properties": {
+                        "adapter": {
+                          "type": "string",
+                          "enum": [
+                            "cedar_native_linkedin",
+                            "heyreach"
+                          ],
+                          "default": "cedar_native_linkedin"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "slack_dm": {
+                      "type": "object",
+                      "properties": {
+                        "adapter": {
+                          "type": "string",
+                          "const": "cedar_native_slack"
+                        }
+                      },
+                      "required": [
+                        "adapter"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false,
+                  "default": {}
+                },
+                "seats": {
+                  "type": "object",
+                  "properties": {
+                    "profileIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": []
+                    },
+                    "assignment": {
+                      "type": "string",
+                      "enum": [
+                        "sticky",
+                        "rotate"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "default": {
+                    "profileIds": []
+                  }
+                },
+                "segments": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "const": "programmatic"
+                          },
+                          "on": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "when": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "op": {
+                                    "type": "string",
+                                    "enum": [
+                                      "eq",
+                                      "neq"
+                                    ]
+                                  },
+                                  "value": {}
+                                },
+                                "required": [
+                                  "op"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "op": {
+                                    "type": "string",
+                                    "enum": [
+                                      "in",
+                                      "nin"
+                                    ]
+                                  },
+                                  "values": {
+                                    "type": "array",
+                                    "items": {}
+                                  }
+                                },
+                                "required": [
+                                  "op",
+                                  "values"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "op": {
+                                    "type": "string",
+                                    "enum": [
+                                      "lt",
+                                      "lte",
+                                      "gt",
+                                      "gte"
+                                    ]
+                                  },
+                                  "value": {
+                                    "type": [
+                                      "number",
+                                      "string"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "op",
+                                  "value"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "op": {
+                                    "type": "string",
+                                    "const": "between"
+                                  },
+                                  "value": {
+                                    "type": "array",
+                                    "minItems": 2,
+                                    "maxItems": 2,
+                                    "items": [
+                                      {
+                                        "type": [
+                                          "number",
+                                          "string"
+                                        ]
+                                      },
+                                      {
+                                        "type": [
+                                          "number",
+                                          "string"
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "op",
+                                  "value"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "op": {
+                                    "type": "string",
+                                    "enum": [
+                                      "before",
+                                      "after"
+                                    ]
+                                  },
+                                  "value": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "op",
+                                  "value"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "op": {
+                                    "type": "string",
+                                    "enum": [
+                                      "contains",
+                                      "startsWith"
+                                    ]
+                                  },
+                                  "value": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "op",
+                                  "value"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "op": {
+                                    "type": "string",
+                                    "const": "exists"
+                                  }
+                                },
+                                "required": [
+                                  "op"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "op": {
+                                    "type": "string",
+                                    "const": "empty"
+                                  }
+                                },
+                                "required": [
+                                  "op"
+                                ],
+                                "additionalProperties": false
+                              }
+                            ]
+                          },
+                          "version": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "on",
+                          "when"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "const": "ai"
+                          },
+                          "prompt": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "contextScope": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "person",
+                                "company",
+                                "recent_posts",
+                                "job_openings",
+                                "mutual_connections",
+                                "signal_context"
+                              ]
+                            }
+                          },
+                          "modelId": {
+                            "type": "string"
+                          },
+                          "version": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "prompt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                },
+                "templates": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "channel": {
+                        "type": "string",
+                        "enum": [
+                          "email",
+                          "linkedin",
+                          "linkedin_connect",
+                          "linkedin_inmail",
+                          "slack_dm"
+                        ]
+                      },
+                      "subject": {
+                        "type": "string"
+                      },
+                      "spans": {
+                        "type": "array",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "const": "literal"
+                                },
+                                "text": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "text"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "const": "variable"
+                                },
+                                "field": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "fallback": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "field"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "const": "spintax"
+                                },
+                                "options": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "minItems": 1
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "options"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "const": "conditional"
+                                },
+                                "segmentId": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "spans": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/templates/items/properties/spans/items"
+                                  }
+                                },
+                                "elseSpans": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/templates/items/properties/spans/items"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "segmentId",
+                                "spans"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "const": "ai"
+                                },
+                                "prompt": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "maxWords": {
+                                  "type": "integer",
+                                  "exclusiveMinimum": 0
+                                },
+                                "contextScope": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/segments/items/anyOf/1/properties/contextScope/items"
+                                  }
+                                },
+                                "tone": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "prompt"
+                              ],
+                              "additionalProperties": false
+                            }
+                          ]
+                        },
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "channel",
+                      "spans"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "const": "linkedin_connect"
+                          },
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "sendAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "delayHours": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "conditions": {
+                            "type": "array",
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "segmentId": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  },
+                                  "required": [
+                                    "segmentId"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "field": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "filter": {
+                                      "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/segments/items/anyOf/0/properties/when"
+                                    }
+                                  },
+                                  "required": [
+                                    "field",
+                                    "filter"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              ]
+                            }
+                          },
+                          "rateLimit": {
+                            "type": "object",
+                            "properties": {
+                              "maxPerHour": {
+                                "type": "integer",
+                                "exclusiveMinimum": 0
+                              },
+                              "maxPerDay": {
+                                "type": "integer",
+                                "exclusiveMinimum": 0
+                              },
+                              "jitterPct": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "automationMode": {
+                            "type": "string",
+                            "enum": [
+                              "auto",
+                              "review",
+                              "manual"
+                            ]
+                          },
+                          "requireConnection": {
+                            "type": "boolean"
+                          },
+                          "template": {
+                            "type": "string"
+                          },
+                          "body": {
+                            "type": "string"
+                          },
+                          "note": {
+                            "type": "string"
+                          },
+                          "segmentVariants": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "segmentId": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "template": {
+                                  "type": "string",
+                                  "minLength": 1
+                                }
+                              },
+                              "required": [
+                                "segmentId",
+                                "template"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "channel",
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "const": "linkedin"
+                          },
+                          "id": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/id"
+                          },
+                          "sendAt": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/sendAt"
+                          },
+                          "delayHours": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/delayHours"
+                          },
+                          "conditions": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/conditions"
+                          },
+                          "rateLimit": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/rateLimit"
+                          },
+                          "automationMode": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/automationMode"
+                          },
+                          "requireConnection": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/requireConnection"
+                          },
+                          "template": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/template"
+                          },
+                          "body": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/body"
+                          },
+                          "note": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/note"
+                          },
+                          "segmentVariants": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/segmentVariants"
+                          }
+                        },
+                        "required": [
+                          "channel",
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "const": "linkedin_inmail"
+                          },
+                          "id": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/id"
+                          },
+                          "sendAt": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/sendAt"
+                          },
+                          "delayHours": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/delayHours"
+                          },
+                          "conditions": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/conditions"
+                          },
+                          "rateLimit": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/rateLimit"
+                          },
+                          "automationMode": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/automationMode"
+                          },
+                          "requireConnection": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/requireConnection"
+                          },
+                          "template": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/template"
+                          },
+                          "body": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/body"
+                          },
+                          "note": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/note"
+                          },
+                          "segmentVariants": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/segmentVariants"
+                          }
+                        },
+                        "required": [
+                          "channel",
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "const": "email"
+                          },
+                          "id": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/id"
+                          },
+                          "sendAt": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/sendAt"
+                          },
+                          "delayHours": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/delayHours"
+                          },
+                          "conditions": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/conditions"
+                          },
+                          "rateLimit": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/rateLimit"
+                          },
+                          "automationMode": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/automationMode"
+                          },
+                          "requireConnection": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/requireConnection"
+                          },
+                          "template": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/template"
+                          },
+                          "body": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/body"
+                          },
+                          "note": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/note"
+                          },
+                          "segmentVariants": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/segmentVariants"
+                          }
+                        },
+                        "required": [
+                          "channel",
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "const": "slack_dm"
+                          },
+                          "id": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/id"
+                          },
+                          "sendAt": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/sendAt"
+                          },
+                          "delayHours": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/delayHours"
+                          },
+                          "conditions": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/conditions"
+                          },
+                          "rateLimit": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/rateLimit"
+                          },
+                          "automationMode": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/automationMode"
+                          },
+                          "requireConnection": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/requireConnection"
+                          },
+                          "template": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/template"
+                          },
+                          "body": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/body"
+                          },
+                          "note": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/note"
+                          },
+                          "segmentVariants": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/segmentVariants"
+                          },
+                          "slack": {
+                            "type": "object",
+                            "properties": {
+                              "containerId": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "threadTs": {
+                                "type": "string",
+                                "pattern": "^\\d+\\.\\d+$"
+                              }
+                            },
+                            "required": [
+                              "containerId"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "channel",
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "const": "manual"
+                          },
+                          "id": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/id"
+                          },
+                          "sendAt": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/sendAt"
+                          },
+                          "delayHours": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/delayHours"
+                          },
+                          "conditions": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/conditions"
+                          },
+                          "rateLimit": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/rateLimit"
+                          },
+                          "automationMode": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/automationMode"
+                          },
+                          "requireConnection": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/requireConnection"
+                          },
+                          "channels": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "email",
+                                "linkedin",
+                                "linkedin_connect",
+                                "linkedin_inmail"
+                              ]
+                            }
+                          },
+                          "template": {
+                            "type": "string"
+                          },
+                          "body": {
+                            "type": "string"
+                          },
+                          "subject": {
+                            "type": "string"
+                          },
+                          "segmentVariants": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/segmentVariants/items"
+                            }
+                          },
+                          "preDraft": {
+                            "type": "boolean",
+                            "default": true
+                          }
+                        },
+                        "required": [
+                          "channel",
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "const": "linkedin_view"
+                          },
+                          "id": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/id"
+                          },
+                          "sendAt": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/sendAt"
+                          },
+                          "delayHours": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/delayHours"
+                          },
+                          "conditions": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/conditions"
+                          },
+                          "rateLimit": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/rateLimit"
+                          },
+                          "automationMode": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/automationMode"
+                          },
+                          "requireConnection": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/requireConnection"
+                          }
+                        },
+                        "required": [
+                          "channel",
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "const": "linkedin_react"
+                          },
+                          "id": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/id"
+                          },
+                          "sendAt": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/sendAt"
+                          },
+                          "delayHours": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/delayHours"
+                          },
+                          "conditions": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/conditions"
+                          },
+                          "rateLimit": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/rateLimit"
+                          },
+                          "automationMode": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/automationMode"
+                          },
+                          "requireConnection": {
+                            "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/requireConnection"
+                          },
+                          "reactionType": {
+                            "type": "string",
+                            "enum": [
+                              "like",
+                              "celebrate",
+                              "support",
+                              "love",
+                              "insightful",
+                              "funny"
+                            ]
+                          },
+                          "sinceDays": {
+                            "type": "integer",
+                            "exclusiveMinimum": 0
+                          }
+                        },
+                        "required": [
+                          "channel",
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "const": "wait"
+                          },
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "delayHours": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "channel",
+                          "id",
+                          "delayHours"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "channel": {
+                            "type": "string",
+                            "const": "branch"
+                          },
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "delayHours": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "branches": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "label": {
+                                  "type": "string"
+                                },
+                                "condition": {
+                                  "type": "string"
+                                },
+                                "to": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "label"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "channel",
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  "minItems": 1
+                },
+                "rules": {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                "sendWindow": {
+                  "type": "object",
+                  "properties": {
+                    "timezone": {
+                      "type": "string"
+                    },
+                    "days": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "mon",
+                          "tue",
+                          "wed",
+                          "thu",
+                          "fri",
+                          "sat",
+                          "sun"
+                        ]
+                      }
+                    },
+                    "hourStart": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 24
+                    },
+                    "hourEnd": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 24
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "automationMode": {
+                  "$ref": "#/properties/sequence/anyOf/0/properties/config/properties/steps/items/anyOf/0/properties/automationMode"
+                },
+                "channelConfig": {
+                  "type": "object",
+                  "properties": {
+                    "missingVariablePolicy": {
+                      "type": "string",
+                      "enum": [
+                        "skip_step",
+                        "default",
+                        "pause_enrollment",
+                        "alert_only"
+                      ]
+                    },
+                    "costBudgetUsdPerRow": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "sourceFlowId": {
+                  "type": "string"
+                },
+                "sourceListId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "steps"
+              ],
+              "additionalProperties": false
+            },
+            "entryId": {
+              "type": "string"
+            },
+            "personContext": {
+              "type": "object",
+              "properties": {
+                "personId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "linkedinUrl": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "conversationId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "status",
+            "version",
+            "canEdit",
+            "config"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sequences": {
+      "type": "array",
+      "items": {
+        "$ref": "#/properties/sequence/anyOf/0"
+      }
+    },
+    "attachmentContext": {
+      "type": "object",
+      "properties": {
+        "taskId": {
+          "type": "string"
+        },
+        "expectedTaskRevision": {
+          "type": "string"
+        },
+        "expectedAssignmentVersion": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "taskId",
+        "expectedTaskRevision",
+        "expectedAssignmentVersion"
+      ],
+      "additionalProperties": false
+    },
+    "attachment": {
+      "type": "object",
+      "properties": {
+        "attached": {
+          "type": "boolean"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "attached",
+            "unchanged"
+          ]
+        },
+        "taskId": {
+          "type": "string"
+        },
+        "sequenceId": {
+          "type": "string"
+        },
+        "taskRevision": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "attached",
+        "outcome",
+        "taskId",
+        "sequenceId",
+        "taskRevision"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "success"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

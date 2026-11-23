@@ -32,40 +32,6 @@ Create a new opportunity in the connected external CRM. Looks up the linked acco
 }
 ```
 
-## Tools and surface compatibility
+## CRM writes
 
-Use the canonical family tools in your connection’s `tools/list`. Skill source may still mention older granular names. The source dependencies below describe implementation composition; they are **not additional external MCP registrations**. The [complete capability index](/reference/coverage) records callable family/action contracts.
-
-- `publish-crm-field-definition` maps to [`crm-write publish-field-definition`](/reference/crm-write).
-- `publish-crm-event-definition` maps to [`crm-write publish-event-definition`](/reference/crm-write).
-- `ensure-crm-record` maps to [`crm-write ensure-record`](/reference/crm-write).
-- `update-crm-record-field` maps to [`crm-write update-fields`](/reference/crm-write).
-- `record-crm-org-event` maps to [`crm-write create-event`](/reference/crm-write).
-- `signals-read`
-- `signals-write`
-- `conversation-analytics`
-- `fetch-conversation`
-- `find-crm-conversations`
-- `list-my-canvases`
-- `fetch-email-attachments`
-- `search-live-emails`
-- `read-live-email-thread`
-- `sync-gmail-thread`
-- `search-live-slack`
-- `read-live-slack-thread`
-- `sync-slack-thread`
-- `list-linkedin-chats`
-- `find-linkedin-chat`
-- `read-linkedin-chat`
-- `sync-linkedin-chat`
-- `find-meetings`
-- `sync-meeting`
-- `meeting-capabilities`
-- `update-conversation-fields`
-- `reassign-conversation-ownership`
-- `list-documents`
-- `search-documents`
-- `read-document`
-- `create-conversation-event`
-- `create-conversation`
-- `link-crm-deal`
+Use the [CRM write reference](/reference/crm-write) to publish definitions, ensure records, update fields and record events.

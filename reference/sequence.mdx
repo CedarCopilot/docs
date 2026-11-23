@@ -1,0 +1,50 @@
+---
+title: "sequence"
+description: "Author sequence drafts."
+---
+
+Use a sequence draft to prepare several touches for the same person. Creating or editing the draft leaves enrollment, activation, approval and sending separate.
+
+Read `list` or `get` to obtain the current ID and version. To create a draft, supply a name and at least one step. For an edit, pass the draft ID, its `expectedVersion` and the changed configuration. A reviewer can use `get` to confirm the draft and version. For a person-specific draft, use the same person and conversation in the selection scope and the draft's person context.
+
+To attach an owned draft to an owned open task, call `attachment-context` with the task ID. Pass the returned task revision and assignment version to `attach-task` along with the sequence ID. An existing task output is preserved. Preparing and reviewing the delivery plan uses the [task family](/reference/task).
+
+## Operations and scopes
+
+| Action | Accepted scope |
+| --- | --- |
+| `list` | `crm:read` |
+| `get` | `crm:read` |
+| `create` | `sequence:write`, `sequences:write` |
+| `update` | `sequence:write` |
+| `attachment-context` | `crm:read` |
+| `attach-task` | `sequence:write` |
+
+## Parameters
+
+| Field | Type | Required | Details |
+| --- | --- | --- | --- |
+| `action` | `list` · `get` · `create` · `update` · `attachment-context` · `attach-task` | Yes |  |
+| `attachmentContext` | object | No |  |
+| `attachment` | object | No |  |
+| `id` | string | No | format: "uuid" |
+| `expectedVersion` | integer | No | exclusiveMinimum: 0 |
+| `config` | object | No |  |
+| `scope` | object | No |  |
+| `user_request_summary` | string | Yes | One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does. |
+| `is_new_request` | boolean | Yes | true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread. |
+
+[Download the input schema](/reference/schemas/sequence.input.json)
+
+## Response
+
+| Field | Type | Required | Details |
+| --- | --- | --- | --- |
+| `success` | boolean | Yes |  |
+| `errorMessage` | string | No |  |
+| `sequence` | object or null | No |  |
+| `sequences` | array of object | No |  |
+| `attachmentContext` | object | No |  |
+| `attachment` | object | No |  |
+
+[Download the output schema](/reference/schemas/sequence.output.json)

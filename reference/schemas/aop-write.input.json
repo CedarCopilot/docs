@@ -5,6 +5,7 @@
       "type": "string",
       "enum": [
         "create-aop",
+        "create-internal",
         "update-selection-procedure",
         "update-custom-assignment-instruction"
       ],
@@ -44,6 +45,41 @@
         "name",
         "cloneFromAopId",
         "selectionProcedure"
+      ],
+      "additionalProperties": false
+    },
+    "createInternal": {
+      "type": "object",
+      "properties": {
+        "taskViewId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "guidance": {
+          "type": "string",
+          "maxLength": 10000,
+          "default": ""
+        },
+        "weeklyPrepDelivery": {
+          "type": "string",
+          "enum": [
+            "preview",
+            "notify"
+          ],
+          "default": "preview"
+        },
+        "optIn": {
+          "type": "boolean",
+          "const": true
+        },
+        "targetUserId": {
+          "type": "string",
+          "description": "Org owner/admin only: target a same-org member. Omit for self; non-admins and cross-org targets are rejected."
+        }
+      },
+      "required": [
+        "taskViewId",
+        "optIn"
       ],
       "additionalProperties": false
     },

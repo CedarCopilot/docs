@@ -104,6 +104,10 @@
               },
               "displayName": {
                 "type": "string"
+              },
+              "optional": {
+                "type": "boolean",
+                "description": "True for an optional guest; false for a required guest. Omit to preserve the existing role on update; defaults to required on create."
               }
             },
             "required": [
@@ -111,7 +115,7 @@
             ],
             "additionalProperties": false
           },
-          "description": "Meeting attendees. Required for create. CRITICAL: ONLY include attendees whose ACTUAL email addresses you extracted from the conversation (headers, signatures, previous messages). ABSOLUTELY FORBIDDEN: making up emails or using placeholder domains (@example.com, @domain.com). Better to have fewer real attendees than fake ones."
+          "description": "Meeting attendees. Required and non-empty for create. BEFORE calling create, resolve every intended guest's actual email from conversation/contact context. If emails are missing, read that context first or ask the user; do not call create with an empty list. CRITICAL: ONLY include attendees whose ACTUAL email addresses you extracted from the conversation (headers, signatures, previous messages). ABSOLUTELY FORBIDDEN: making up emails or using placeholder domains (@example.com, @domain.com). Better to have fewer real attendees than fake ones."
         },
         "location": {
           "type": "string",

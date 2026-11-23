@@ -5,6 +5,10 @@ description: "Configure field definitions, governance, CRM options and stage ent
 
 Load `cedar-configuration` with `fields-and-values` before changing fields. Read `config-read list-fields` to get canonical field keys, user/org ownership, options and external mappings.
 
+## Review a proposed opportunity
+
+When the CRM updater prepares an opportunity, review its proposed deal fields, associations and supporting context in the saved approval. Check required custom fields, including values specific to your provider, before accepting. Opening the proposal leaves the CRM untouched. Read the result of the accepted proposal before treating the external deal as created.
+
 ## Field definitions and governance
 
 `config-write create-field`, `update-field` and `delete-field` manage supported custom definitions. The schema includes text, number, date, boolean, select, currency, URL/email/phone, list, fraction, JSON, people, summarized history and deal-brief types. Updates also expose supported governance and extraction/display configuration; inspect the full nested parameter tables before editing.

@@ -1,0 +1,14 @@
+---
+title: "Run your own agent with Cedar"
+description: "Prepare a follow-up in a runtime you host and hand the result to a rep through Cedar."
+---
+
+Suppose your team runs a scheduled job to prepare follow-ups after discovery calls. Your runtime owns the schedule, agent instructions, execution logs and retry decisions. The agent calls Cedar through an authorized MCP connection to read deal evidence and save the work.
+
+1. **Connect and discover tools.** Complete the [MCP quickstart](/getting-started/quickstart) and check the tools available to the signed-in account. For this example, the connection needs to read the deal and task, write a document and attach it to an open task it owns. Check [permissions](/getting-started/permissions) before enabling the schedule.
+2. **Find the existing follow-up.** List the account’s open tasks and select the intended discovery-call follow-up. Read the linked deal evidence. If the meeting contains no verifiable commitment, leave the task alone.
+3. **Prepare the output.** Save a short follow-up brief with the promised action, owner, due date if known, and a link to the evidence. Keep the document ID returned by [document-write](/reference/document-write).
+4. **Hand it to the rep.** Use the [task tool’s attach-document action](/reference/task) with the saved document ID and current task revision and assignment version. Read back the open task to verify the attachment. The rep can now [review it with their assistant](/workspace/review-with-mcp).
+5. **Handle a retry.** If the write or attachment times out, inspect the document and task before repeating the operation. Reuse the saved output when it already exists. Record the task ID and outcome in your runtime so you can trace the next attempt.
+
+For tool names, pagination and retry behavior, see [Calling tools](/getting-started/calling-tools). To have Cedar start the agent on an event, schedule or webhook, use [Cedar’s agent harness](/agent-platform/execution).
