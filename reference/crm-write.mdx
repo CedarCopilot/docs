@@ -14,6 +14,8 @@ Use `crm-write` for deal field updates, account or contact observations, deal ac
 
 Deal actions use the existing conversation permissions and approval flow. An active organization member, admin or owner can append to an agent-maintained list. Organization events require an active admin or owner. To discover field and event definitions, use `conversation-read` with `crm:read`. Copy the returned key and version and resolve Cedar record IDs before writing.
 
+Interactive Cedar agents and OAuth clients with the required scopes can use these account, contact and organization actions. Scheduled automations and their subagents currently have no grant for appending custom field observations or creating organization events.
+
 Current-value account/contact fields remain readable. New scalar writes are on hold. Triggering outbound webhooks from arbitrary custom events is coming soon. The inbound source receiver and the existing deal-signal dispatcher keep their own delivery contracts.
 
 ## Examples
