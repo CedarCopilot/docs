@@ -1,6 +1,7 @@
 name: Documentation
 on:
   pull_request:
+    types: [opened, reopened, synchronize, edited, ready_for_review]
     branches: [staging, main]
   push:
     branches: [staging, main]
@@ -20,5 +21,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Verify public documentation privacy review
+        if: github.event_name == 'pull_request'
+        run: node .github/docs-check/privacy-review.mjs
       - run: npm ci --prefix .github/docs-check --ignore-scripts
       - run: node .github/docs-check/check.mjs

@@ -5,7 +5,7 @@ Which customer task changed? Link the product PR here and link back from the pro
 ## Review
 
 - [ ] Verified the instructions and examples against the customer-visible product.
-- [ ] Checked pages, images and downloadable files for customer names, account data and internal-only content.
+- [ ] Privacy review complete. All examples and assets are independently synthetic, and all public changes are free of customer names, identifiers and customer-derived material.
 - [ ] Confirmed the documentation validation check passes.
 
 ## Release timing
