@@ -40953,7 +40953,7 @@
         },
         {
           "metric": "aop_conversion",
-          "description": "Lead-band: share of conversations ever bound to a non-Deal AOP that were later reassigned to a Deal-bound AOP (a real AOP change, e.g. Vooma's Lead AOP → Deals AOP at qualification) — \"lead → opp conversion\". Deals-only conversations (never non-Deal-bound) are excluded, same as win_rate excludes non-terminal deals. No outcome mapping needed — the AOP's own boundObjectApiName is the terminal signal, not a status value.",
+          "description": "Lead-band: share of conversations ever bound to a non-Deal AOP that were later reassigned to a Deal-bound AOP (a real AOP change, e.g. a Lead AOP → Deals AOP at qualification) — \"lead → opp conversion\". Deals-only conversations (never non-Deal-bound) are excluded, same as win_rate excludes non-terminal deals. No outcome mapping needed — the AOP's own boundObjectApiName is the terminal signal, not a status value.",
           "reducer": "rate",
           "unit": "percent",
           "groupBys": [
