@@ -12077,7 +12077,7 @@
     {
       "name": "conversation-write",
       "title": "Update CRM conversations",
-      "description": "Creating/changing a CRM deal or conversation? FIRST read the effective crm-updater path from the agent directory (document-read), or use injected <crm_write_rules>, before searching email. Fallback only: #subagents/crm-updater.md. Cedar conversation actions. Create alone makes no external CRM record: (1) create — create a Cedar conversation. (2) update-fields — metadata/working memory; linkCrmDeal links first so fields sync to it. People: upsert value={people:[{id,...changes}]}. History: append complete new entries; update existing IDs with changed properties only. New people need all required properties (evidence=[] if no verified quote). Preserve IDs and unaffected entries; supplied arrays replace. Roles: one buying role except Economic buyer + Decision maker together, plus at most one relationship role. (3) create-event — log a deal activity. Call/text: supply stable externalEventId; triggerPlaybook:true runs the attached playbook on first save. Default save only. Ask if unclear. Use crm-write for organization events. (4) mutate — move/reassign/merge/rename/refresh conversations or clear working memory. (5) reassign-ownership — transfer to an org member, adding membership if needed. (6) link-external-crm-deal — link existing search-external-crm-deals result; update-fields syncs values. (7) sync-gmail-thread — import missing live Gmail by threadId/searchQuery into an existing deal for processing. (8) convert-hubspot-lead — create/reuse the linked Deal, qualify the Lead, and hand off using configured stages/AOP. Requires saved in-app approval and enabled writes. (9) handoff-crm-record — link an existing record to another AOP, preserving source history; no provider changes. Requires saved in-app approval. (10) create-opportunity — durably propose or create an external CRM opportunity with account-specific fields and associations. (11) log-email-activity — propose logging one email to its linked CRM deal. Pass only the matching params object (e.g. updateFields for update-fields).",
+      "description": "Creating/changing a CRM deal or conversation? FIRST read the effective crm-updater path from the agent directory (document-read), or use injected <crm_write_rules>, before searching email. Fallback only: #subagents/crm-updater.md. Cedar deals. Create is Cedar-only. (1) create a deal. (2) update-fields — metadata/working memory; linkCrmDeal links first so fields sync to it. People: upsert value={people:[{id,...changes}]}. History: append complete new entries; update existing IDs with changed properties only. New people need all required properties (evidence=[] if no verified quote). Preserve IDs and unaffected entries; supplied arrays replace. Roles: one buying role except Economic buyer + Decision maker together, plus at most one relationship role. (3) create-event — log a deal activity. Call/text: supply stable externalEventId; triggerPlaybook:true runs the attached playbook on first save. Default save only. Ask if unclear. Use crm-write for organization events. (4) mutate — move/reassign/merge/rename/refresh conversations or clear working memory. (5) reassign-ownership — transfer to org member; adds membership. (6) link-external-crm-deal — link existing search-external-crm-deals result; update-fields syncs values. (7) sync-gmail-thread — import missing Gmail by threadId/searchQuery. (8) convert-hubspot-lead — create/reuse Deal, qualify Lead, hand off via stages/AOP. Needs saved approval and enabled writes. (9) handoff-crm-record — link an existing record to another AOP, preserving source history; no provider changes. Requires saved in-app approval. (10) create-opportunity — propose/create external CRM opportunity with account fields and associations. (11) log-email-activity — propose logging one linked email. Pass only the matching params object (e.g. updateFields for update-fields).",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -12635,26 +12635,26 @@
                   "text",
                   "custom"
                 ],
-                "description": "Meeting, call, chat or custom."
+                "description": "Activity kind."
               },
               "title": {
                 "type": "string",
                 "minLength": 1,
-                "description": "Short event title."
+                "description": "Title."
               },
               "occurredAt": {
                 "type": "string",
-                "description": "ISO datetime; default now."
+                "description": "ISO datetime."
               },
               "externalEventId": {
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 500,
-                "description": "Stable source occurrence ID for call/text. Reuse the same ID and occurrence timestamp on retries."
+                "description": "Call/text retry ID."
               },
               "triggerPlaybook": {
                 "type": "boolean",
-                "description": "Call/text only. Opt in to matching deal playbook triggers on first creation. Requires externalEventId."
+                "description": "Call/text opt-in; ID required."
               },
               "description": {
                 "type": "string",
@@ -12662,11 +12662,11 @@
               },
               "notes": {
                 "type": "string",
-                "description": "Personal meeting/call.notes."
+                "description": "Meeting/call notes."
               },
               "transcript": {
                 "type": "string",
-                "description": "Verbatim; use requirePaste."
+                "description": "Use requirePaste."
               },
               "participants": {
                 "type": "array",
@@ -12686,15 +12686,15 @@
                   ],
                   "additionalProperties": false
                 },
-                "description": "Meeting/call attendees."
+                "description": "Attendees."
               },
               "content": {
                 "type": "string",
-                "description": "Body for eventType:text only."
+                "description": "Text body."
               },
               "requirePaste": {
                 "type": "boolean",
-                "description": "True for transcripts; omit transcript."
+                "description": "Paste via card."
               }
             },
             "required": [
@@ -14989,26 +14989,26 @@
                       "text",
                       "custom"
                     ],
-                    "description": "Meeting, call, chat or custom."
+                    "description": "Activity kind."
                   },
                   "title": {
                     "type": "string",
                     "minLength": 1,
-                    "description": "Short event title."
+                    "description": "Title."
                   },
                   "occurredAt": {
                     "type": "string",
-                    "description": "ISO datetime; default now."
+                    "description": "ISO datetime."
                   },
                   "externalEventId": {
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 500,
-                    "description": "Stable source occurrence ID for call/text. Reuse the same ID and occurrence timestamp on retries."
+                    "description": "Call/text retry ID."
                   },
                   "triggerPlaybook": {
                     "type": "boolean",
-                    "description": "Call/text only. Opt in to matching deal playbook triggers on first creation. Requires externalEventId."
+                    "description": "Call/text opt-in; ID required."
                   },
                   "description": {
                     "type": "string",
@@ -15016,11 +15016,11 @@
                   },
                   "notes": {
                     "type": "string",
-                    "description": "Personal meeting/call.notes."
+                    "description": "Meeting/call notes."
                   },
                   "transcript": {
                     "type": "string",
-                    "description": "Verbatim; use requirePaste."
+                    "description": "Use requirePaste."
                   },
                   "participants": {
                     "type": "array",
@@ -15040,15 +15040,15 @@
                       ],
                       "additionalProperties": false
                     },
-                    "description": "Meeting/call attendees."
+                    "description": "Attendees."
                   },
                   "content": {
                     "type": "string",
-                    "description": "Body for eventType:text only."
+                    "description": "Text body."
                   },
                   "requirePaste": {
                     "type": "boolean",
-                    "description": "True for transcripts; omit transcript."
+                    "description": "Paste via card."
                   },
                   "target": {
                     "$ref": "#/properties/updateFields/anyOf/0/properties/target"
@@ -42986,7 +42986,7 @@
     "note": "Static product metadata plus reviewed tool references. agent initialize is externally available for supported templates without adding triggers; other app workspace controls are not implied external MCP registrations.",
     "triggers": {
       "any": {
-        "fires": "every supported event — email, meeting, Slack message, LinkedIn message, accepted LinkedIn connection, external-CRM sync (calendar changes and signals require explicit opt-in)",
+        "fires": "every supported event — email, meeting, Slack message, LinkedIn message, accepted LinkedIn connection, external-CRM sync (calendar changes, signals, calls, texts and custom events require explicit opt-in)",
         "carries": [],
         "dispatch": "orchestrator"
       },

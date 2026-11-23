@@ -555,26 +555,26 @@
             "text",
             "custom"
           ],
-          "description": "Meeting, call, chat or custom."
+          "description": "Activity kind."
         },
         "title": {
           "type": "string",
           "minLength": 1,
-          "description": "Short event title."
+          "description": "Title."
         },
         "occurredAt": {
           "type": "string",
-          "description": "ISO datetime; default now."
+          "description": "ISO datetime."
         },
         "externalEventId": {
           "type": "string",
           "minLength": 1,
           "maxLength": 500,
-          "description": "Stable source occurrence ID for call/text. Reuse the same ID and occurrence timestamp on retries."
+          "description": "Call/text retry ID."
         },
         "triggerPlaybook": {
           "type": "boolean",
-          "description": "Call/text only. Opt in to matching deal playbook triggers on first creation. Requires externalEventId."
+          "description": "Call/text opt-in; ID required."
         },
         "description": {
           "type": "string",
@@ -582,11 +582,11 @@
         },
         "notes": {
           "type": "string",
-          "description": "Personal meeting/call.notes."
+          "description": "Meeting/call notes."
         },
         "transcript": {
           "type": "string",
-          "description": "Verbatim; use requirePaste."
+          "description": "Use requirePaste."
         },
         "participants": {
           "type": "array",
@@ -606,15 +606,15 @@
             ],
             "additionalProperties": false
           },
-          "description": "Meeting/call attendees."
+          "description": "Attendees."
         },
         "content": {
           "type": "string",
-          "description": "Body for eventType:text only."
+          "description": "Text body."
         },
         "requirePaste": {
           "type": "boolean",
-          "description": "True for transcripts; omit transcript."
+          "description": "Paste via card."
         }
       },
       "required": [
