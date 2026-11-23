@@ -1,0 +1,710 @@
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "update-fields",
+        "create-event"
+      ]
+    },
+    "updateFields": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Change title."
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Evidence per value; omit only for direct user requests."
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Exact field name from get-conversation."
+                  },
+                  "changeSummary": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 180,
+                    "description": "Text delta; full value separate. No invented counts/resolutions or success. Omit for scalars."
+                  },
+                  "confidence": {
+                    "type": "string",
+                    "enum": [
+                      "low",
+                      "medium",
+                      "high"
+                    ],
+                    "description": "Opt-in only: high=direct; medium=review; low=ask."
+                  },
+                  "decision": {
+                    "type": "string",
+                    "enum": [
+                      "change",
+                      "keep"
+                    ],
+                    "description": "Default change; keep never writes; confident keep silent."
+                  },
+                  "uncertainty": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000,
+                    "description": "Low/medium: missing fact."
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "replace",
+                      "patch",
+                      "upsert",
+                      "append",
+                      "update"
+                    ],
+                    "description": "People upsert; history append/update. Keys merge; arrays replace. replace=value; patch=old_string/new_string."
+                  },
+                  "value": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "people": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "name": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "title": {
+                                      "type": [
+                                        "string",
+                                        "null"
+                                      ]
+                                    },
+                                    "email": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "format": "email"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "contactId": {
+                                      "type": [
+                                        "string",
+                                        "null"
+                                      ]
+                                    },
+                                    "engagement": {
+                                      "type": "string",
+                                      "enum": [
+                                        "mentioned",
+                                        "introduced",
+                                        "engaged",
+                                        "should_engage",
+                                        "critical_to_engage"
+                                      ]
+                                    },
+                                    "engagementPriority": {
+                                      "type": "string",
+                                      "enum": [
+                                        "critical",
+                                        "recommended",
+                                        "none"
+                                      ]
+                                    },
+                                    "engagementReason": {
+                                      "type": "string"
+                                    },
+                                    "roles": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      },
+                                      "maxItems": 3
+                                    },
+                                    "support": {
+                                      "type": "string",
+                                      "enum": [
+                                        "strong_support",
+                                        "support",
+                                        "neutral",
+                                        "opposed",
+                                        "unknown"
+                                      ]
+                                    },
+                                    "summary": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "evidence": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "eventId": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          },
+                                          "quote": {
+                                            "type": "string",
+                                            "minLength": 1
+                                          }
+                                        },
+                                        "required": [
+                                          "eventId",
+                                          "quote"
+                                        ],
+                                        "additionalProperties": false
+                                      }
+                                    }
+                                  },
+                                  "required": [
+                                    "id"
+                                  ],
+                                  "additionalProperties": false,
+                                  "description": "New ID: name, engagement, roles, support, summary, evidence required; existing ID: changed properties only."
+                                },
+                                "maxItems": 40
+                              }
+                            },
+                            "required": [
+                              "people"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "entries": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "title": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 120
+                                    },
+                                    "occurredAt": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "kind": {
+                                      "type": "string",
+                                      "enum": [
+                                        "meeting",
+                                        "correspondence",
+                                        "email",
+                                        "milestone"
+                                      ]
+                                    },
+                                    "summary": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 600
+                                    },
+                                    "sourceEventIds": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string",
+                                        "minLength": 1
+                                      },
+                                      "minItems": 1
+                                    }
+                                  },
+                                  "required": [
+                                    "id"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "required": [
+                              "entries"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "stage": {
+                                    "type": "string",
+                                    "enum": [
+                                      "discovery",
+                                      "demo",
+                                      "commercial",
+                                      "negotiation"
+                                    ]
+                                  },
+                                  "rows": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "label": {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        },
+                                        "graded": {
+                                          "type": "boolean",
+                                          "default": true
+                                        },
+                                        "signal": {
+                                          "anyOf": [
+                                            {
+                                              "type": "string",
+                                              "enum": [
+                                                "green",
+                                                "yellow",
+                                                "red"
+                                              ]
+                                            },
+                                            {
+                                              "type": "null"
+                                            }
+                                          ],
+                                          "default": null
+                                        },
+                                        "signalReasoning": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ]
+                                        },
+                                        "strength": {
+                                          "anyOf": [
+                                            {
+                                              "type": "integer",
+                                              "minimum": 0,
+                                              "maximum": 100
+                                            },
+                                            {
+                                              "type": "null"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "label",
+                                        "value"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "maxItems": 3
+                                  },
+                                  "rubric": {
+                                    "type": "string"
+                                  },
+                                  "checklist": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        "label": {
+                                          "type": "string",
+                                          "minLength": 1
+                                        },
+                                        "completed": {
+                                          "type": "boolean"
+                                        }
+                                      },
+                                      "required": [
+                                        "id",
+                                        "label",
+                                        "completed"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "stage"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "rows": {
+                                    "type": "array",
+                                    "items": {
+                                      "$ref": "#/properties/updateFields/anyOf/0/properties/fields/items/properties/value/anyOf/4/anyOf/2/anyOf/0/properties/rows/items"
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "rows"
+                                ],
+                                "additionalProperties": false
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "description": "Scalar/object/JSON; preserve IDs. Omit for patches."
+                  },
+                  "old_string": {
+                    "type": "string",
+                    "description": "Unique current-value substring from get-conversation."
+                  },
+                  "new_string": {
+                    "type": "string",
+                    "description": "Patch text; \"\" deletes old_string."
+                  },
+                  "signal": {
+                    "type": "string",
+                    "enum": [
+                      "red",
+                      "yellow",
+                      "green"
+                    ],
+                    "description": "Only if instructed; follow field red/yellow/green rubric."
+                  },
+                  "signalReasoning": {
+                    "type": "string",
+                    "description": "Brief explanation for the signal."
+                  },
+                  "reasoning": {
+                    "type": "string",
+                    "description": "Evidence: source/person/date; no Why/field/confidence prefix. Gaps in uncertainty. No raw IDs. Use plain language and descriptive verified links; never invent URLs."
+                  },
+                  "strength": {
+                    "type": "number",
+                    "description": "Owned type:list scorecard only: 1–100; value=verbatim evidence, reasoning=justification, together on one event atom, never persistent fields."
+                  },
+                  "contextQuote": {
+                    "type": "string",
+                    "description": "Scorecard triple only: verbatim lead-in; omit for bare quotes."
+                  },
+                  "reactionQuote": {
+                    "type": "string",
+                    "description": "Scorecard triple with contextQuote: verbatim reaction; omit if absent."
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false
+              },
+              "description": "get writable fields only; relay blockedReason; empty needs linkCrmDeal."
+            },
+            "targetDealId": {
+              "type": "string",
+              "description": "Deal ID if multiple."
+            },
+            "linkCrmDeal": {
+              "type": "object",
+              "properties": {
+                "provider": {
+                  "type": "string",
+                  "description": "The CRM provider identifier (e.g. \"hubspot\", \"salesforce\", \"attio\")"
+                },
+                "dealId": {
+                  "type": "string",
+                  "description": "The opportunity/deal ID returned by the CRM after creation"
+                },
+                "instanceUrl": {
+                  "type": "string",
+                  "description": "For Salesforce: the org Lightning base URL. For HubSpot: the portal hub_id (e.g. \"245934213\") — required to generate deep-link URLs."
+                }
+              },
+              "required": [
+                "provider",
+                "dealId"
+              ],
+              "additionalProperties": false,
+              "description": "Link dealId before sync; new: create-opportunity."
+            },
+            "target": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "conversation"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "type",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "target"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "fieldKey": {
+              "type": "string",
+              "maxLength": 120,
+              "pattern": "^custom\\.[a-z][a-z0-9_]*$"
+            },
+            "version": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 2147483647
+            },
+            "value": {},
+            "observationId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 250
+            },
+            "occurredAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "evidence": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "target": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "account",
+                    "contact"
+                  ]
+                },
+                "id": {
+                  "$ref": "#/properties/updateFields/anyOf/0/properties/target/properties/id"
+                }
+              },
+              "required": [
+                "type",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "fieldKey",
+            "version",
+            "observationId",
+            "occurredAt",
+            "evidence",
+            "target"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "createEvent": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "eventType": {
+              "type": "string",
+              "enum": [
+                "meeting",
+                "call",
+                "text",
+                "custom"
+              ],
+              "description": "Meeting, call, chat or custom."
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Short event title."
+            },
+            "occurredAt": {
+              "type": "string",
+              "description": "ISO datetime; default now."
+            },
+            "description": {
+              "type": "string",
+              "description": "Event summary."
+            },
+            "notes": {
+              "type": "string",
+              "description": "Personal meeting/call.notes."
+            },
+            "transcript": {
+              "type": "string",
+              "description": "Verbatim; use requirePaste."
+            },
+            "participants": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "name"
+                ],
+                "additionalProperties": false
+              },
+              "description": "Meeting/call attendees."
+            },
+            "content": {
+              "type": "string",
+              "description": "Body for eventType:text only."
+            },
+            "requirePaste": {
+              "type": "boolean",
+              "description": "True for transcripts; omit transcript."
+            },
+            "target": {
+              "$ref": "#/properties/updateFields/anyOf/0/properties/target"
+            }
+          },
+          "required": [
+            "eventType",
+            "title",
+            "occurredAt",
+            "target"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "eventKey": {
+              "type": "string",
+              "maxLength": 120,
+              "pattern": "^[a-z][a-z0-9_]*$"
+            },
+            "version": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 2147483647
+            },
+            "externalEventId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "occurredAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            "entityLinks": {
+              "type": "object",
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/properties/createEvent/anyOf/1/properties/entityLinks/additionalProperties/anyOf/0"
+                    },
+                    "maxItems": 100
+                  }
+                ]
+              }
+            },
+            "target": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "organization"
+                }
+              },
+              "required": [
+                "type"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "eventKey",
+            "version",
+            "externalEventId",
+            "occurredAt",
+            "payload",
+            "entityLinks",
+            "target"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "user_request_summary": {
+      "type": "string",
+      "description": "One sentence, in your own words: what the user actually asked you to do in this turn. Used only for Cedar's observability — it does not change what this tool does."
+    },
+    "is_new_request": {
+      "type": "boolean",
+      "description": "true on the FIRST Cedar tool call of a NEW user request; false when this call continues the same request you are already working on. Groups related calls into one activity thread."
+    }
+  },
+  "required": [
+    "action",
+    "user_request_summary",
+    "is_new_request"
+  ],
+  "additionalProperties": true
+}

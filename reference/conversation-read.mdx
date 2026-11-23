@@ -23,6 +23,7 @@ Read Cedar CRM records. For connected CRM deals use action 4. ACTIONS: (1) get �
 | `find` | Find Cedar conversations using the family’s supported filters. | `crm:read` |
 | `search-semantic` | Search meaning across already-synced conversation evidence. | `crm:read` |
 | `search-external-crm-deals` | Find deals in the connected external CRM, separately from Cedar conversations. | `crm:read` |
+| `record-profile` | Read an account or contact by Cedar ID, including enrichment, fields and linked organization events. | `crm:read` |
 | `related-activity` | Read shared custom events linked through the deal’s primary account or contacts. | `crm:read` |
 | `timeline` | Read a time-ordered stream across events and extracted fields for selected deals. | `crm:read` |
 | `field-evolution` | Inspect one field's change or occurrence series over time, grouped by deal. | `crm:read` |
@@ -359,6 +360,21 @@ The SAME filter cube as `timeline`, applied to the semantic candidates. Only the
 | --- | --- | --- | --- |
 | `min` | number | No |   |
 | `max` | number | No |   |
+
+### record-profile
+
+Supply `recordProfile.kind` (account or contact) and `recordProfile.id` (the organization’s Cedar record ID). This works before a deal exists. Read the effective profile and each reserved field’s source, the current scalar values, and up to five newest observations per list. Pass `recordProfile.after` from `next` to continue field keys. To continue one list, pass `history: {key, before}` using that field’s `earlierCursor`.
+
+Add `activity: {}` to include ten organization events linked directly to the record. Repeat with `activity.before` set to the returned `activity.next` for another page. Deal-private and channel activity are outside this feed.
+
+```json
+{
+  "action": "record-profile",
+  "recordProfile": {"kind": "account", "id": "20000000-0000-4000-8000-000000000001", "activity": {}},
+  "user_request_summary": "Read this account’s ABM tier and recent events",
+  "is_new_request": true
+}
+```
 
 ### definitions
 

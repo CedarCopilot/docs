@@ -14,6 +14,7 @@
         "value-as-of",
         "describe-field",
         "definitions",
+        "record-profile",
         "raw-content",
         "search"
       ],
@@ -32,7 +33,7 @@
             "string",
             "null"
           ],
-          "description": "Optional event ID to expand with full content. Use this when you need the complete content of a specific event in the timeline (e.g., full email body, meeting transcript). The event content will be returned in requestedEvent. NOTE: for external_crm events specifically, use mail.fetch-full-event-content instead — this path has no formatter for that event type."
+          "description": "Return full source content for a specific event ID from search or timeline. Supports meetings, calls, email and Slack; date filters still apply."
         },
         "startDate": {
           "type": [
@@ -73,7 +74,7 @@
         "includePlaybook": {
           "type": "boolean",
           "default": false,
-          "description": "Whether to inline the full rendered playbook in `agentOperatingProcedure`. Default false: the playbook is often 40KB+, so it's omitted and `agentOperatingProcedure` instead carries a short directive naming the deal's playbook (aopId) and the exact tool call to read it in full when you actually need to decide behavior. `domainGuidance` is returned either way. Set true only when you specifically want the whole playbook inlined up front."
+          "description": "Include the full playbook in agentOperatingProcedure only for playbook-specific questions. Defaults to false; the conversation overview includes current stage and playbook context."
         }
       },
       "required": [
@@ -178,7 +179,7 @@
             ],
             "additionalProperties": false
           },
-          "description": "Filter conditions, ANDed together. Filter ANY field: standard columns (name, status, priority, dealValue, nextStepDate, lastContactedAt, aopName, primaryCompanyName, ownerId, …), computed booleans (crmSynced, hasFutureCalendar), or custom fields as \"wm_<fieldKey>\" (the ids in <available_columns>). e.g. [{\"field\":\"status\",\"operator\":\"in\",\"value\":[\"pilot_planned\"]},{\"field\":\"crmSynced\",\"operator\":\"eq\",\"value\":true}]. For a name/company text search use an \"ilike\" filter (e.g. {\"field\":\"primaryCompanyName\",\"operator\":\"ilike\",\"value\":\"%acme%\"}). For the \"ownerId\" field pass the literal \"self\" to scope to the calling user (resolved server-side). SCOPE: results are ORG-WIDE by default — every conversation in the caller's organization, including other members'. When the user asks about THEIR OWN deals (\"my pipeline\", \"deals I own\"), you MUST add {\"field\":\"ownerId\",\"operator\":\"eq\",\"value\":\"self\"} or the answer will silently include other people's deals. Each result carries ownerName / isOwnedByCurrentUser."
+          "description": "AND filters on standard columns, computed crmSynced/hasFutureCalendar or wm_<fieldKey> from <available_columns>. Use ilike with %name% for text search; in with arrays for enums. For “my deals” always filter ownerId eq self; otherwise results include other members. Load the conversation skill for operators and examples."
         },
         "eventFilter": {
           "type": "object",
@@ -203,7 +204,7 @@
             },
             "date": {
               "type": "string",
-              "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-11-22 - compute from this."
+              "description": "Reference date as ISO YYYY-MM-DD. Today is 2026-11-23 - compute from this."
             },
             "dateTo": {
               "type": "string",
@@ -285,7 +286,7 @@
           "items": {
             "type": "string"
           },
-          "description": "[flexible_query mode] Additional fields to include in each result beyond the defaults. Standard fields (camelCase columns from crmConversations): \"nextSteps\", \"statusOverview\", \"important\", \"lastEmailAt\", \"lastUpdatedAt\", \"updatedAt\", \"conversationScope\" — returned as top-level keys on each result. Custom fields: pass \"wm_<fieldKey>\" (the ids shown in <available_columns>) to get their current values, returned under each result's `customFields` object keyed by fieldKey. Unknown standard field names are silently ignored; list-type custom fields are not returned inline (they accumulate per-event)."
+          "description": "Flexible query extra columns: nextSteps, statusOverview, important, lastEmailAt, lastUpdatedAt, updatedAt, conversationScope. Standard values are top-level. wm_<fieldKey> adds scalar customFields[fieldKey]. Unknown columns and list fields are omitted."
         }
       },
       "additionalProperties": false
@@ -698,6 +699,79 @@
       "additionalProperties": false,
       "description": "Learn a field's filterable surface (plane, whether it carries strength/completeness, its vocab, and payload keys + observed values) before building a precise mask."
     },
+    "recordProfile": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "account",
+            "contact"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "activity": {
+          "type": "object",
+          "properties": {
+            "before": {
+              "type": "object",
+              "properties": {
+                "at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "at",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "after": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "history": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "before": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "key"
+          ],
+          "additionalProperties": false
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 25,
+          "default": 12
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "additionalProperties": false
+    },
     "definitions": {
       "type": "object",
       "properties": {
@@ -854,6 +928,5 @@
     "user_request_summary",
     "is_new_request"
   ],
-  "additionalProperties": false,
-  "$schema": "http://json-schema.org/draft-07/schema#"
+  "additionalProperties": true
 }

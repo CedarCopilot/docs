@@ -20,7 +20,7 @@ Creating a Cedar conversation does not create an opportunity in Salesforce, HubS
 
 Structural mutations include moving an event, assigning an AOP, refreshing a conversation, clearing working memory, merging records, fixing assignments, and renaming. Those operations have different consequences; use the exact operation and verify the result.
 
-Agents can update an agent-maintained account or contact field with evidence. Organization owners and admins can also publish events against a saved definition. External callers need the `crm:write` grant. [Custom data writes](/reference/crm-data-write).
+Use `crm-write` to update deal fields, log deal activity or update an agent-maintained account or contact list with evidence. Organization owners and admins can also publish events against a saved definition. External callers need `crm:write`. Deal operations also require `crm:read`. [Custom data writes](/reference/crm-write).
 
 ## Historical and evidence-based analysis
 

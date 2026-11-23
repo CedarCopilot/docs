@@ -1680,6 +1680,15 @@
   {
     "tool": "conversation-read",
     "selector": "action",
+    "value": "record-profile",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:read",
+    "reference": "/reference/conversation-read"
+  },
+  {
+    "tool": "conversation-read",
+    "selector": "action",
     "value": "raw-content",
     "branch": "",
     "surface": "external",
@@ -1879,22 +1888,67 @@
     "reference": "/reference/conversation-write"
   },
   {
-    "tool": "crm-data-write",
+    "tool": "crm-write",
     "selector": "action",
-    "value": "write-attribute",
+    "value": "update-fields",
     "branch": "",
     "surface": "external",
     "scope": "crm:write",
-    "reference": "/reference/crm-data-write"
+    "reference": "/reference/crm-write"
   },
   {
-    "tool": "crm-data-write",
+    "tool": "crm-write",
     "selector": "action",
-    "value": "record-event",
+    "value": "create-event",
     "branch": "",
     "surface": "external",
     "scope": "crm:write",
-    "reference": "/reference/crm-data-write"
+    "reference": "/reference/crm-write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "updateFields.fields[].mode",
+    "value": "replace",
+    "branch": "",
+    "surface": "external",
+    "reference": "/reference/crm-write",
+    "scope": "crm:write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "updateFields.fields[].mode",
+    "value": "patch",
+    "branch": "",
+    "surface": "external",
+    "reference": "/reference/crm-write",
+    "scope": "crm:write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "updateFields.fields[].mode",
+    "value": "upsert",
+    "branch": "",
+    "surface": "external",
+    "reference": "/reference/crm-write",
+    "scope": "crm:write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "updateFields.fields[].mode",
+    "value": "append",
+    "branch": "",
+    "surface": "external",
+    "reference": "/reference/crm-write",
+    "scope": "crm:write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "updateFields.fields[].mode",
+    "value": "update",
+    "branch": "",
+    "surface": "external",
+    "reference": "/reference/crm-write",
+    "scope": "crm:write"
   },
   {
     "tool": "slack-read",

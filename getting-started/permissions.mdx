@@ -14,7 +14,7 @@ Cedar checks OAuth grants and the requested action at execution time. It also en
 | `linkedin:write` | LinkedIn invitations, DMs, InMail, scheduled LinkedIn messages |
 | `slack:read` | Live Slack search, thread/file reads, and thread ingestion |
 | `crm:read` | Conversations, tasks, calendar, notifications, metrics, guarded SQL; also several CRM writes |
-| `crm:write` | Update agent-maintained account and contact fields with evidence, or publish defined organization events with admin or owner authority |
+| `crm:write` | Update deal fields and log deal activity (also requires `crm:read`), write agent-maintained account or contact lists with evidence, or publish organization events as an admin or owner |
 | `docs:read` | Document/table reads and ordinary document/table writes, subject to role checks |
 | `playbook:write` | Configuration, integration behavior, playbook/agenda writes, field definitions |
 | `enrichment:write` | Paid enrichment dispatch |
