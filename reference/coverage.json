@@ -1890,6 +1890,33 @@
   {
     "tool": "crm-write",
     "selector": "action",
+    "value": "publish-field-definition",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:manage + crm:write",
+    "reference": "/reference/crm-write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "action",
+    "value": "publish-event-definition",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:manage + crm:write",
+    "reference": "/reference/crm-write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "action",
+    "value": "ensure-record",
+    "branch": "",
+    "surface": "external",
+    "scope": "crm:manage + crm:write",
+    "reference": "/reference/crm-write"
+  },
+  {
+    "tool": "crm-write",
+    "selector": "action",
     "value": "update-fields",
     "branch": "",
     "surface": "external",

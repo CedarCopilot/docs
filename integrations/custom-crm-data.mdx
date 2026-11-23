@@ -5,6 +5,38 @@ description: "Publish an event contract, send a typed occurrence, verify its rec
 
 Use this guide once your workspace has the custom CRM data release. An organization owner or admin publishes a versioned contract in Cedar. A customer connection can then send occurrences to that workspace. Each occurrence has an external ID, timestamp, typed payload and named links to Cedar account or contact IDs. Store these IDs in your sender before delivery. A domain, email address, Salesforce ID or warehouse row ID cannot stand in for a Cedar record ID.
 
+### Set up website visits with a coding agent
+
+Once your workspace has the self-service MCP release, connect your coding agent to [Cedar MCP](/getting-started/quickstart) as a workspace owner or admin. Grant `crm:read`, `crm:write` and `crm:manage`. Reauthorize an existing connection to add the setup permission. Tell the agent:
+
+> Set up website visits in Cedar. Reuse a compatible website_visit definition, or publish it if missing. For my first identified visit, find or create the visiting company's account by domain. If the source identified the visitor by email, link their contact too. Use the source ID and timestamp to record the visit, then verify it in the account's activity. Tell me whether recurring delivery is connected.
+
+The agent can publish the definition before you have a visit. For verification, give it one real source row with a stable occurrence ID, timestamp, page path and the **visiting company's domain**. For an anonymous visit without a known company, wait for attribution. Use the visitor's email only when supplied by your source. The website being visited usually belongs to you.
+
+The agent uses `conversation-read` to discover the current contract, then `crm-write` to publish a missing definition:
+
+```json
+{
+  "action": "publish-event-definition",
+  "user_request_summary": "Set up website visits in Cedar",
+  "is_new_request": true,
+  "publishEventDefinition": {
+    "eventKey": "website_visit",
+    "expectedPreviousVersion": 0,
+    "label": "Website visit",
+    "payloadSchema": [{"name": "path", "type": "string", "required": true}],
+    "entityLinks": [
+      {"name": "visitor_account", "kind": "account", "required": true, "cardinality": "one"},
+      {"name": "visitor", "kind": "contact", "required": false, "cardinality": "one"}
+    ]
+  }
+}
+```
+
+For an identified visit the agent uses `ensure-record` for the workspace account and optional contact, passes those Cedar IDs to `create-event`, and reads `conversation-read` → `record-profile` with `activity: {}`. An unchanged retry under the same sender should return the same event ID. If a definition already exists with different fields, review its version and the impact on existing senders before publishing an update. [CRM write actions](/reference/crm-write)
+
+**Continuous delivery** starts when your analytics backend sends new visits. Its OAuth connection needs its own `crm:write` grant. Keep the token on the server. A verified sample confirms the Cedar setup; use the sender example below to connect your source.
+
 ### Choose an event
 
 These examples use synthetic data. Choose the event key and replace the sample values with values from your source. The payload field names below are illustrative Cedar contract names. Your sender translates its source columns into that contract.
@@ -16,7 +48,7 @@ These examples use synthetic data. Choose the event key and replace the sample v
 | A visitor opened the pricing page | `website_visit` | `{"path":"/pricing"}` | Required account `visitor_account`, optional contact `visitor` |
 | An account showed intent for a topic | `intent_observed` | `{"topic":"fleet software","score":84}` | Required account `interested_account` |
 
-### Publish the definition
+### Publish through the admin API
 
 Use an authenticated administrator session for the tRPC mutation `POST /api/trpc/crm.eventDefinitions.publish`. The inbound OAuth token is for submitting occurrences. To publish without exporting your session cookie, open Cedar while signed in as an organization owner or admin, open the browser developer console, and run this example. Set `apiOrigin` to the origin Cedar uses for its own `/api/trpc` requests, visible in the Network panel. Choose one event key per run.
 

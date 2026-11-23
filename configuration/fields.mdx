@@ -77,6 +77,8 @@ A successful event response returns its Cedar event ID and `created` or `replaye
 
 ## Read definitions through MCP
 
+Workspace owners and admins can publish account and contact field definitions through the `crm-write` action `publish-field-definition`, or event definitions with `publish-event-definition`. [MCP setup example](/integrations/custom-crm-data#set-up-website-visits-with-a-coding-agent).
+
 Use `conversation-read` with the `crm:read` permission to discover your organization’s published definitions. Choose `account` or `contact` for attributes and `event` for event contracts. This action needs no conversation ID.
 
 To list contact fields, call the tool with these arguments:

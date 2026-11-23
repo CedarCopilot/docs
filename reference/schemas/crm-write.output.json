@@ -7,6 +7,75 @@
     "errorMessage": {
       "type": "string"
     },
+    "publishFieldDefinition": {
+      "type": "object",
+      "properties": {
+        "ownerKind": {
+          "type": "string",
+          "enum": [
+            "account",
+            "contact"
+          ]
+        },
+        "fieldKey": {
+          "type": "string"
+        },
+        "version": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "ownerKind",
+        "fieldKey",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "publishEventDefinition": {
+      "type": "object",
+      "properties": {
+        "eventKey": {
+          "type": "string"
+        },
+        "version": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "eventKey",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "ensureRecord": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "account",
+            "contact"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "created",
+            "matched"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "status"
+      ],
+      "additionalProperties": false
+    },
     "updateFields": {
       "anyOf": [
         {

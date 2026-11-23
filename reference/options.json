@@ -2902,6 +2902,81 @@
         "organization"
       ],
       "description": ""
+    },
+    {
+      "path": "publishFieldDefinition.ownerKind",
+      "branch": "",
+      "values": [
+        "account",
+        "contact"
+      ],
+      "description": ""
+    },
+    {
+      "path": "publishFieldDefinition.fieldType",
+      "branch": "",
+      "values": [
+        "text",
+        "number",
+        "score",
+        "percent",
+        "date",
+        "boolean",
+        "select",
+        "currency",
+        "url",
+        "email",
+        "phone",
+        "list",
+        "fraction",
+        "json"
+      ],
+      "description": ""
+    },
+    {
+      "path": "publishFieldDefinition.writer",
+      "branch": "",
+      "values": [
+        "source",
+        "agent",
+        "manual"
+      ],
+      "description": ""
+    },
+    {
+      "path": "publishEventDefinition.payloadSchema[].type",
+      "branch": "",
+      "values": [
+        "string",
+        "number",
+        "boolean",
+        "date",
+        "datetime",
+        "object",
+        "string[]",
+        "number[]",
+        "boolean[]"
+      ],
+      "description": ""
+    },
+    {
+      "path": "publishEventDefinition.entityLinks[].kind",
+      "branch": "",
+      "values": [
+        "account",
+        "contact",
+        "conversation"
+      ],
+      "description": ""
+    },
+    {
+      "path": "publishEventDefinition.entityLinks[].cardinality",
+      "branch": "",
+      "values": [
+        "one",
+        "many"
+      ],
+      "description": ""
     }
   ]
 }

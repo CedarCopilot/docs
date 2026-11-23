@@ -14210,8 +14210,8 @@
     },
     {
       "name": "crm-write",
-      "title": "Write CRM fields and events",
-      "description": "Update fields or create events. Supply only updateFields for update-fields, or createEvent for create-event. A conversation target uses its existing CRM field/event contract and requires crm:read as well as crm:write. An account/contact field needs an agent-maintained definition and evidence. An organization event needs its published definition and named entityLinks. Discover definitions with conversation-read. Reuse the same observationId or externalEventId on retry.",
+      "title": "Manage CRM records, fields and events",
+      "description": "Supply the matching camelCase parameters only. Administrators with crm:manage and crm:write can publish versioned event and field definitions and ensure account/contact records. Use expectedPreviousVersion 0 on first publish. A conversation target uses its existing CRM field/event contract and requires crm:read as well as crm:write. An account/contact field needs an agent-maintained definition and evidence. An organization event needs its published definition and named entityLinks. Discover definitions with conversation-read. Reuse the same observationId or externalEventId on retry.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -14219,7 +14219,257 @@
             "type": "string",
             "enum": [
               "update-fields",
-              "create-event"
+              "create-event",
+              "publish-field-definition",
+              "publish-event-definition",
+              "ensure-record"
+            ]
+          },
+          "publishFieldDefinition": {
+            "type": "object",
+            "properties": {
+              "ownerKind": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "contact"
+                ]
+              },
+              "fieldKey": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "expectedPreviousVersion": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483646
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "default": ""
+              },
+              "fieldType": {
+                "type": "string",
+                "enum": [
+                  "text",
+                  "number",
+                  "score",
+                  "percent",
+                  "date",
+                  "boolean",
+                  "select",
+                  "currency",
+                  "url",
+                  "email",
+                  "phone",
+                  "list",
+                  "fraction",
+                  "json"
+                ]
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "enumOrder": {
+                      "type": "number"
+                    },
+                    "color": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "icon": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "enumOrder"
+                  ],
+                  "additionalProperties": false
+                },
+                "default": []
+              },
+              "writer": {
+                "type": "string",
+                "enum": [
+                  "source",
+                  "agent",
+                  "manual"
+                ]
+              },
+              "includeInAgentSummary": {
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "required": [
+              "ownerKind",
+              "fieldKey",
+              "expectedPreviousVersion",
+              "label",
+              "fieldType",
+              "writer"
+            ],
+            "additionalProperties": false
+          },
+          "publishEventDefinition": {
+            "type": "object",
+            "properties": {
+              "eventKey": {
+                "type": "string",
+                "maxLength": 120,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              "expectedPreviousVersion": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483646
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "default": ""
+              },
+              "payloadSchema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120,
+                      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "string",
+                        "number",
+                        "boolean",
+                        "date",
+                        "datetime",
+                        "object",
+                        "string[]",
+                        "number[]",
+                        "boolean[]"
+                      ]
+                    },
+                    "required": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type",
+                    "required"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "entityLinks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "$ref": "#/properties/publishEventDefinition/properties/payloadSchema/items/properties/name"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "account",
+                        "contact",
+                        "conversation"
+                      ]
+                    },
+                    "required": {
+                      "type": "boolean"
+                    },
+                    "cardinality": {
+                      "type": "string",
+                      "enum": [
+                        "one",
+                        "many"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "kind",
+                    "required",
+                    "cardinality"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "eventKey",
+              "expectedPreviousVersion",
+              "label",
+              "payloadSchema",
+              "entityLinks"
+            ],
+            "additionalProperties": false
+          },
+          "ensureRecord": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "account"
+                  },
+                  "domain": {
+                    "type": "string",
+                    "maxLength": 253,
+                    "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "domain"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "contact"
+                  },
+                  "email": {
+                    "type": "string",
+                    "maxLength": 254,
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "email"
+                ],
+                "additionalProperties": false
+              }
             ]
           },
           "updateFields": {
@@ -14702,9 +14952,7 @@
                 "type": "object",
                 "properties": {
                   "fieldKey": {
-                    "type": "string",
-                    "maxLength": 120,
-                    "pattern": "^custom\\.[a-z][a-z0-9_]*$"
+                    "$ref": "#/properties/publishFieldDefinition/properties/fieldKey"
                   },
                   "version": {
                     "type": "integer",
@@ -14737,7 +14985,8 @@
                         ]
                       },
                       "id": {
-                        "$ref": "#/properties/updateFields/anyOf/0/properties/target/properties/id"
+                        "type": "string",
+                        "format": "uuid"
                       }
                     },
                     "required": [
@@ -14839,9 +15088,7 @@
                 "type": "object",
                 "properties": {
                   "eventKey": {
-                    "type": "string",
-                    "maxLength": 120,
-                    "pattern": "^[a-z][a-z0-9_]*$"
+                    "$ref": "#/properties/publishEventDefinition/properties/eventKey"
                   },
                   "version": {
                     "type": "integer",
@@ -14930,6 +15177,75 @@
           },
           "errorMessage": {
             "type": "string"
+          },
+          "publishFieldDefinition": {
+            "type": "object",
+            "properties": {
+              "ownerKind": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "contact"
+                ]
+              },
+              "fieldKey": {
+                "type": "string"
+              },
+              "version": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "ownerKind",
+              "fieldKey",
+              "version"
+            ],
+            "additionalProperties": false
+          },
+          "publishEventDefinition": {
+            "type": "object",
+            "properties": {
+              "eventKey": {
+                "type": "string"
+              },
+              "version": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "eventKey",
+              "version"
+            ],
+            "additionalProperties": false
+          },
+          "ensureRecord": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "contact"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "created",
+                  "matched"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "id",
+              "status"
+            ],
+            "additionalProperties": false
           },
           "updateFields": {
             "anyOf": [
@@ -15669,7 +15985,7 @@
         "additionalProperties": false
       },
       "annotations": {
-        "title": "Write CRM fields and events",
+        "title": "Manage CRM records, fields and events",
         "readOnlyHint": false,
         "destructiveHint": true,
         "openWorldHint": true
@@ -15677,7 +15993,7 @@
       "surface": "external",
       "kind": "family",
       "metadata": {
-        "title": "Write CRM fields and events",
+        "title": "Manage CRM records, fields and events",
         "annotations": {
           "readOnlyHint": false,
           "destructiveHint": true,
@@ -15686,7 +16002,10 @@
       },
       "actionScopes": {
         "update-fields": "crm:write",
-        "create-event": "crm:write"
+        "create-event": "crm:write",
+        "publish-field-definition": "crm:manage",
+        "publish-event-definition": "crm:manage",
+        "ensure-record": "crm:manage"
       }
     },
     {
@@ -34392,7 +34711,7 @@
     },
     {
       "name": "conversation",
-      "description": "Find/filter CRM conversations, update conversation fields, create new conversations, log events, and reassign ownership. Filtering: analyzes natural language requests, suggests filter configurations, and executes queries to find matching conversations — streams filter suggestions to the frontend for user approval. Load when the user says ''show me'', ''find'', ''filter'', or asks about deals by status, date, priority, or company — e.g. ''show stalled deals'', ''find my Acme conversation'', ''which deals are in negotiation''. Updating: extracts information from communications and updates CRM conversation fields with clean, digestible, high-confidence content that respects temporal context and AOP governance; also creates new deals/conversations, logs meetings/calls/events, and reassigns conversation ownership. For creating a new opportunity in the connected external CRM (not a new Cedar conversation), see this skill''s opportunity-creation resource. For finding and linking an EXISTING external-CRM deal to a conversation, see ''Two different things are called \"CRM\"'' below. Also covers pulling a message in from the user''s LIVE Gmail, Slack, or LinkedIn when they say it belongs to a deal but it isn''t on the timeline — ''there was an email for this conversation from X'', ''we discussed this in Slack'', ''that LinkedIn thread isn''t showing up here'' — finding it in the channel, disambiguating with the user, and attaching it to the conversation; see ''Pulling a missing message in from Gmail, Slack, or LinkedIn'' below.",
+      "description": "Manage deals, accounts and contacts, publish CRM definitions, and set up website visits. Filtering: analyzes natural language requests, suggests filter configurations, and executes queries to find matching conversations — streams filter suggestions to the frontend for user approval. Load when the user says ''show me'', ''find'', ''filter'', or asks about deals by status, date, priority, or company — e.g. ''show stalled deals'', ''find my Acme conversation'', ''which deals are in negotiation''. Updating: extracts information from communications and updates CRM conversation fields with clean, digestible, high-confidence content that respects temporal context and AOP governance; also creates new deals/conversations, logs meetings/calls/events, and reassigns conversation ownership. For creating a new opportunity in the connected external CRM (not a new Cedar conversation), see this skill''s opportunity-creation resource. For finding and linking an EXISTING external-CRM deal to a conversation, see ''Two different things are called \"CRM\"'' below. Also covers pulling a message in from the user''s LIVE Gmail, Slack, or LinkedIn when they say it belongs to a deal but it isn''t on the timeline — ''there was an email for this conversation from X'', ''we discussed this in Slack'', ''that LinkedIn thread isn''t showing up here'' — finding it in the channel, disambiguating with the user, and attaching it to the conversation; see ''Pulling a missing message in from Gmail, Slack, or LinkedIn'' below.",
       "loader": "load-skill",
       "resources": [
         {
@@ -34402,6 +34721,9 @@
         }
       ],
       "toolDependencies": [
+        "publish-crm-field-definition",
+        "publish-crm-event-definition",
+        "ensure-crm-record",
         "update-crm-record-field",
         "record-crm-org-event",
         "signals-read",
