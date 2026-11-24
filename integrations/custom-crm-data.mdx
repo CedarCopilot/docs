@@ -155,7 +155,16 @@ When an accessible deal already links to the same account or contact, read its `
 
 ### Run a playbook when an event arrives
 
-In the attached deal playbook, add **On event → Custom** and select the published event key. Choose **Any custom event** to match all published keys. Add the agents and optional conditions to that block. The custom-data endpoint requests background processing by default. To store an event without running a playbook, add `"triggerPlaybook": false` beside `"kind": "event"` in the request body.
+In the attached deal playbook, add **On event → Custom** and select the published event key. Choose **Any custom event** to match all published keys. Add the agents and optional conditions to that block.
+
+The webhook saves each new event by default. Set `triggerPlaybook` at the top level of the request body, alongside `"kind": "event"`.
+
+| What you are sending | What to pass | What Cedar does |
+| --- | --- | --- |
+| A live stream of new events that should trigger automation | `"triggerPlaybook": true` | Saves the event and requests background processing for matching deal playbooks. |
+| A historical backfill or import | `"triggerPlaybook": false` | Saves the event without starting a playbook. Omitting the flag has the same effect. |
+
+Choose the setting on the first submission. Resending a backfilled occurrence with `true` later returns its existing receipt and does not start a run.
 
 Cedar checks conversations linked through the event’s accounts or contacts. Each eligible deal with a matching attached playbook can run once for this occurrence, even when several links lead to that deal. With no qualifying deal, the event is still saved. Repeating the same submission does not start another run. [Playbook triggers](/agent-platform/triggers).
 
