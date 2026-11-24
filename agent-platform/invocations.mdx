@@ -17,7 +17,7 @@ Past chats and **Run now** are activity, not persistent invocation configuration
 
 ## Limit which events start a producer
 
-An event trigger block can include checks on facts such as the event type, whether a calendar meeting is in the future, or whether an existing plan already blocks preparation. For example, an agent can prepare a first-meeting plan only for future meetings with external attendees. The same checks apply to all agents in the block. Put agents with different conditions in separate blocks. Optional judgment uses the bounded context selected in the rule. When required facts or a configured judgment are unavailable, automatic work is held. These checks apply to supported event triggers and leave explicit human requests and outbound approvals separate.
+A trigger can require all of its filters to pass before its agents run. Add a Jev question when the decision depends on the meaning of the selected evidence. Agents under the same trigger share the decision. Put agents with different conditions in separate blocks. Read back the trigger and its conditions after editing it. [Trigger conditions](/agent-platform/triggers#conditions-on-a-trigger).
 
 ## Add, change or remove a source
 
