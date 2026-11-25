@@ -196,6 +196,201 @@
         "contact"
       ],
       "description": ""
+    },
+    {
+      "path": "timeline.orderBy",
+      "branch": "",
+      "values": [
+        "occurredAt",
+        "ingestedAt"
+      ],
+      "description": ""
+    },
+    {
+      "path": "timeline.include[]",
+      "branch": "",
+      "values": [
+        "email.messageId",
+        "email.from",
+        "email.to",
+        "email.cc",
+        "email.subject",
+        "email.body"
+      ],
+      "description": ""
+    },
+    {
+      "path": "timeline.conversationFilters[].field",
+      "branch": "",
+      "values": [
+        "id",
+        "name",
+        "status",
+        "priority",
+        "dealValue",
+        "nextSteps",
+        "lastContactedAt",
+        "lastInboundAt",
+        "lastOutboundEmailAt",
+        "lastMeetingAt",
+        "nextStepDate",
+        "createdAt",
+        "updatedAt",
+        "aopId",
+        "important",
+        "ownerId",
+        "aopName",
+        "primaryCompanyName",
+        "primaryCompanyDomain",
+        "crmSynced",
+        "hasFutureCalendar"
+      ],
+      "description": ""
+    },
+    {
+      "path": "timeline.conversationFilters[].operator",
+      "branch": "",
+      "values": [
+        "eq",
+        "neq",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "like",
+        "ilike",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+      ],
+      "description": ""
+    },
+    {
+      "path": "timeline.eventFilters[].field",
+      "branch": "",
+      "values": [
+        "direction",
+        "sourceUserId",
+        "eventType",
+        "title",
+        "ingestedAt",
+        "occurredAt",
+        "email.from",
+        "email.subject",
+        "email.messageId"
+      ],
+      "description": ""
+    },
+    {
+      "path": "timeline.eventFilters[].operator",
+      "branch": "",
+      "values": [
+        "eq",
+        "neq",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "like",
+        "ilike",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+      ],
+      "description": ""
+    },
+    {
+      "path": "fieldEvolution.orderBy",
+      "branch": "",
+      "values": [
+        "occurredAt",
+        "ingestedAt"
+      ],
+      "description": ""
+    },
+    {
+      "path": "fieldEvolution.conversationFilters[].field",
+      "branch": "",
+      "values": [
+        "id",
+        "name",
+        "status",
+        "priority",
+        "dealValue",
+        "nextSteps",
+        "lastContactedAt",
+        "lastInboundAt",
+        "lastOutboundEmailAt",
+        "lastMeetingAt",
+        "nextStepDate",
+        "createdAt",
+        "updatedAt",
+        "aopId",
+        "important",
+        "ownerId",
+        "aopName",
+        "primaryCompanyName",
+        "primaryCompanyDomain",
+        "crmSynced",
+        "hasFutureCalendar"
+      ],
+      "description": ""
+    },
+    {
+      "path": "fieldEvolution.conversationFilters[].operator",
+      "branch": "",
+      "values": [
+        "eq",
+        "neq",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "like",
+        "ilike",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+      ],
+      "description": ""
+    },
+    {
+      "path": "fieldEvolution.eventFilters[].field",
+      "branch": "",
+      "values": [
+        "direction",
+        "sourceUserId",
+        "eventType",
+        "title",
+        "ingestedAt",
+        "occurredAt",
+        "email.from",
+        "email.subject",
+        "email.messageId"
+      ],
+      "description": ""
+    },
+    {
+      "path": "fieldEvolution.eventFilters[].operator",
+      "branch": "",
+      "values": [
+        "eq",
+        "neq",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "like",
+        "ilike",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+      ],
+      "description": ""
     }
   ],
   "conversation-write": [
