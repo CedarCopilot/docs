@@ -9944,7 +9944,7 @@
     {
       "name": "conversation-read",
       "title": "Read CRM conversations",
-      "description": "Read Cedar CRM records. For connected CRM deals use action 4. ACTIONS: (1) get — conversation by ID; brief timeline by default, write_to_file for full content, expandEventId for one event. Email entries show observed opens/clicks when available. (2) find — locate Cedar conversations via `filters` (field/operator/value, ANDed): standard columns, computed booleans, or custom fields as \"wm_<fieldKey>\"; add extraFields for more columns. Call load-skill(\"conversation\") for the full field reference. (3) search-semantic — find relevant events by vector/full-text search. For a named call/email, get its eventId here or in the timeline, then use get with expandEventId for the full source. (4) search-external-crm-deals — search the connected EXTERNAL CRM for a deal by keyword (get providerId from config read-settings first). record-profile — account/contact fields and enrichment by Cedar ID. related-activity — shared events linked to the deal. DEAL-INTELLIGENCE (over extracted sub-event taxonomy atoms): (5) timeline — one time-ordered stream across events + both taxonomy planes for 1+ deals, filtered by fieldIds/kinds/stages/reps/scores/payload/time. (6) field-evolution — one field's series over time, grouped by deal. (7) value-as-of — a versioned field's value+scores at a stage/date/event. (8) describe-field — a field's plane/scores/vocab/payload keys (learn before filtering). (9) raw-content — resolve a deal's RAW verbatim events to a doc-sink buffer (stage-marked); read via read-document (#lines/#words) + search-documents (regex). (10) search — semantic search over the atoms (same cube); hits point back. Large results → the doc sink. (11) definitions — discover account/contact field or event definitions. Choose kind; page with after/limit, or read an exact key and version. Pass each action's params in a same-named object; omit the others.",
+      "description": "Read Cedar CRM records. For connected CRM deals use action 4. ACTIONS: (1) get — conversation by ID; brief timeline by default, write_to_file for full content, expandEventId for one event. Email entries show observed opens/clicks when available. (2) find — locate Cedar conversations via `filters` (field/operator/value, ANDed): standard columns, computed booleans, or custom fields as \"wm_<fieldKey>\"; add extraFields for more columns. Call load-skill(\"conversation\") for the full field reference. (3) search-semantic — find relevant events by vector/full-text search. For a named call/email, get its eventId here or in the timeline, then use get with expandEventId for the full source. (4) search-external-crm-deals — search the connected EXTERNAL CRM for a deal by keyword (get providerId from config read-settings first). record-profile — account/contact fields and enrichment by Cedar ID. related-activity — shared events linked to the deal. DEAL-INTELLIGENCE (over extracted sub-event taxonomy atoms): (5) timeline — one time-ordered stream across events + both taxonomy planes for 1+ deals, filtered by fieldIds/kinds/stages/reps/scores/payload/time. (6) field-evolution — one field's series over time, grouped by deal. (7) value-as-of — a versioned field's value+scores at a stage/date/event. (8) describe-field — a field's plane/scores/vocab/payload keys (learn before filtering). (9) raw-content — resolve a deal's RAW verbatim events inline without a document sink, or in a stage-marked document; read via read-document (#lines/#words) + search-documents (regex). (10) search — semantic search over the atoms (same cube); hits point back. Large results → the doc sink. (11) definitions — discover account/contact field or event definitions. Choose kind; page with after/limit, or read an exact key and version. Pass each action's params in a same-named object; omit the others.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -10234,6 +10234,13 @@
                   "type": "string"
                 },
                 "description": "Flexible query extra columns: nextSteps, statusOverview, important, lastEmailAt, lastUpdatedAt, updatedAt, conversationScope. Standard values are top-level. wm_<fieldKey> adds scalar customFields[fieldKey]. Unknown columns and list fields are omitted."
+              },
+              "pageSize": {
+                "type": "integer",
+                "exclusiveMinimum": 0
+              },
+              "cursor": {
+                "type": "string"
               }
             },
             "additionalProperties": false
@@ -10512,13 +10519,104 @@
                 "type": "integer",
                 "minimum": 1,
                 "description": "Inline limit (default 200); larger results return a document handle."
+              },
+              "pageSize": {
+                "type": "integer",
+                "exclusiveMinimum": 0
+              },
+              "cursor": {
+                "type": "string"
+              },
+              "orderBy": {
+                "type": "string",
+                "enum": [
+                  "occurredAt",
+                  "ingestedAt"
+                ]
+              },
+              "eventFilters": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "enum": [
+                        "direction",
+                        "sourceUserId",
+                        "eventType",
+                        "title",
+                        "ingestedAt",
+                        "occurredAt",
+                        "email.from",
+                        "email.subject",
+                        "email.messageId"
+                      ]
+                    },
+                    "operator": {
+                      "type": "string",
+                      "enum": [
+                        "eq",
+                        "neq",
+                        "gt",
+                        "gte",
+                        "lt",
+                        "lte",
+                        "like",
+                        "ilike",
+                        "in",
+                        "notIn",
+                        "isNull",
+                        "isNotNull"
+                      ]
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "operator"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "conversationFilters": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/properties/find/properties/filters/items"
+                }
+              },
+              "include": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "email.messageId",
+                    "email.from",
+                    "email.to",
+                    "email.cc",
+                    "email.subject",
+                    "email.body"
+                  ]
+                }
               }
             },
-            "required": [
-              "conversationIds"
-            ],
             "additionalProperties": false,
-            "description": "Time-ordered events and taxonomy entries for conversationIds. Use kinds:[\"event\"] for events or fieldIds for one field."
+            "description": "Time-ordered event and field rows. Use kinds:[\"event\"] for events, conversationFilters for a deal query, and pageSize for cursor paging."
           },
           "fieldEvolution": {
             "type": "object",
@@ -10584,14 +10682,28 @@
               "maxInline": {
                 "type": "integer",
                 "minimum": 1
+              },
+              "pageSize": {
+                "$ref": "#/properties/timeline/properties/pageSize"
+              },
+              "cursor": {
+                "$ref": "#/properties/timeline/properties/cursor"
+              },
+              "orderBy": {
+                "$ref": "#/properties/timeline/properties/orderBy"
+              },
+              "eventFilters": {
+                "$ref": "#/properties/timeline/properties/eventFilters"
+              },
+              "conversationFilters": {
+                "$ref": "#/properties/timeline/properties/conversationFilters"
               }
             },
             "required": [
-              "conversationIds",
               "fieldId"
             ],
             "additionalProperties": false,
-            "description": "One field's change/occurrence series over time, grouped by deal."
+            "description": "One field's series over matching conversations."
           },
           "valueAsOf": {
             "type": "object",
@@ -10768,7 +10880,7 @@
               "conversationId"
             ],
             "additionalProperties": false,
-            "description": "Resolve a deal's RAW verbatim events (full transcripts / email bodies / Slack) into a doc-sink buffer with greppable \"=== STAGE: <stage> (evt_<id> @ <ISO>) [word_base: N] ===\" section markers, then return only a handle + access instructions. Word offsets in the buffer are global; each marker's word_base + an atom's `position` gives the atom's global offset for a #words read. Read it via read-document (supports #lines/{a}-{b} and #words/{a}-{b} windowed reads) and search-documents (regex)."
+            "description": "Verbatim deal activity as a document handle or inline text. For #words reads add position to the stage marker word_base."
           },
           "search": {
             "type": "object",
@@ -11306,6 +11418,12 @@
                   },
                   "totalMatches": {
                     "type": "number"
+                  },
+                  "nextCursor": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   }
                 },
                 "additionalProperties": false
@@ -11581,6 +11699,15 @@
                   }
                 },
                 "additionalProperties": false
+              },
+              "nextCursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "checkpoint": {
+                "type": "string"
               }
             },
             "additionalProperties": false
@@ -11635,6 +11762,15 @@
                   }
                 },
                 "additionalProperties": false
+              },
+              "nextCursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "checkpoint": {
+                "type": "string"
               }
             },
             "additionalProperties": false
@@ -11991,6 +12127,9 @@
                   }
                 },
                 "additionalProperties": false
+              },
+              "content": {
+                "type": "string"
               }
             },
             "additionalProperties": false
