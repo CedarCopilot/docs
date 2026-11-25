@@ -9,7 +9,7 @@ Use `POST https://api.mail.cedarcopilot.com/v1/conversations/read` to retrieve a
 
 ### Service account for a scheduled export
 
-Ask Cedar to provision a read-only export client for your workspace. Save its client ID and secret in your job's secret manager. The loader authenticates as the workspace's service account, so nobody needs to sign in, including on the first run.
+Ask Cedar to provision a service account for your workspace. It has workspace administrator visibility and receives the `crm:read` OAuth scope. The HTTP export reads data. The same credential can also call the MCP actions available to that scope, including meeting sync, which can write activity to a deal. Save its client ID and secret in your job's secret manager. The loader authenticates as the workspace's service account, so nobody needs to sign in, including on the first run.
 
 With the secret manager supplying `CEDAR_CLIENT_ID` and `CEDAR_CLIENT_SECRET`, run the following in Bash with `curl` and `jq` installed. It stores the bearer token in the current shell for the export example below.
 
