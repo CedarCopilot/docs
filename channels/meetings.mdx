@@ -20,3 +20,15 @@ Synchronization requires exactly one match. Zero or multiple matches do not sile
 After discovery, use conversation evidence tools to read the full relevant source. A calendar event is a scheduled appointment; a synced recording is evidence of a meeting that occurred. [Calendar](/channels/calendar) manages the former.
 
 For an internal pipeline meeting, a configured playbook can turn captured commitments into new tasks, updates to existing tasks, or references to work already under way. Use the [pipeline review walkthrough](/recipes/pipeline-review) to check owners and see where the follow-ups landed.
+
+## Connect Sybill
+
+A Cedar organization admin sets up Sybill once. Each member then opens the Meeting Recorders section in Settings → Connections, selects **Sybill**, and clicks **Connect**. Cedar imports internal and external meetings for connected members whose Cedar email appears among the attendees.
+
+1. Open Sybill in Cedar’s organization integration settings.
+2. For direct delivery of newly processed recordings, copy the webhook URL from Cedar. In Sybill, go to **Settings → Integrations → Webhooks**, add the URL, and subscribe to `meeting.new_recording.v2`. Copy that endpoint’s signing secret into Cedar and save.
+3. For historical sync and scheduled polling, create an API key in Sybill under **Settings → Integrations → API Keys** with **Export** permission. Save it in Cedar’s Sybill settings. Confirm with your Cedar setup contact that polling is enabled for your organization.
+
+Webhook filters control which recordings Sybill sends directly. Polling and historical sync use the meetings visible to the organization’s Export key, so a meeting excluded by a webhook filter can still arrive through sync.
+
+After a connected member attends a recorded meeting and Sybill finishes processing it, use `find` with the meeting title to confirm it arrived. [Sybill webhook guide](https://help.sybill.ai/en/articles/9925117-webhook-automations-with-sybill) · [Sybill API permissions](https://api.sybill.ai/docs/authentication.html)

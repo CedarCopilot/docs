@@ -287,6 +287,13 @@
             "type": "string"
           },
           "description": "Flexible query extra columns: nextSteps, statusOverview, important, lastEmailAt, lastUpdatedAt, updatedAt, conversationScope. Standard values are top-level. wm_<fieldKey> adds scalar customFields[fieldKey]. Unknown columns and list fields are omitted."
+        },
+        "pageSize": {
+          "type": "integer",
+          "exclusiveMinimum": 0
+        },
+        "cursor": {
+          "type": "string"
         }
       },
       "additionalProperties": false
@@ -565,13 +572,104 @@
           "type": "integer",
           "minimum": 1,
           "description": "Inline limit (default 200); larger results return a document handle."
+        },
+        "pageSize": {
+          "type": "integer",
+          "exclusiveMinimum": 0
+        },
+        "cursor": {
+          "type": "string"
+        },
+        "orderBy": {
+          "type": "string",
+          "enum": [
+            "occurredAt",
+            "ingestedAt"
+          ]
+        },
+        "eventFilters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string",
+                "enum": [
+                  "direction",
+                  "sourceUserId",
+                  "eventType",
+                  "title",
+                  "ingestedAt",
+                  "occurredAt",
+                  "email.from",
+                  "email.subject",
+                  "email.messageId"
+                ]
+              },
+              "operator": {
+                "type": "string",
+                "enum": [
+                  "eq",
+                  "neq",
+                  "gt",
+                  "gte",
+                  "lt",
+                  "lte",
+                  "like",
+                  "ilike",
+                  "in",
+                  "notIn",
+                  "isNull",
+                  "isNotNull"
+                ]
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "field",
+              "operator"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "conversationFilters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/find/properties/filters/items"
+          }
+        },
+        "include": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "email.messageId",
+              "email.from",
+              "email.to",
+              "email.cc",
+              "email.subject",
+              "email.body"
+            ]
+          }
         }
       },
-      "required": [
-        "conversationIds"
-      ],
       "additionalProperties": false,
-      "description": "Time-ordered events and taxonomy entries for conversationIds. Use kinds:[\"event\"] for events or fieldIds for one field."
+      "description": "Time-ordered event and field rows. Use kinds:[\"event\"] for events, conversationFilters for a deal query, and pageSize for cursor paging."
     },
     "fieldEvolution": {
       "type": "object",
@@ -637,14 +735,28 @@
         "maxInline": {
           "type": "integer",
           "minimum": 1
+        },
+        "pageSize": {
+          "$ref": "#/properties/timeline/properties/pageSize"
+        },
+        "cursor": {
+          "$ref": "#/properties/timeline/properties/cursor"
+        },
+        "orderBy": {
+          "$ref": "#/properties/timeline/properties/orderBy"
+        },
+        "eventFilters": {
+          "$ref": "#/properties/timeline/properties/eventFilters"
+        },
+        "conversationFilters": {
+          "$ref": "#/properties/timeline/properties/conversationFilters"
         }
       },
       "required": [
-        "conversationIds",
         "fieldId"
       ],
       "additionalProperties": false,
-      "description": "One field's change/occurrence series over time, grouped by deal."
+      "description": "One field's series over matching conversations."
     },
     "valueAsOf": {
       "type": "object",
@@ -821,7 +933,7 @@
         "conversationId"
       ],
       "additionalProperties": false,
-      "description": "Resolve a deal's RAW verbatim events (full transcripts / email bodies / Slack) into a doc-sink buffer with greppable \"=== STAGE: <stage> (evt_<id> @ <ISO>) [word_base: N] ===\" section markers, then return only a handle + access instructions. Word offsets in the buffer are global; each marker's word_base + an atom's `position` gives the atom's global offset for a #words read. Read it via read-document (supports #lines/{a}-{b} and #words/{a}-{b} windowed reads) and search-documents (regex)."
+      "description": "Verbatim deal activity as a document handle or inline text. For #words reads add position to the stage marker word_base."
     },
     "search": {
       "type": "object",

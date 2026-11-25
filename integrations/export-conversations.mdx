@@ -1,0 +1,74 @@
+---
+title: "Export conversation data over HTTP"
+description: "Read deal activity, messages, current fields and field history from a scheduled job."
+---
+
+Use `POST https://api.mail.cedarcopilot.com/v1/conversations/read` to retrieve any data available through the [conversation-read tool](/reference/conversation-read) for your authorized conversations. Each request selects one read action. Choose `find` for current deal records, `timeline` for events and extracted field entries, or `field-evolution` for the history of a specific field. Use `get` with an event ID to inspect an individual source. The same read permissions and playbook filters apply over HTTP and MCP.
+
+## Connect your loader
+
+Authorize your loader as an OAuth client using Cedar's [OAuth sign-in and consent flow](/getting-started/quickstart#authentication-model). Request `crm:read` and `offline_access`. Keep the refresh token in your job's secret store and use the access token as the bearer credential. Cedar resolves the workspace and reader from that grant. The selected user must already be able to read the conversations you want to export.
+
+## Fetch newly ingested messages
+
+Replace `YOUR_PLAYBOOK_ID` with the ID of the playbook you want to read. Omit the time filter for an initial load of all eligible events Cedar currently holds. A connection or backfill can add older messages later.
+
+```bash
+curl --fail-with-body 'https://api.mail.cedarcopilot.com/v1/conversations/read' \
+  -H "Authorization: Bearer ${CEDAR_ACCESS_TOKEN}" \
+  -H 'Content-Type: application/json' \
+  --data '{
+    "action": "timeline",
+    "timeline": {
+      "conversationFilters": [
+        {"field": "aopId", "operator": "eq", "value": "YOUR_PLAYBOOK_ID"}
+      ],
+      "kinds": ["event"],
+      "eventTypes": ["email"],
+      "eventFilters": [
+        {"field": "ingestedAt", "operator": "gte", "value": "2026-01-01T00:00:00Z"}
+      ],
+      "orderBy": "ingestedAt",
+      "include": ["email.messageId", "email.from", "email.to", "email.cc", "email.subject", "email.body"]
+    }
+  }'
+```
+
+Use `ingestedAt` to include a December message first imported in January. Use the existing `from` and `to` bounds to filter by when the event occurred. To read meetings, set `eventTypes` to `["meeting"]` and omit the email projections. For a single meeting's content, pass its conversation and event IDs to `get` as `get.conversationId` and `get.expandEventId`.
+
+## Page, load and resume
+
+1. Read the rows in `timeline.entries`. Upsert email events by `eventId`. The optional `email` object contains the requested message fields. A missing stored body can be null.
+2. When `timeline.nextCursor` is present, put its value in `timeline.cursor` and repeat the same query. Save your progress after the warehouse write succeeds. A short page can still have a continuation.
+3. On the final page of an ingestion-ordered event query, save `timeline.checkpoint` after committing the rows, including when the result is empty. Use that value as `timeline.cursor` at the next scheduled run.
+4. Retry transient failures with the last committed cursor. The checkpoint rereads the previous five minutes, so the same event can arrive more than once. If a transaction becomes visible more than five minutes after its recorded ingestion time, restart from an earlier timestamp to reconcile that interval. Follow the OAuth refresh flow when an access token expires.
+
+HTTP defaults to 500 rows on paged reads. MCP defaults to 50 when you request paging. Set `pageSize` on the action to request another size. An ingestion checkpoint follows newly stored events. To refresh records after a deal changes playbooks, or reconcile removed records, start a fresh full read of the desired scope.
+
+## Read current fields or field history
+
+For the current status and next steps of each matching conversation, use the following request body. Add a configured scalar custom field as `wm_<fieldKey>` in `extraFields`. Continue with `find.cursor` while the result includes `find.nextCursor`.
+
+```json
+{
+  "action": "find",
+  "find": {
+    "filters": [{"field": "aopId", "operator": "eq", "value": "YOUR_PLAYBOOK_ID"}],
+    "extraFields": ["nextSteps"]
+  }
+}
+```
+
+To see how a field changed, use its configured field ID. Continue with `fieldEvolution.cursor` when the result includes `fieldEvolution.nextCursor`.
+
+```json
+{
+  "action": "field-evolution",
+  "fieldEvolution": {
+    "conversationFilters": [{"field": "aopId", "operator": "eq", "value": "YOUR_PLAYBOOK_ID"}],
+    "fieldId": "YOUR_FIELD_ID"
+  }
+}
+```
+
+The [action reference](/reference/conversation-read) also covers historical point-in-time values, field definitions, account and contact profiles, search, linked activity and verbatim source content.

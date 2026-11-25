@@ -421,6 +421,7 @@
                 "pages": [
                   "integrations/external-systems",
                   "integrations/custom-crm-data",
+                  "integrations/export-conversations",
                   "capabilities/systems",
                   {
                     "group": "Connections",
