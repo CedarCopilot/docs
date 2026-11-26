@@ -9,7 +9,7 @@ Use `POST https://api.mail.cedarcopilot.com/v1/conversations/read` to retrieve a
 
 ### Service account for a scheduled export
 
-Ask Cedar to provision a service account for your workspace. It has workspace administrator visibility and receives the `crm:read` OAuth scope. The HTTP export reads data. The same credential can also call the MCP actions available to that scope, including meeting sync, which can write activity to a deal. Save its client ID and secret in your job's secret manager. The loader authenticates as the workspace's service account, so nobody needs to sign in, including on the first run.
+Ask Cedar to provision a service account for your workspace. It has workspace administrator visibility. Tell Cedar which permissions your workspace admin approves. For an export, request `crm:read`. If the same pipeline sends custom events or field data, also authorize `crm:write`. The HTTP export reads data. The same credential can also call the MCP actions available to that scope, including meeting sync, which can write activity to a deal. Save its client ID and secret in your job's secret manager. The loader authenticates as the workspace's service account, so nobody needs to sign in, including on the first run.
 
 With the secret manager supplying `CEDAR_CLIENT_ID` and `CEDAR_CLIENT_SECRET`, run the following in Bash with `curl` and `jq` installed. It stores the bearer token in the current shell for the export example below.
 
@@ -24,6 +24,8 @@ CEDAR_ACCESS_TOKEN="$(
     jq -er '.access_token'
 )" || exit 1
 ```
+
+Use the narrowest token each job needs. The export job above requests `crm:read`. An ingestion job can exchange the same client ID and secret with `scope=crm:write` and use the resulting bearer to [submit custom CRM data](/integrations/custom-crm-data#send-a-test-occurrence). Request multiple approved scopes as a space-separated list. Omitting `scope` requests the client's full assigned grant. Cedar returns `invalid_scope` if any requested permission exceeds the grant. Contact Cedar to change the client’s approved permissions. Publishing a new definition through MCP requires separate approval for `crm:manage`.
 
 For the first run, use the token with the timeline request below and look for a message you recognize. The token response includes `expires_in` in seconds. Before expiry, repeat the exchange with the same client credentials. Keep the export checkpoint when you renew a token or rotate the secret. If the exchange returns `invalid_client`, check that your job has the latest secret and that the client is active. Contact Cedar to rotate the secret or revoke the client.
 

@@ -102,6 +102,8 @@ Use `expectedPreviousVersion: 0` for a new event. A successful publish returns t
 
 ### Send a test occurrence
 
+For a scheduled sender, ask Cedar to record your workspace admin's approval for `crm:write` on the service account. Exchange its client ID and secret for a bearer using the token request in the [service account guide](/integrations/export-conversations#service-account-for-a-scheduled-export), changing the scope to `crm:write`. Export and ingestion jobs can request separate tokens from the same client. Use the ingestion token as `CEDAR_ACCESS_TOKEN` in the example below. The same grant works for supported source-maintained list fields.
+
 Use a connection with an explicit `crm:write` OAuth grant belonging to an authorized owner or admin. Set `CEDAR_API_ORIGIN`, `CEDAR_ORG_ID`, `CEDAR_ACCOUNT_ID` and `CEDAR_EVENT_KEY` in your shell. Provide `CEDAR_ACCESS_TOKEN` through your development environment’s secret manager. For `job_change`, also set `CEDAR_CONTACT_ID` to the champion’s Cedar contact ID. For `website_visit`, set it only when the source identifies a person. Set `CEDAR_EVENT_VERSION` to the version returned by publication.
 
 The Python example uses only the standard library. Save it as `send_event.py` and run `python3 send_event.py`. Change the ID and timestamp when sending a distinct occurrence.
