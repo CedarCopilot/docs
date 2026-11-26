@@ -7,6 +7,30 @@ Use `POST https://api.mail.cedarcopilot.com/v1/conversations/read` to retrieve a
 
 ## Connect your loader
 
+### Service account for a scheduled export
+
+Ask Cedar to provision a service account for your workspace. It has workspace administrator visibility. Tell Cedar which permissions your workspace admin approves. For an export, request `crm:read`. If the same pipeline sends custom events or field data, also authorize `crm:write`. The HTTP export reads data. The same credential can also call the MCP actions available to that scope, including meeting sync, which can write activity to a deal. Save its client ID and secret in your job's secret manager. The loader authenticates as the workspace's service account, so nobody needs to sign in, including on the first run.
+
+With the secret manager supplying `CEDAR_CLIENT_ID` and `CEDAR_CLIENT_SECRET`, run the following in Bash with `curl` and `jq` installed. It stores the bearer token in the current shell for the export example below.
+
+```bash
+set -o pipefail
+CEDAR_ACCESS_TOKEN="$(
+  curl --silent --show-error --fail \
+    --user "${CEDAR_CLIENT_ID}:${CEDAR_CLIENT_SECRET}" \
+    --data 'grant_type=client_credentials' \
+    --data 'scope=crm:read' \
+    'https://api.mail.cedarcopilot.com/api/auth/mcp/token' |
+    jq -er '.access_token'
+)" || exit 1
+```
+
+Use the narrowest token each job needs. The export job above requests `crm:read`. An ingestion job can exchange the same client ID and secret with `scope=crm:write` and use the resulting bearer to [submit custom CRM data](/integrations/custom-crm-data#send-a-test-occurrence). Request multiple approved scopes as a space-separated list. Omitting `scope` requests the client's full assigned grant. Cedar returns `invalid_scope` if the scope contains only spaces or any requested permission exceeds the grant. Contact Cedar to change the client’s approved permissions. Publishing a new definition through MCP requires separate approval for `crm:manage`.
+
+For the first run, use the token with the timeline request below and look for a message you recognize. The token response includes `expires_in` in seconds. Before expiry, repeat the exchange with the same client credentials. Keep the export checkpoint when you renew a token or rotate the secret. If the exchange returns `invalid_client`, check that your job has the latest secret and that the client is active. Contact Cedar to rotate the secret or revoke the client.
+
+### OAuth sign-in for a user
+
 Authorize your loader as an OAuth client using Cedar's [OAuth sign-in and consent flow](/getting-started/quickstart#authentication-model). Request `crm:read` and `offline_access`. Keep the refresh token in your job's secret store and use the access token as the bearer credential. Cedar resolves the workspace and reader from that grant. The selected user must already be able to read the conversations you want to export.
 
 ## Fetch newly ingested messages
@@ -41,7 +65,7 @@ Use `ingestedAt` to include a December message first imported in January. Use th
 1. Read the rows in `timeline.entries`. Upsert email events by `eventId`. The optional `email` object contains the requested message fields. A missing stored body can be null.
 2. When `timeline.nextCursor` is present, put its value in `timeline.cursor` and repeat the same query. Save your progress after the warehouse write succeeds. A short page can still have a continuation.
 3. On the final page of an ingestion-ordered event query, save `timeline.checkpoint` after committing the rows, including when the result is empty. Use that value as `timeline.cursor` at the next scheduled run.
-4. Retry transient failures with the last committed cursor. The checkpoint rereads the previous five minutes, so the same event can arrive more than once. If a transaction becomes visible more than five minutes after its recorded ingestion time, restart from an earlier timestamp to reconcile that interval. Follow the OAuth refresh flow when an access token expires.
+4. Retry transient failures with the last committed cursor. The checkpoint rereads the previous five minutes, so the same event can arrive more than once. If a transaction becomes visible more than five minutes after its recorded ingestion time, restart from an earlier timestamp to reconcile that interval. For a service account, exchange the client credentials again when the token expires. For a user-authorized loader, use the OAuth refresh flow.
 
 HTTP defaults to 500 rows on paged reads. MCP defaults to 50 when you request paging. Set `pageSize` on the action to request another size. An ingestion checkpoint follows newly stored events. To refresh records after a deal changes playbooks, or reconcile removed records, start a fresh full read of the desired scope.
 
